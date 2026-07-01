@@ -406,18 +406,18 @@ export class TurnosService {
 - [x] Ajustar porta 8080 + prefixo `/api`
 
 ### Fase 2 — Autenticação
-- [ ] Login page (formulário email + senha)
-- [ ] `AuthService` com login, logout, refresh
-- [ ] `JwtInterceptor` para anexar token nas requisições
-- [ ] `AuthGuard` e `RoleGuard`
-- [ ] `TenantService` para contexto de empresa
-- [ ] Tratamento de token expirado (redirect /login?expired=true)
+- [x] Login page (formulário email + senha)
+- [x] `AuthService` com login, logout, refresh
+- [x] `JwtInterceptor` para anexar token nas requisições
+- [x] `AuthGuard` e `RoleGuard`
+- [x] `TenantService` para contexto de empresa
+- [x] Tratamento de token expirado (redirect /login?expired=true)
 
 ### Fase 3 — Dashboard
-- [ ] KPIs (cards com contagens: turnos ativos, alertas, check-ins/hora)
+- [x] KPIs (cards com contagens: turnos ativos, alertas, check-ins/hora)
 - [ ] Gráficos (ngx-charts ou Chart.js)
-- [ ] Lista de alertas recentes
-- [ ] Polling inicial (substituído por WebSocket na Fase 7)
+- [x] Lista de alertas recentes
+- [x] Polling inicial (substituído por WebSocket na Fase 7)
 
 ### Fase 4 — CRUDs Administrativos
 - [ ] Gestão de Postos (listar, criar, editar, inativar)
