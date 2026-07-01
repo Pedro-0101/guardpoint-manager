@@ -1,10 +1,40 @@
-import { Component } from '@angular/core';
-import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { map } from 'rxjs/operators';
+import { DashboardService } from './dashboard.service';
+
+import { KpiCard } from './components/kpi-card/kpi-card';
+import { AlertasRecentes } from './components/alertas-recentes/alertas-recentes';
+import { TurnosResumo } from './components/turnos-resumo/turnos-resumo';
+import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'gp-dashboard',
-  imports: [EmptyState],
+  imports: [AsyncPipe, KpiCard, AlertasRecentes, TurnosResumo, LoadingSpinner],
+  providers: [DashboardService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {}
+export class DashboardComponent implements OnInit, OnDestroy {
+  private readonly dashboardService = inject(DashboardService);
+
+  readonly loading$ = this.dashboardService.loading$;
+  readonly error$ = this.dashboardService.error$;
+  readonly summary$ = this.dashboardService.summary$;
+
+  readonly kpis$ = this.summary$.pipe(map((s) => s?.kpis ?? null));
+  readonly alertas$ = this.summary$.pipe(map((s) => s?.alertasRecentes ?? []));
+  readonly turnosPorPosto$ = this.summary$.pipe(map((s) => s?.turnosPorPosto ?? []));
+
+  ngOnInit(): void {
+    this.dashboardService.startPolling();
+  }
+
+  ngOnDestroy(): void {
+    this.dashboardService.stopPolling();
+  }
+
+  retry(): void {
+    this.dashboardService.refresh();
+  }
+}

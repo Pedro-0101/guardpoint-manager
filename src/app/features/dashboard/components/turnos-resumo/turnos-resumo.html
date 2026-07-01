@@ -1,0 +1,10 @@
+<div class="turnos-resumo">
+  <h3 class="turnos-resumo__title">Turnos por Posto</h3>
+  <div class="turnos-resumo__chart-wrapper">
+    @if (data().length === 0) {
+      <p class="turnos-resumo__empty">Nenhum turno ativo.</p>
+    } @else {
+      <canvas #chartCanvas></canvas>
+    }
+  </div>
+</div>

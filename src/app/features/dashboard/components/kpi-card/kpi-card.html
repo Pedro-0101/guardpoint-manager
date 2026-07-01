@@ -1,0 +1,9 @@
+<div class="kpi-card" [class]="'kpi-card--' + color()">
+  <div class="kpi-card__icon" aria-hidden="true">
+    <span class="material-symbols-outlined">{{ icon() }}</span>
+  </div>
+  <div class="kpi-card__content">
+    <span class="kpi-card__value">{{ value() }}</span>
+    <span class="kpi-card__label">{{ label() }}</span>
+  </div>
+</div>

@@ -1,0 +1,89 @@
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-fast);
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-sm);
+    flex-shrink: 0;
+
+    .material-symbols-outlined {
+      font-size: 28px;
+      font-variation-settings: 'FILL' 0;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  &__value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &--primary .kpi-card__icon {
+    background: #e8eaf6;
+    color: var(--color-primary);
+  }
+
+  &--primary .kpi-card__value {
+    color: var(--color-primary);
+  }
+
+  &--accent .kpi-card__icon {
+    background: #e0f2f1;
+    color: var(--color-accent-dark);
+  }
+
+  &--accent .kpi-card__value {
+    color: var(--color-accent-dark);
+  }
+
+  &--warn .kpi-card__icon {
+    background: #ffebee;
+    color: var(--color-warn);
+  }
+
+  &--warn .kpi-card__value {
+    color: var(--color-warn);
+  }
+
+  &--info .kpi-card__icon {
+    background: #e3f2fd;
+    color: #1565c0;
+  }
+
+  &--info .kpi-card__value {
+    color: #1565c0;
+  }
+}

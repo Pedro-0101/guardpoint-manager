@@ -1,0 +1,29 @@
+<div class="alertas-recentes">
+  <h3 class="alertas-recentes__title">Alertas Recentes</h3>
+
+  @if (alertas().length === 0) {
+    <p class="alertas-recentes__empty">Nenhum alerta recente.</p>
+  } @else {
+    <ul class="alertas-recentes__list">
+      @for (alerta of alertas(); track alerta.id) {
+        <li class="alertas-recentes__item">
+          <span class="alertas-recentes__tipo-icon material-symbols-outlined">
+            {{ tipoIcon(alerta.tipo) }}
+          </span>
+          <div class="alertas-recentes__info">
+            <span class="alertas-recentes__mensagem">{{ alerta.mensagem }}</span>
+            <span class="alertas-recentes__meta">
+              <span class="alertas-recentes__gravidade" [class]="gravidadeClass(alerta.gravidade)">
+                {{ gravidadeLabel(alerta.gravidade) }}
+              </span>
+              <span class="alertas-recentes__time">
+                {{ alerta.createdAt | date:'dd/MM HH:mm' }}
+              </span>
+            </span>
+          </div>
+          <gp-status-badge [status]="alerta.status" />
+        </li>
+      }
+    </ul>
+  }
+</div>

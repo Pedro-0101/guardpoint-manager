@@ -1,5 +1,57 @@
-<gp-empty-state
-  icon="dashboard"
-  title="Dashboard"
-  description="Visão geral de KPIs, gráficos e alertas recentes será implementada na Fase 3."
-/>
+<div class="dashboard">
+  <header class="dashboard__header">
+    <h1 class="dashboard__title">Dashboard</h1>
+  </header>
+
+  @if (loading$ | async) {
+    <div class="dashboard__loading">
+      <gp-loading-spinner message="Carregando dashboard..." />
+    </div>
+  } @else if (error$ | async; as errorMsg) {
+    <div class="dashboard__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="dashboard__retry-btn" (click)="retry()">Tentar novamente</button>
+    </div>
+  } @else {
+    <!-- KPIs -->
+    @if (kpis$ | async; as kpis) {
+      <section class="dashboard__kpis">
+        <gp-kpi-card
+          icon="groups"
+          [value]="kpis.turnosAtivos"
+          label="Turnos ativos"
+          color="primary"
+        />
+        <gp-kpi-card
+          icon="warning"
+          [value]="kpis.alertasAbertos"
+          label="Alertas abertos"
+          color="warn"
+        />
+        <gp-kpi-card
+          icon="check_circle"
+          [value]="kpis.checkinsUltimaHora"
+          label="Check-ins (última hora)"
+          color="accent"
+        />
+        <gp-kpi-card
+          icon="alt_route"
+          [value]="kpis.desviosRota"
+          label="Desvios de rota"
+          color="info"
+        />
+      </section>
+    }
+
+    <!-- Chart + Alertas -->
+    <section class="dashboard__grid">
+      @if (turnosPorPosto$ | async; as turnosPorPosto) {
+        <gp-turnos-resumo [data]="turnosPorPosto" />
+      }
+      @if (alertas$ | async; as alertas) {
+        <gp-alertas-recentes [alertas]="alertas" />
+      }
+    </section>
+  }
+</div>
