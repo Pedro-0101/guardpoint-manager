@@ -8,8 +8,9 @@ import { Component, input, output } from '@angular/core';
 })
 export class Header {
   toggleSidebar = output<void>();
+  logout = output<void>();
 
   userName = input('');
-  userRole = input('');
+  userRole = input<string | null>(null);
   notificationCount = input(0);
 }
