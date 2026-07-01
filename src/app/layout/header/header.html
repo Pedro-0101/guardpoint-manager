@@ -1,0 +1,28 @@
+<header class="header">
+  <button class="header__menu-btn" (click)="toggleSidebar.emit()">
+    <span class="material-symbols-outlined">menu</span>
+  </button>
+
+  <div class="header__spacer"></div>
+
+  <div class="header__actions">
+    <button class="header__icon-btn">
+      <span class="material-symbols-outlined">notifications</span>
+      @if (notificationCount() > 0) {
+        <span class="header__badge">{{ notificationCount() }}</span>
+      }
+    </button>
+
+    <div class="header__user">
+      <div class="header__avatar">
+        <span class="material-symbols-outlined">person</span>
+      </div>
+      <div class="header__user-info">
+        <span class="header__user-name">{{ userName() }}</span>
+        @if (userRole()) {
+          <span class="header__user-role">{{ userRole() }}</span>
+        }
+      </div>
+    </div>
+  </div>
+</header>

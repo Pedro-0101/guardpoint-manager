@@ -1,0 +1,125 @@
+.header {
+  display: flex;
+  align-items: center;
+  height: var(--header-height);
+  padding: 0 20px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.header__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-primary);
+  }
+}
+
+.header__spacer {
+  flex: 1;
+}
+
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header__icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--text-primary);
+  }
+}
+
+.header__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-warn);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header__user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 4px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.header__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  span {
+    font-size: 20px;
+  }
+}
+
+.header__user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.header__user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.header__user-role {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}

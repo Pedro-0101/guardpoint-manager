@@ -8,7 +8,7 @@ O `guardpoint-manager` é o painel web gerencial (frontend) da plataforma GuardP
 
 | Componente          | Tecnologia                                  |
 | ------------------- | ------------------------------------------- |
-| Framework           | Angular 17+                                 |
+| Framework           | Angular 21+                                 |
 | Linguagem           | TypeScript 5+                               |
 | Estado / Reativo    | RxJS (Observables, Subjects, BehaviorSubject) |
 | UI Components       | Angular Material ou PrimeNG                 |
@@ -397,10 +397,13 @@ export class TurnosService {
 
 ### Fase 1 — Fundação
 - [x] Scaffold do projeto Angular (`ng new`)
-- [ ] Configurar Angular Material
-- [ ] Tema base (paleta de cores, tipografia)
-- [ ] Layout shell: sidebar + toolbar + router-outlet
-- [ ] Configurar `ApiService` (HttpClient wrapper com base URL)
+- [x] Configurar Angular Material
+- [x] Tema base (paleta de cores, tipografia)
+- [x] Layout shell: sidebar + toolbar + router-outlet
+- [x] Configurar `ApiService` (HttpClient wrapper com base URL)
+- [x] Configurar ESLint + script lint
+- [x] Rota `/login` standalone (fora do MainLayout)
+- [x] Ajustar porta 8080 + prefixo `/api`
 
 ### Fase 2 — Autenticação
 - [ ] Login page (formulário email + senha)

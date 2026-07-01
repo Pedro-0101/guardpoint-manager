@@ -1,0 +1,35 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: 1fr;
+  height: 100%;
+  transition: grid-template-columns var(--transition-normal);
+
+  &.sidebar-collapsed {
+    grid-template-columns: var(--sidebar-collapsed-width) 1fr;
+  }
+}
+
+.layout__sidebar {
+  height: 100vh;
+}
+
+.layout__main {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.layout__content {
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg-content);
+  padding: 24px;
+}

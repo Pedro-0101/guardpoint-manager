@@ -1,0 +1,6 @@
+<div class="spinner" [style.--diameter]="diameter() + 'px'">
+  <div class="spinner__ring"></div>
+  @if (message()) {
+    <p class="spinner__message">{{ message() }}</p>
+  }
+</div>

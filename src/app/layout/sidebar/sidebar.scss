@@ -1,0 +1,112 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-sidebar);
+  color: var(--text-sidebar);
+  transition: width var(--transition-normal);
+  overflow: hidden;
+  width: var(--sidebar-width);
+
+  &.collapsed {
+    width: var(--sidebar-collapsed-width);
+  }
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  height: var(--header-height);
+  box-sizing: border-box;
+}
+
+.sidebar__logo {
+  flex-shrink: 0;
+}
+
+.sidebar__title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  letter-spacing: -0.02em;
+}
+
+.sidebar__nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--text-sidebar-muted);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--bg-sidebar-hover);
+    color: var(--text-sidebar);
+    text-decoration: none;
+  }
+
+  &--active {
+    background: var(--bg-sidebar-active);
+    color: var(--text-sidebar-active);
+  }
+}
+
+.sidebar__icon {
+  font-size: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.sidebar__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.sidebar__footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 8px;
+}
+
+.sidebar__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-sidebar-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--bg-sidebar-hover);
+    color: var(--text-sidebar);
+  }
+}

@@ -1,0 +1,38 @@
+<aside class="sidebar" [class.collapsed]="collapsed()">
+  <div class="sidebar__brand">
+    <div class="sidebar__logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="var(--color-primary-light)" />
+        <path d="M16 6L26 22H6L16 6Z" fill="white" opacity="0.9" />
+        <circle cx="16" cy="19" r="4" fill="white" />
+      </svg>
+    </div>
+    @if (!collapsed()) {
+      <span class="sidebar__title">GuardPoint</span>
+    }
+  </div>
+
+  <nav class="sidebar__nav">
+    @for (item of navItems; track item.route) {
+      <a
+        class="sidebar__link"
+        [routerLink]="item.route"
+        routerLinkActive="sidebar__link--active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+      >
+        <span class="sidebar__icon material-symbols-outlined">{{ item.icon }}</span>
+        @if (!collapsed()) {
+          <span class="sidebar__label">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar__footer">
+    <button class="sidebar__toggle" (click)="toggleSidebar.emit()">
+      <span class="material-symbols-outlined sidebar__icon">
+        {{ collapsed() ? 'chevron_right' : 'chevron_left' }}
+      </span>
+    </button>
+  </div>
+</aside>

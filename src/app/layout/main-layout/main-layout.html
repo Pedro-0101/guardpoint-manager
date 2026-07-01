@@ -1,0 +1,13 @@
+<div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
+  <gp-sidebar
+    class="layout__sidebar"
+    [collapsed]="sidebarCollapsed"
+    (toggleSidebar)="onToggleSidebar()"
+  />
+  <div class="layout__main">
+    <gp-header (toggleSidebar)="onToggleSidebar()" />
+    <div class="layout__content">
+      <router-outlet />
+    </div>
+  </div>
+</div>

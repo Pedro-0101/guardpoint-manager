@@ -21,11 +21,11 @@ Instruções e boas práticas para agentes de IA e desenvolvedores trabalhando n
 
 ## 2. Configuração do Ambiente
 
-- **Node.js**: 20 LTS
+- **Node.js**: 20 LTS+
 - **npm**: 10+ ou **pnpm** 9+
-- **Angular CLI**: 17+ (`npm i -g @angular/cli`)
-- **TypeScript**: 5.3+
-- **Angular**: 17+
+- **Angular CLI**: 21+ (`npm i -g @angular/cli`)
+- **TypeScript**: 5.9+
+- **Angular**: 21+
 
 ```bash
 npm install -g @angular/cli
