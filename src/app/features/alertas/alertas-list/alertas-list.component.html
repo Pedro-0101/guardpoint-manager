@@ -1,0 +1,224 @@
+<div class="list-page">
+  <header class="list-page__header">
+    <div>
+      <h1 class="list-page__title">Alertas</h1>
+      <p class="list-page__subtitle">Gerencie e monitore os alertas do sistema</p>
+    </div>
+    @if (coacaoCount() > 0) {
+      <div class="list-page__coacao-badge">
+        <mat-icon>warning</mat-icon>
+        <span>{{ coacaoCount() }} alerta(s) de coação ativo(s)</span>
+      </div>
+    }
+  </header>
+
+  <mat-tab-group
+    [selectedIndex]="activeTab()"
+    (selectedIndexChange)="onTabChange($event)"
+    animationDuration="0"
+  >
+    <mat-tab label="Lista">
+      @if (loading()) {
+        <div class="list-page__loading">
+          <gp-loading-spinner message="Carregando alertas..." />
+        </div>
+      } @else if (error(); as errorMsg) {
+        <div class="list-page__error">
+          <span class="material-symbols-outlined">error_outline</span>
+          <p>{{ errorMsg }}</p>
+          <button class="list-page__retry-btn" (click)="carregarAlertas()">Tentar novamente</button>
+        </div>
+      } @else {
+        <div class="list-page__toolbar">
+          <mat-form-field appearance="outline" class="list-page__search">
+            <mat-label>Buscar alerta</mat-label>
+            <input matInput [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
+            <mat-icon matPrefix>search</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="list-page__filter">
+            <mat-label>Tipo</mat-label>
+            <mat-select [formControl]="tipoControl">
+              @for (filtro of tipoFilters; track filtro.value) {
+                <mat-option [value]="filtro.value">
+                  <span class="list-page__filter-option">
+                    <mat-icon class="list-page__filter-icon">{{ filtro.icon }}</mat-icon>
+                    {{ filtro.label }}
+                  </span>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="list-page__filter">
+            <mat-label>Gravidade</mat-label>
+            <mat-select [formControl]="gravidadeControl">
+              @for (filtro of gravidadeFilters; track filtro.value) {
+                <mat-option [value]="filtro.value">{{ filtro.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="list-page__filter">
+            <mat-label>Status</mat-label>
+            <mat-select [formControl]="statusControl">
+              @for (filtro of statusFilters; track filtro.value) {
+                <mat-option [value]="filtro.value">{{ filtro.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        @if (filteredAlertas$ | async; as alertas) {
+          @if (alertas.length === 0) {
+            <gp-empty-state
+              icon="notifications_off"
+              title="Nenhum alerta encontrado"
+              [description]="
+                searchControl.value || tipoControl.value || gravidadeControl.value || statusControl.value
+                  ? 'Nenhum alerta corresponde aos filtros aplicados.'
+                  : 'Nenhum alerta registrado.'
+              "
+            />
+          } @else {
+            <div class="list-page__table-wrapper">
+              <table mat-table [dataSource]="alertas" class="list-page__table">
+                <ng-container matColumnDef="tipo">
+                  <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                  <td mat-cell *matCellDef="let alerta">
+                    <span class="list-page__tipo">
+                      <mat-icon
+                        class="list-page__tipo-icon"
+                        [class.list-page__tipo-icon--coacao]="isCoercaoAberto(alerta)"
+                        [matTooltip]="tipoLabel(alerta.tipo)"
+                      >
+                        {{ tipoIcon(alerta.tipo) }}
+                      </mat-icon>
+                      {{ tipoLabel(alerta.tipo) }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="gravidade">
+                  <th mat-header-cell *matHeaderCellDef>Gravidade</th>
+                  <td mat-cell *matCellDef="let alerta">
+                    <span
+                      class="list-page__gravidade"
+                      [class]="'list-page__gravidade--' + alerta.gravidade"
+                    >
+                      {{ gravidadeLabel(alerta.gravidade) }}
+                    </span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let alerta">
+                    <gp-status-badge [status]="alerta.status" />
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="mensagem">
+                  <th mat-header-cell *matHeaderCellDef>Mensagem</th>
+                  <td mat-cell *matCellDef="let alerta" class="list-page__mensagem-cell">
+                    {{ alerta.mensagem || '—' }}
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="data">
+                  <th mat-header-cell *matHeaderCellDef>Data</th>
+                  <td mat-cell *matCellDef="let alerta">{{ formatarData(alerta.createdAt) }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="acoes">
+                  <th mat-header-cell *matHeaderCellDef>Ações</th>
+                  <td mat-cell *matCellDef="let alerta" class="list-page__actions">
+                    @if (alerta.status === 'aberto') {
+                      <button
+                        mat-icon-button
+                        color="primary"
+                        (click)="confirmarReconhecer(alerta)"
+                        matTooltip="Reconhecer alerta"
+                        aria-label="Reconhecer alerta"
+                      >
+                        <mat-icon>check_circle</mat-icon>
+                      </button>
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="confirmarEncerrar(alerta)"
+                        matTooltip="Encerrar alerta"
+                        aria-label="Encerrar alerta"
+                      >
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    } @else if (alerta.status === 'reconhecido') {
+                      <button
+                        mat-icon-button
+                        color="warn"
+                        (click)="confirmarEncerrar(alerta)"
+                        matTooltip="Encerrar alerta"
+                        aria-label="Encerrar alerta"
+                      >
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                    } @else {
+                      <span class="list-page__acoes-empty">—</span>
+                    }
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: displayedColumns"
+                  [class.list-page__row--coacao]="isCoercaoAberto(row)"
+                ></tr>
+              </table>
+            </div>
+          }
+        }
+      }
+    </mat-tab>
+
+    <mat-tab label="Estatísticas">
+      <div class="list-page__stats">
+        @if (statsLoading()) {
+          <div class="list-page__loading">
+            <gp-loading-spinner message="Carregando estatísticas..." />
+          </div>
+        } @else {
+          <div class="list-page__stats-grid">
+            <div class="list-page__chart-card">
+              <h3 class="list-page__chart-title">Alertas por Tipo</h3>
+              <div class="list-page__chart-container">
+                <canvas #porTipoCanvas></canvas>
+              </div>
+            </div>
+
+            <div class="list-page__chart-card">
+              <h3 class="list-page__chart-title">Alertas por Gravidade</h3>
+              <div class="list-page__chart-container">
+                <canvas #porGravidadeCanvas></canvas>
+              </div>
+            </div>
+
+            <div class="list-page__chart-card">
+              <h3 class="list-page__chart-title">Alertas por Status</h3>
+              <div class="list-page__chart-container">
+                <canvas #porStatusCanvas></canvas>
+              </div>
+            </div>
+
+            <div class="list-page__chart-card list-page__chart-card--wide">
+              <h3 class="list-page__chart-title">Alertas por Hora (24h)</h3>
+              <div class="list-page__chart-container">
+                <canvas #porDiaCanvas></canvas>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

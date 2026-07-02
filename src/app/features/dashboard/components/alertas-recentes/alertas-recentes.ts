@@ -31,6 +31,7 @@ export class AlertasRecentes {
       atraso: 'schedule',
       ausencia: 'person_off',
       coacao: 'warning',
+      sabotagem: 'gpp_bad',
       bateria_baixa: 'battery_alert',
       fora_raio: 'location_off',
       sessao_expirada: 'timer_off',

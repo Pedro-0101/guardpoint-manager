@@ -1,7 +1,7 @@
 export interface Alerta {
   id: string;
   turnoId: string;
-  tipo: 'atraso' | 'ausencia' | 'coacao' | 'bateria_baixa' | 'fora_raio' | 'sessao_expirada';
+  tipo: 'atraso' | 'ausencia' | 'coacao' | 'sabotagem' | 'bateria_baixa' | 'fora_raio' | 'sessao_expirada';
   gravidade: 'baixa' | 'media' | 'alta' | 'critica';
   status: 'aberto' | 'reconhecido' | 'encerrado';
   mensagem: string;
