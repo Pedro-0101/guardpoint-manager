@@ -432,19 +432,19 @@ export class TurnosService {
 - [x] Status badges por estado do turno
 
 ### Fase 6 — Mapa Interativo
-- [ ] Integração Leaflet + OpenStreetMap
-- [ ] Renderização de pins dos vigias com turno ativo
-- [ ] Cores por status (verde, amarelo, vermelho, cinza)
-- [ ] Popup ao clicar no pin (dados resumidos, link para detalhe)
-- [ ] Polyline da rota no detalhe do turno
+- [x] Integração Leaflet + OpenStreetMap
+- [x] Renderização de pins dos vigias com turno ativo
+- [x] Cores por status (verde, amarelo, vermelho, cinza)
+- [x] Popup ao clicar no pin (dados resumidos, link para detalhe)
+- [x] Polyline da rota no detalhe do turno
 
 ### Fase 7 — WebSocket e Tempo Real
-- [ ] `WebSocketService` com RxJS `webSocket`
-- [ ] Lógica de reconexão com backoff
-- [ ] Atualização dos pins no mapa em tempo real (gps_update)
-- [ ] Atualização de status dos turnos (status_change)
-- [ ] Inserção de novos alertas na lista (new_alert)
-- [ ] Substituir polling do dashboard por dados em tempo real
+- [x] `WebSocketService` com RxJS `webSocket`
+- [x] Lógica de reconexão com backoff
+- [x] Atualização dos pins no mapa em tempo real (gps_update)
+- [x] Atualização de status dos turnos (status_change)
+- [x] Inserção de novos alertas na lista (new_alert)
+- [x] Substituir polling do dashboard por dados em tempo real
 
 ### Fase 8 — Alertas
 - [ ] Lista de alertas com filtros

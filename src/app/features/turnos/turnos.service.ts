@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
+import { WebSocketService } from '../../core/websocket/websocket.service';
+import { StatusChangePayload } from '../../core/websocket/websocket.types';
 import { Turno, TurnoComPosicao, TurnoDetalhe } from '../../core/models/turno.model';
 import { Checkin } from '../../core/models/checkin.model';
 import { Posto } from '../../core/models/posto.model';
@@ -68,6 +70,16 @@ interface UsuarioDto {
 @Injectable({ providedIn: 'root' })
 export class TurnosService {
   private readonly api = inject(ApiService);
+  private readonly ws = inject(WebSocketService);
+
+  private readonly turnosSubject = new BehaviorSubject<Turno[]>([]);
+  readonly turnosAtivos$ = this.turnosSubject.asObservable();
+
+  constructor() {
+    this.ws
+      .onEvent<StatusChangePayload>('status_change')
+      .subscribe((payload) => this.handleStatusChange(payload));
+  }
 
   listar(params?: {
     status?: string;
@@ -75,7 +87,13 @@ export class TurnosService {
   }): Observable<Turno[]> {
     return this.api
       .get<TurnoDto[]>('/turnos/ativos', params)
-      .pipe(map((dtos) => dtos.map((dto) => this.mapTurnoFromDto(dto))));
+      .pipe(
+        map((dtos) => {
+          const turnos = dtos.map((dto) => this.mapTurnoFromDto(dto));
+          this.turnosSubject.next(turnos);
+          return turnos;
+        }),
+      );
   }
 
   listarMapa(): Observable<TurnoComPosicao[]> {
@@ -92,6 +110,14 @@ export class TurnosService {
 
   revogarSessao(turnoId: string): Observable<RevogarSessaoResponse> {
     return this.api.post<RevogarSessaoResponse>(`/turnos/${turnoId}/revogar`, {});
+  }
+
+  private handleStatusChange(payload: StatusChangePayload): void {
+    const current = this.turnosSubject.value;
+    const updated = current.map((t) =>
+      t.id === payload.turnoId ? { ...t, status: payload.status } : t,
+    );
+    this.turnosSubject.next(updated);
   }
 
   private mapTurnoFromDto(dto: TurnoDto): Turno {

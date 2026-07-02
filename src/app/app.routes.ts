@@ -31,6 +31,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'mapa',
+        canActivate: [roleGuard(['admin', 'supervisor'])],
+        loadComponent: () =>
+          import('./features/mapa/mapa.component').then(
+            (m) => m.MapaComponent
+          ),
+      },
+      {
         path: 'turnos',
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>

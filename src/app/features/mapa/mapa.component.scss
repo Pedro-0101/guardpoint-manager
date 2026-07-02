@@ -1,0 +1,330 @@
+@use '../../../styles/variables' as v;
+
+:host {
+  display: block;
+  height: calc(100vh - var(--header-height));
+  margin: 0;
+}
+
+.mapa-page {
+  position: relative;
+  height: 100%;
+
+  &__overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: 12px 20px;
+    width: fit-content;
+    pointer-events: auto;
+  }
+
+  &__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  &__subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  &__legend {
+    display: flex;
+    gap: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 8px 16px;
+    width: fit-content;
+    pointer-events: auto;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+
+  &__legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+
+    &--verde {
+      background: #2e7d32;
+    }
+    &--amarelo {
+      background: #f57f17;
+    }
+    &--vermelho {
+      background: #c62828;
+    }
+    &--cinza {
+      background: #78909c;
+    }
+  }
+
+  &__error-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(198, 40, 40, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    padding: 10px 20px;
+    width: fit-content;
+    color: #ffffff;
+    font-size: 13px;
+    pointer-events: auto;
+
+    .material-symbols-outlined {
+      font-size: 20px;
+    }
+  }
+
+  &__retry-btn {
+    padding: 4px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  &__map-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  &__map {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__loading {
+    position: absolute;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(244, 246, 249, 0.85);
+    backdrop-filter: blur(4px);
+  }
+
+  &__empty-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    background: rgba(244, 246, 249, 0.95);
+    backdrop-filter: blur(4px);
+  }
+
+  &__refresh-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 20px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background: #f5f5f5;
+    }
+
+    .material-symbols-outlined {
+      font-size: 18px;
+    }
+  }
+}
+
+::ng-deep {
+  .mapa-pin-wrapper {
+    background: transparent !important;
+    border: none !important;
+  }
+
+  .mapa-pin {
+    position: relative;
+    width: 24px;
+    height: 24px;
+
+    &__dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--pin-color, #78909c);
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: transform var(--transition-fast);
+    }
+
+    &:hover .mapa-pin__dot {
+      transform: scale(1.2);
+    }
+  }
+
+  .mapa-pin__label {
+    position: absolute;
+    left: 30px;
+    top: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #212121;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+  }
+
+  .mapa-popup {
+    .leaflet-popup-content-wrapper {
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 0;
+    }
+
+    .leaflet-popup-content {
+      margin: 0;
+      width: auto !important;
+    }
+  }
+}
+
+.mapa-popup-content {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 220px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--dot-color, #78909c);
+    flex-shrink: 0;
+  }
+
+  &__info {
+    display: flex;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  &__label {
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 90px;
+  }
+
+  &__action {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color var(--transition-fast);
+
+    &:hover {
+      background: var(--color-primary-light);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .mapa-page {
+    &__overlay {
+      top: 8px;
+      left: 8px;
+      right: 8px;
+    }
+
+    &__header {
+      padding: 10px 16px;
+    }
+
+    &__title {
+      font-size: 16px;
+    }
+
+    &__subtitle {
+      font-size: 12px;
+    }
+
+    &__legend {
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 6px 12px;
+    }
+
+    &__legend-item {
+      font-size: 11px;
+    }
+  }
+}

@@ -1,14 +1,14 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Subject, timer } from 'rxjs';
-import { switchMap, takeUntil, finalize } from 'rxjs/operators';
+import { BehaviorSubject, Subject, merge } from 'rxjs';
+import { debounceTime, takeUntil, finalize } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
+import { WebSocketService } from '../../core/websocket/websocket.service';
 import { DashboardSummary } from './dashboard.types';
-
-const POLLING_INTERVAL_MS = 30000;
 
 @Injectable()
 export class DashboardService {
   private readonly api = inject(ApiService);
+  private readonly ws = inject(WebSocketService);
 
   private readonly destroy$ = new Subject<void>();
   private readonly summarySubject = new BehaviorSubject<DashboardSummary | null>(null);
@@ -22,19 +22,9 @@ export class DashboardService {
   startPolling(): void {
     this.loadingSubject.next(true);
 
-    timer(0, POLLING_INTERVAL_MS)
-      .pipe(
-        takeUntil(this.destroy$),
-        switchMap(() =>
-          this.api.get<DashboardSummary>('/dashboard/summary').pipe(
-            finalize(() => {
-              if (this.loadingSubject.value) {
-                this.loadingSubject.next(false);
-              }
-            })
-          )
-        )
-      )
+    this.api
+      .get<DashboardSummary>('/dashboard/summary')
+      .pipe(finalize(() => this.loadingSubject.next(false)))
       .subscribe({
         next: (data) => {
           this.summarySubject.next(data);
@@ -48,6 +38,13 @@ export class DashboardService {
           }
         },
       });
+
+    merge(
+      this.ws.onEvent('new_alert'),
+      this.ws.onEvent('status_change'),
+    )
+      .pipe(debounceTime(3000), takeUntil(this.destroy$))
+      .subscribe(() => this.fetchSummary());
   }
 
   stopPolling(): void {
@@ -57,16 +54,24 @@ export class DashboardService {
 
   refresh(): void {
     this.loadingSubject.next(true);
-    this.api.get<DashboardSummary>('/dashboard/summary').subscribe({
-      next: (data) => {
-        this.summarySubject.next(data);
-        this.loadingSubject.next(false);
-        this.errorSubject.next(null);
-      },
-      error: (err: Error) => {
-        this.loadingSubject.next(false);
-        this.errorSubject.next(err.message);
-      },
-    });
+    this.errorSubject.next(null);
+    this.fetchSummary();
+  }
+
+  private fetchSummary(): void {
+    this.api
+      .get<DashboardSummary>('/dashboard/summary')
+      .pipe(finalize(() => this.loadingSubject.next(false)))
+      .subscribe({
+        next: (data) => {
+          this.summarySubject.next(data);
+          this.errorSubject.next(null);
+        },
+        error: (err: Error) => {
+          if (!this.summarySubject.value) {
+            this.errorSubject.next(err.message);
+          }
+        },
+      });
   }
 }

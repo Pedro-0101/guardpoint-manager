@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
-import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { TurnosService } from '../turnos.service';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
@@ -58,8 +58,7 @@ export class TurnosListComponent implements OnInit, OnDestroy {
 
   readonly statusFilters = STATUS_FILTERS;
 
-  private readonly turnosSubject = new BehaviorSubject<Turno[]>([]);
-  readonly turnos$ = this.turnosSubject.asObservable();
+  readonly turnos$ = this.turnosService.turnosAtivos$;
 
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
@@ -118,8 +117,7 @@ export class TurnosListComponent implements OnInit, OnDestroy {
       .listar()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (turnos) => {
-          this.turnosSubject.next(turnos);
+        next: () => {
           this.loading.set(false);
         },
         error: (err) => {

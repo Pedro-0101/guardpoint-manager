@@ -23,3 +23,9 @@ export interface TurnoDetalhe extends Turno {
   usuario: Usuario | null;
   checkins: Checkin[];
 }
+
+export interface TurnoComPosicao extends Turno {
+  posto: Posto | null;
+  usuario: Usuario | null;
+  ultimoCheckin: Checkin | null;
+}
