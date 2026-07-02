@@ -1,0 +1,104 @@
+<h2 mat-dialog-title>{{ isEdit() ? 'Editar escala' : 'Nova escala' }}</h2>
+
+@if (loadingDeps()) {
+  <mat-dialog-content class="form__loading">
+    <mat-spinner diameter="32" />
+    <span>Carregando...</span>
+  </mat-dialog-content>
+} @else {
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <mat-dialog-content>
+      <mat-form-field appearance="outline" class="form__field">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" placeholder="Ex: Escala diurna" />
+        @if (form.controls.nome.invalid && form.controls.nome.touched) {
+          <mat-error>
+            @if (form.controls.nome.errors?.['required']) {
+              Nome é obrigatório.
+            } @else if (form.controls.nome.errors?.['minlength']) {
+              Mínimo de 3 caracteres.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form__field">
+        <mat-label>Posto</mat-label>
+        <mat-select formControlName="postoId">
+          @for (posto of postos(); track posto.id) {
+            <mat-option [value]="posto.id">{{ posto.nome }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
+          <mat-error>Posto é obrigatório.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form__field">
+        <mat-label>Vigia</mat-label>
+        <mat-select formControlName="vigiaId">
+          @for (vigia of vigias(); track vigia.id) {
+            <mat-option [value]="vigia.id">{{ vigia.nome }}</mat-option>
+          }
+        </mat-select>
+        @if (form.controls.vigiaId.invalid && form.controls.vigiaId.touched) {
+          <mat-error>Vigia é obrigatório.</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form__field">
+        <span class="form__label">Dias da semana</span>
+        <div class="form__dias">
+          @for (dia of diasSemana; track dia.value) {
+            <button type="button" class="form__dia" [class.form__dia--active]="isDiaSelecionado(dia.value)" (click)="toggleDia(dia.value)">
+              {{ dia.label }}
+            </button>
+          }
+        </div>
+        @if (form.controls.diasSemana.invalid && form.controls.diasSemana.touched) {
+          <span class="form__error">Selecione pelo menos um dia.</span>
+        }
+      </div>
+
+      <div class="form__row">
+        <mat-form-field appearance="outline" class="form__field">
+          <mat-label>Hora início</mat-label>
+          <input matInput type="time" formControlName="horaInicio" />
+          @if (form.controls.horaInicio.invalid && form.controls.horaInicio.touched) {
+            <mat-error>
+              @if (form.controls.horaInicio.errors?.['required']) {
+                Hora início é obrigatória.
+              } @else {
+                Formato inválido (HH:mm).
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form__field">
+          <mat-label>Hora fim</mat-label>
+          <input matInput type="time" formControlName="horaFim" />
+          @if (form.controls.horaFim.invalid && form.controls.horaFim.touched) {
+            <mat-error>
+              @if (form.controls.horaFim.errors?.['required']) {
+                Hora fim é obrigatória.
+              } @else {
+                Formato inválido (HH:mm).
+              }
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button type="button" mat-button mat-dialog-close [disabled]="loading()">Cancelar</button>
+      <button type="submit" mat-flat-button color="primary" [disabled]="loading()">
+        @if (loading()) {
+          <mat-spinner diameter="20" />
+        }
+        {{ isEdit() ? 'Salvar' : 'Criar' }}
+      </button>
+    </mat-dialog-actions>
+  </form>
+}

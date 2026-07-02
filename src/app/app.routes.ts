@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard } from './core/auth/auth.guard';
+import { featureEscalasGuard } from './core/auth/feature.guard';
 
 export const routes: Routes = [
   {
@@ -26,6 +27,28 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent
+          ),
+      },
+      {
+        path: 'postos',
+        loadComponent: () =>
+          import('./features/postos/postos-list.component').then(
+            (m) => m.PostosListComponent
+          ),
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./features/usuarios/usuarios-list.component').then(
+            (m) => m.UsuariosListComponent
+          ),
+      },
+      {
+        path: 'escalas',
+        canActivate: [featureEscalasGuard], // TODO(F8): remover guard quando /api/escalas existir
+        loadComponent: () =>
+          import('./features/escalas/escalas-list.component').then(
+            (m) => m.EscalasListComponent
           ),
       },
     ],

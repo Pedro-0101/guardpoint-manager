@@ -420,10 +420,10 @@ export class TurnosService {
 - [x] Polling inicial (substituído por WebSocket na Fase 7)
 
 ### Fase 4 — CRUDs Administrativos
-- [ ] Gestão de Postos (listar, criar, editar, inativar)
-- [ ] Gestão de Usuários (listar, criar, editar, inativar)
-- [ ] Gestão de Escalas (listar, criar, editar, excluir)
-- [ ] Validações de formulário (required, patterns, etc.)
+- [x] Gestão de Postos (listar, criar, editar, inativar) — inativar usa DELETE (soft-delete no server)
+- [x] Gestão de Usuários (listar, criar, editar, inativar) — inativar usa DELETE (soft-delete no server); payload envia "cargo"
+- [ ] Gestão de Escalas — REPRESADA aguardando Fase 8 do server (feature flag `featureEscalas: false`)
+- [x] Validações de formulário (required, patterns, etc.)
 
 ### Fase 5 — Monitoramento de Turnos
 - [ ] Lista de turnos ativos com filtros

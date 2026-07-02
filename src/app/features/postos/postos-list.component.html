@@ -1,0 +1,87 @@
+<div class="list-page">
+  <header class="list-page__header">
+    <div>
+      <h1 class="list-page__title">Postos</h1>
+      <p class="list-page__subtitle">Gerencie os postos de trabalho</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="abrirFormulario()">
+      <mat-icon>add</mat-icon>
+      Novo posto
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <gp-loading-spinner message="Carregando postos..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="list-page__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="list-page__retry-btn" (click)="carregarPostos()">Tentar novamente</button>
+    </div>
+  } @else {
+    <div class="list-page__toolbar">
+      <mat-form-field appearance="outline" class="list-page__search">
+        <mat-label>Buscar posto</mat-label>
+        <input matInput [formControl]="searchControl" placeholder="Nome do posto..." />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    @if (filteredPostos$ | async; as postos) {
+      @if (postos.length === 0) {
+        <gp-empty-state
+          icon="location_off"
+          title="Nenhum posto encontrado"
+          [description]="searchControl.value ? 'Nenhum posto corresponde à busca.' : 'Nenhum posto cadastrado.'"
+        />
+      } @else {
+        <div class="list-page__table-wrapper">
+          <table mat-table [dataSource]="postos" class="list-page__table">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef>Nome</th>
+              <td mat-cell *matCellDef="let posto">{{ posto.nome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="geo">
+              <th mat-header-cell *matHeaderCellDef>Coordenadas</th>
+              <td mat-cell *matCellDef="let posto">
+                {{ posto.latitude }}, {{ posto.longitude }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="raio">
+              <th mat-header-cell *matHeaderCellDef>Raio (m)</th>
+              <td mat-cell *matCellDef="let posto">{{ posto.raioM }}m</td>
+            </ng-container>
+
+            <ng-container matColumnDef="ativo">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let posto">
+                <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef>Ações</th>
+              <td mat-cell *matCellDef="let posto" class="list-page__actions">
+                <button mat-icon-button color="primary" (click)="abrirFormulario(posto)" aria-label="Editar posto">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                @if (posto.ativo) {
+                  <button mat-icon-button color="warn" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
+                    <mat-icon>block</mat-icon>
+                  </button>
+                }
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+      }
+    }
+  }
+</div>

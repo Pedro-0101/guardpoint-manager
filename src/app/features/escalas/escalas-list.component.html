@@ -1,0 +1,93 @@
+<div class="list-page">
+  <header class="list-page__header">
+    <div>
+      <h1 class="list-page__title">Escalas</h1>
+      <p class="list-page__subtitle">Gerencie as escalas de trabalho</p>
+    </div>
+    <button mat-flat-button color="primary" (click)="abrirFormulario()">
+      <mat-icon>add</mat-icon>
+      Nova escala
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <gp-loading-spinner message="Carregando escalas..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="list-page__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="list-page__retry-btn" (click)="carregarEscalas()">Tentar novamente</button>
+    </div>
+  } @else {
+    <div class="list-page__toolbar">
+      <mat-form-field appearance="outline" class="list-page__search">
+        <mat-label>Buscar escala</mat-label>
+        <input matInput [formControl]="searchControl" placeholder="Nome, posto ou vigia..." />
+        <mat-icon matPrefix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    @if (filteredEscalas$ | async; as escalas) {
+      @if (escalas.length === 0) {
+        <gp-empty-state
+          icon="event_busy"
+          title="Nenhuma escala encontrada"
+          [description]="searchControl.value ? 'Nenhuma escala corresponde à busca.' : 'Nenhuma escala cadastrada.'"
+        />
+      } @else {
+        <div class="list-page__table-wrapper">
+          <table mat-table [dataSource]="escalas" class="list-page__table">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef>Nome</th>
+              <td mat-cell *matCellDef="let escala">{{ escala.nome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="posto">
+              <th mat-header-cell *matHeaderCellDef>Posto</th>
+              <td mat-cell *matCellDef="let escala">{{ escala.postoNome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="vigia">
+              <th mat-header-cell *matHeaderCellDef>Vigia</th>
+              <td mat-cell *matCellDef="let escala">{{ escala.vigiaNome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dias">
+              <th mat-header-cell *matHeaderCellDef>Dias</th>
+              <td mat-cell *matCellDef="let escala">{{ formatarDias(escala.diasSemana) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="horario">
+              <th mat-header-cell *matHeaderCellDef>Horário</th>
+              <td mat-cell *matCellDef="let escala">{{ formatarHorario(escala.horaInicio, escala.horaFim) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="ativo">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let escala">
+                <gp-status-badge [status]="escala.ativo ? 'ativo' : 'cancelado'" />
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef>Ações</th>
+              <td mat-cell *matCellDef="let escala" class="list-page__actions">
+                <button mat-icon-button color="primary" (click)="abrirFormulario(escala)" aria-label="Editar escala">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="confirmarExclusao(escala)" aria-label="Excluir escala">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+      }
+    }
+  }
+</div>

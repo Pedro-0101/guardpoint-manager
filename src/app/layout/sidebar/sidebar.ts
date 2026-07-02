@@ -1,5 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 interface NavItem {
   label: string;
@@ -17,7 +18,7 @@ export class Sidebar {
   collapsed = input(false);
   toggleSidebar = output<void>();
 
-  navItems: NavItem[] = [
+  private readonly allItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
     { label: 'Mapa', icon: 'map', route: '/mapa' },
     { label: 'Turnos', icon: 'schedule', route: '/turnos' },
@@ -28,4 +29,11 @@ export class Sidebar {
     { label: 'Relatórios', icon: 'assessment', route: '/relatorios' },
     { label: 'Configurações', icon: 'settings', route: '/configuracoes' },
   ];
+
+  navItems = this.allItems.filter((item) => {
+    if (item.route === '/escalas' && !environment.featureEscalas) {
+      return false; // TODO(F8): reabilitar quando /api/escalas existir
+    }
+    return true;
+  });
 }
