@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
-import { Turno, TurnoDetalhe } from '../../core/models/turno.model';
+import { Turno, TurnoComPosicao, TurnoDetalhe } from '../../core/models/turno.model';
 import { Checkin } from '../../core/models/checkin.model';
 import { Posto } from '../../core/models/posto.model';
 import { Usuario } from '../../core/models/usuario.model';
@@ -27,6 +27,7 @@ interface TurnoDto {
   posto?: PostoDto;
   usuario?: UsuarioDto;
   checkins?: CheckinDto[];
+  ultimo_checkin?: CheckinDto;
 }
 
 interface CheckinDto {
@@ -75,6 +76,12 @@ export class TurnosService {
     return this.api
       .get<TurnoDto[]>('/turnos/ativos', params)
       .pipe(map((dtos) => dtos.map((dto) => this.mapTurnoFromDto(dto))));
+  }
+
+  listarMapa(): Observable<TurnoComPosicao[]> {
+    return this.api
+      .get<TurnoDto[]>('/turnos/ativos')
+      .pipe(map((dtos) => dtos.map((dto) => this.mapTurnoComPosicaoFromDto(dto))));
   }
 
   obter(id: string): Observable<TurnoDetalhe> {
@@ -153,5 +160,29 @@ export class TurnosService {
       usuario: dto.usuario ? this.mapUsuarioFromDto(dto.usuario) : null,
       checkins: (dto.checkins ?? []).map((c) => this.mapCheckinFromDto(c)),
     };
+  }
+
+  private mapTurnoComPosicaoFromDto(dto: TurnoDto): TurnoComPosicao {
+    const ultimoCheckin = dto.ultimo_checkin
+      ? this.mapCheckinFromDto(dto.ultimo_checkin)
+      : this.derivarUltimoCheckin(dto.checkins ?? []);
+
+    return {
+      ...this.mapTurnoFromDto(dto),
+      posto: dto.posto ? this.mapPostoFromDto(dto.posto) : null,
+      usuario: dto.usuario ? this.mapUsuarioFromDto(dto.usuario) : null,
+      ultimoCheckin,
+    };
+  }
+
+  private derivarUltimoCheckin(dtos: CheckinDto[]): Checkin | null {
+    if (dtos.length === 0) return null;
+    const checkins = dtos.map((c) => this.mapCheckinFromDto(c));
+    return checkins.reduce((a, b) =>
+      new Date(a.timestampCriacao).getTime() >
+      new Date(b.timestampCriacao).getTime()
+        ? a
+        : b,
+    );
   }
 }
