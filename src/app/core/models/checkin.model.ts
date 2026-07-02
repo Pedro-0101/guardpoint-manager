@@ -3,8 +3,9 @@ export interface Checkin {
   turnoId: string;
   latitude: number;
   longitude: number;
-  precisao: number;
-  tipo: 'inicio' | 'periodico' | 'fim' | 'manual';
-  timestamp: string;
-  createdAt: string;
+  timestampCriacao: string;
+  timestampRecebimento: string;
+  tipoSenha: 'padrao' | 'coacao' | 'finalizacao' | 'sabotagem';
+  flagGeofence: 'ok' | 'desvio_rota';
+  origemRede: 'online' | 'offline_sincronizado';
 }

@@ -1,0 +1,64 @@
+<div class="revogar-dialog">
+  <h2 class="revogar-dialog__title">
+    <span class="material-symbols-outlined revogar-dialog__icon">warning</span>
+    Revogar Sessão
+  </h2>
+
+  @if (resultado(); as res) {
+    <div class="revogar-dialog__result">
+      <p class="revogar-dialog__result-text">
+        Sessão do vigia <strong>{{ turno.usuarioNome }}</strong> foi revogada.
+      </p>
+      <div class="revogar-dialog__pin-box">
+        <span class="revogar-dialog__pin-label">PIN para novo dispositivo</span>
+        <strong class="revogar-dialog__pin-value">{{ res.pin_novo_dispositivo }}</strong>
+      </div>
+      <p class="revogar-dialog__pin-info">
+        Válido por {{ res.validade_minutos }} minutos.
+      </p>
+    </div>
+  } @else {
+    @if (!resultado()) {
+      <div class="revogar-dialog__body">
+        <p>
+          Tem certeza que deseja revogar a sessão do vigia
+          <strong>{{ turno.usuarioNome }}</strong> no posto
+          <strong>{{ turno.postoNome }}</strong>?
+        </p>
+        <p class="revogar-dialog__warning">
+          Esta ação encerrará o turno atual e gerará um PIN temporário para
+          um novo dispositivo.
+        </p>
+      </div>
+
+      @if (erro(); as errorMsg) {
+        <div class="revogar-dialog__error">
+          <span class="material-symbols-outlined">error</span>
+          {{ errorMsg }}
+        </div>
+      }
+    }
+  }
+
+  <div class="revogar-dialog__actions">
+    @if (resultado()) {
+      <button mat-flat-button color="primary" (click)="fechar()">Fechar</button>
+    } @else {
+      <button mat-stroked-button [disabled]="revogando()" (click)="fechar()">
+        Cancelar
+      </button>
+      <button
+        mat-flat-button
+        color="warn"
+        [disabled]="revogando()"
+        (click)="revogar()"
+      >
+        @if (revogando()) {
+          <mat-spinner diameter="20" class="revogar-dialog__spinner" />
+        } @else {
+          Revogar Sessão
+        }
+      </button>
+    }
+  </div>
+</div>

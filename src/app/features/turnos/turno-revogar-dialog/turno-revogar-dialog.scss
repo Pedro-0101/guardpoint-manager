@@ -1,0 +1,115 @@
+.revogar-dialog {
+  padding: 8px 0;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  &__icon {
+    font-size: 28px;
+    color: #f57f17;
+  }
+
+  &__body {
+    margin-bottom: 16px;
+
+    p {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--text-primary);
+      line-height: 1.5;
+    }
+  }
+
+  &__warning {
+    font-size: 13px;
+    color: #f57f17;
+    background: #fff8e1;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #f57f17;
+    line-height: 1.4;
+  }
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 6px;
+    background: #ffebee;
+    color: #c62828;
+    font-size: 13px;
+    margin-bottom: 16px;
+
+    .material-symbols-outlined {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+  }
+
+  &__result {
+    margin-bottom: 20px;
+
+    &-text {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin: 0 0 8px;
+    }
+  }
+
+  &__pin-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 20px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    border: 2px dashed #2e7d32;
+    margin-bottom: 12px;
+  }
+
+  &__pin-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  &__pin-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #2e7d32;
+    letter-spacing: 8px;
+    font-family: monospace;
+  }
+
+  &__pin-info {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    text-align: center;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding-top: 8px;
+  }
+
+  &__spinner {
+    display: inline-block;
+  }
+}
+
+::ng-deep .revogar-dialog__spinner circle {
+  stroke: white !important;
+}

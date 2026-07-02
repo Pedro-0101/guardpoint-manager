@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard } from './core/auth/auth.guard';
+import { roleGuard } from './core/auth/role.guard';
 import { featureEscalasGuard } from './core/auth/feature.guard';
 
 export const routes: Routes = [
@@ -27,6 +28,22 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent
+          ),
+      },
+      {
+        path: 'turnos',
+        canActivate: [roleGuard(['admin', 'supervisor'])],
+        loadComponent: () =>
+          import('./features/turnos/turnos-list/turnos-list.component').then(
+            (m) => m.TurnosListComponent
+          ),
+      },
+      {
+        path: 'turnos/:id',
+        canActivate: [roleGuard(['admin', 'supervisor'])],
+        loadComponent: () =>
+          import('./features/turnos/turno-detail/turno-detail').then(
+            (m) => m.TurnoDetailComponent
           ),
       },
       {

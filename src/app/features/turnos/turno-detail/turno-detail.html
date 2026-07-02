@@ -1,0 +1,149 @@
+<div class="detail-page">
+  @if (loading()) {
+    <div class="detail-page__loading">
+      <gp-loading-spinner message="Carregando detalhes do turno..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="detail-page__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="detail-page__retry-btn" (click)="voltar()">Voltar para turnos</button>
+    </div>
+  } @else if (turno(); as turno) {
+    <header class="detail-page__header">
+      <button mat-icon-button (click)="voltar()" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="detail-page__header-info">
+        <h1 class="detail-page__title">
+          Turno de {{ turno.usuarioNome }}
+        </h1>
+        <span class="detail-page__subtitle">
+          {{ turno.postoNome }}
+        </span>
+      </div>
+      <div class="detail-page__header-status">
+        <gp-status-badge [status]="turno.status" />
+      </div>
+    </header>
+
+    <div class="detail-page__grid">
+      <section class="detail-page__info">
+        <h2 class="detail-page__section-title">Informações do Turno</h2>
+        <div class="detail-page__info-grid">
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Vigia</span>
+            <span class="detail-page__info-value">{{ turno.usuarioNome }}</span>
+          </div>
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Posto</span>
+            <span class="detail-page__info-value">{{ turno.postoNome }}</span>
+          </div>
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Status</span>
+            <span class="detail-page__info-value">
+              <gp-status-badge [status]="turno.status" />
+            </span>
+          </div>
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Início Previsto</span>
+            <span class="detail-page__info-value">{{ formatarData(turno.inicioPrevisto) }}</span>
+          </div>
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Fim Previsto</span>
+            <span class="detail-page__info-value">{{ formatarData(turno.fimPrevisto) }}</span>
+          </div>
+          @if (turno.inicioReal) {
+            <div class="detail-page__info-item">
+              <span class="detail-page__info-label">Início Real</span>
+              <span class="detail-page__info-value">{{ formatarData(turno.inicioReal) }}</span>
+            </div>
+          }
+          @if (turno.fimReal) {
+            <div class="detail-page__info-item">
+              <span class="detail-page__info-label">Fim Real</span>
+              <span class="detail-page__info-value">{{ formatarData(turno.fimReal) }}</span>
+            </div>
+          }
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Criado em</span>
+            <span class="detail-page__info-value">{{ formatarData(turno.createdAt) }}</span>
+          </div>
+        </div>
+
+        @if (isAdmin && (turno.status === 'em_andamento' || turno.status === 'pausado')) {
+          <div class="detail-page__admin-actions">
+            <button mat-flat-button color="warn" (click)="abrirRevogarDialog()">
+              <mat-icon>block</mat-icon>
+              Revogar Sessão
+            </button>
+          </div>
+        }
+      </section>
+
+      <section class="detail-page__map-section">
+        <h2 class="detail-page__section-title">Rota do Vigia</h2>
+        @if (checkins.length > 0) {
+          <div class="detail-page__map-wrapper">
+            <div #mapContainer class="detail-page__map"></div>
+          </div>
+          <p class="detail-page__map-hint">
+            <span class="material-symbols-outlined detail-page__map-legend-icon detail-page__map-legend-icon--start"></span>
+            Início
+            <span class="material-symbols-outlined detail-page__map-legend-icon detail-page__map-legend-icon--end"></span>
+            Último
+            <span class="material-symbols-outlined detail-page__map-legend-icon detail-page__map-legend-icon--middle"></span>
+            Intermediário
+          </p>
+        } @else {
+          <div class="detail-page__map-empty">
+            <span class="material-symbols-outlined">map_off</span>
+            <p>Nenhum check-in registrado para este turno.</p>
+          </div>
+        }
+      </section>
+    </div>
+
+    <section class="detail-page__timeline-section">
+      <h2 class="detail-page__section-title">
+        Timeline de Check-ins
+        <span class="detail-page__timeline-count">{{ timeline().length }} registros</span>
+      </h2>
+
+      @if (timeline().length > 0) {
+        <div class="detail-page__timeline">
+          @for (entry of timeline(); track entry.checkin.id) {
+            <div class="detail-page__timeline-item">
+              <div
+                class="detail-page__timeline-marker"
+                [style.--marker-color]="entry.color"
+              >
+                <span class="material-symbols-outlined">{{ entry.icon }}</span>
+              </div>
+              <div class="detail-page__timeline-content">
+                <div class="detail-page__timeline-header">
+                  <span class="detail-page__timeline-type">{{ entry.label }}</span>
+                  <span class="detail-page__timeline-time">
+                    {{ formatarDataHora(entry.checkin.timestampCriacao) }}
+                  </span>
+                </div>
+                <div class="detail-page__timeline-details">
+                  <span class="detail-page__timeline-coord">
+                    <span class="material-symbols-outlined">location_on</span>
+                    {{ formatarCoordenada(entry.checkin.latitude, entry.checkin.longitude) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        <gp-empty-state
+          icon="timeline"
+          title="Nenhum check-in encontrado"
+          description="Este turno ainda não possui check-ins registrados."
+        />
+      }
+    </section>
+  }
+</div>

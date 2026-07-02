@@ -426,10 +426,10 @@ export class TurnosService {
 - [x] Validações de formulário (required, patterns, etc.)
 
 ### Fase 5 — Monitoramento de Turnos
-- [ ] Lista de turnos ativos com filtros
-- [ ] Detalhe do turno (timeline de check-ins, rota no mini-mapa)
-- [ ] Ação "Revogar Sessão" (admin)
-- [ ] Status badges por estado do turno
+- [x] Lista de turnos ativos com filtros
+- [x] Detalhe do turno (timeline de check-ins, rota no mini-mapa)
+- [x] Ação "Revogar Sessão" (admin)
+- [x] Status badges por estado do turno
 
 ### Fase 6 — Mapa Interativo
 - [ ] Integração Leaflet + OpenStreetMap
