@@ -65,7 +65,7 @@
     transition: background-color var(--transition-fast);
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--bg-hover);
     }
   }
 
@@ -100,7 +100,7 @@
     transition: background-color var(--transition-fast);
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: var(--bg-hover);
     }
   }
 

@@ -33,10 +33,10 @@ interface TimelineEntry {
 }
 
 const TIPO_CHECKIN_MAP: Record<string, { icon: string; label: string; color: string }> = {
-  padrao: { icon: 'lucideClock', label: 'Check-in padrão', color: '#1565c0' },
-  coacao: { icon: 'lucideTriangleAlert', label: 'Check-in de coação', color: '#c62828' },
-  finalizacao: { icon: 'lucideCircleStop', label: 'Finalização', color: '#546e7a' },
-  sabotagem: { icon: 'lucideShieldAlert', label: 'Sabotagem', color: '#e65100' },
+  padrao: { icon: 'lucideClock', label: 'Check-in padrão', color: 'var(--color-info)' },
+  coacao: { icon: 'lucideTriangleAlert', label: 'Check-in de coação', color: 'var(--color-destructive)' },
+  finalizacao: { icon: 'lucideCircleStop', label: 'Finalização', color: 'var(--text-secondary)' },
+  sabotagem: { icon: 'lucideShieldAlert', label: 'Sabotagem', color: 'var(--color-warn)' },
 };
 
 @Component({

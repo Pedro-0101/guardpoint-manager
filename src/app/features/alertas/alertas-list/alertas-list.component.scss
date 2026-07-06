@@ -63,10 +63,10 @@
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: #ffebee;
-    border: 1px solid #ef9a9a;
+    background: color-mix(in oklch, var(--color-destructive), transparent 88%);
+    border: 1px solid color-mix(in oklch, var(--color-destructive), transparent 50%);
     border-radius: var(--radius-sm);
-    color: #c62828;
+    color: var(--color-destructive);
     font-size: 13px;
     font-weight: 600;
     animation: pulse-coacao 1.5s ease-in-out infinite;
@@ -114,7 +114,7 @@
     transition: background-color var(--transition-fast);
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--bg-hover);
     }
   }
 
@@ -173,7 +173,7 @@
     color: var(--text-secondary);
 
     &--coacao {
-      color: #c62828;
+      color: var(--color-destructive);
       animation: pulse-coacao 1s ease-in-out infinite;
     }
   }
@@ -187,23 +187,24 @@
     letter-spacing: 0.5px;
 
     &--baixa {
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: color-mix(in oklch, var(--color-accent-dark), transparent 85%);
+      color: var(--color-accent-dark);
     }
 
     &--media {
-      background: #fff3e0;
-      color: #e65100;
+      background: color-mix(in oklch, var(--color-warn), transparent 85%);
+      color: var(--color-warn);
     }
 
     &--alta {
-      background: #fce4ec;
-      color: #c62828;
+      background: color-mix(in oklch, var(--color-destructive), transparent 85%);
+      color: var(--color-destructive);
     }
 
     &--critica {
-      background: #ffebee;
-      color: #b71c1c;
+      background: color-mix(in oklch, var(--color-destructive), transparent 70%);
+      color: var(--color-destructive);
+      border: 1px solid color-mix(in oklch, var(--color-destructive), transparent 40%);
     }
   }
 
@@ -226,11 +227,11 @@
   }
 
   &__row--coacao {
-    background: #fff5f5 !important;
+    background: color-mix(in oklch, var(--color-destructive), transparent 93%) !important;
     animation: pulse-row 2s ease-in-out infinite;
 
     &:hover {
-      background: #ffebee !important;
+      background: color-mix(in oklch, var(--color-destructive), transparent 85%) !important;
     }
   }
 
@@ -281,10 +282,10 @@
 @keyframes pulse-row {
   0%,
   100% {
-    background-color: #fff5f5;
+    background-color: color-mix(in oklch, var(--color-destructive), transparent 93%);
   }
   50% {
-    background-color: #ffebee;
+    background-color: color-mix(in oklch, var(--color-destructive), transparent 85%);
   }
 }
 

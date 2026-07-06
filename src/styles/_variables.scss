@@ -11,20 +11,38 @@
   --transition-normal: 250ms ease;
   --transition-slow: 350ms ease;
 
-  --color-primary-light: color-mix(in oklch, var(--color-primary), white 30%);
-  --color-primary-dark: color-mix(in oklch, var(--color-primary), black 40%);
+  /* Tailwind v4's `@theme inline` only emits a --color-* custom property at
+     runtime when some utility class actually needs the indirection (e.g. an
+     opacity modifier like bg-primary/90). Every other --color-* name is
+     inlined away and never exists as a real property. Everything below must
+     therefore reference the raw tokens declared in styles.css (:root/.dark),
+     never the --color-* aliases, or it silently resolves to nothing. */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-light: color-mix(in oklch, var(--primary), white 30%);
+  --color-primary-dark: color-mix(in oklch, var(--primary), black 40%);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-warn: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-accent-dark: var(--success);
+  --color-info: var(--info);
+  --color-text: var(--foreground);
+  --color-text-secondary: var(--muted-foreground);
 
-  --bg-sidebar-hover: color-mix(in oklch, var(--color-sidebar), var(--color-sidebar-accent) 50%);
-  --text-sidebar-muted: color-mix(in oklch, var(--color-sidebar-foreground) 60%, transparent);
+  --bg-sidebar-hover: color-mix(in oklch, var(--sidebar), var(--sidebar-accent) 50%);
+  --text-sidebar-muted: color-mix(in oklch, var(--sidebar-foreground) 60%, transparent);
 
-  --bg-content: var(--color-background);
-  --bg-header: var(--color-background);
-  --bg-card: var(--color-card);
-  --bg-sidebar: var(--color-sidebar);
-  --bg-sidebar-active: var(--color-sidebar-primary);
-  --text-primary: var(--color-foreground);
-  --text-secondary: var(--color-muted-foreground);
-  --text-sidebar: var(--color-sidebar-foreground);
-  --text-sidebar-active: var(--color-sidebar-primary-foreground);
-  --border-color: var(--color-border);
+  --bg-content: var(--background);
+  --bg-header: var(--background);
+  --bg-card: var(--card);
+  --bg-sidebar: var(--sidebar);
+  --bg-sidebar-active: var(--sidebar-primary);
+  --text-primary: var(--foreground);
+  --text-secondary: var(--muted-foreground);
+  --text-sidebar: var(--sidebar-foreground);
+  --text-sidebar-active: var(--sidebar-primary-foreground);
+  --border-color: var(--border);
+  --border-sidebar: var(--sidebar-border);
+  --bg-hover: var(--accent);
 }

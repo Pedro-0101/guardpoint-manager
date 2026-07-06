@@ -13,7 +13,7 @@
 
   &__icon {
     font-size: 28px;
-    color: #f57f17;
+    color: var(--color-warn);
   }
 
   &__body {
@@ -29,11 +29,11 @@
 
   &__warning {
     font-size: 13px;
-    color: #f57f17;
-    background: #fff8e1;
+    color: var(--color-warn);
+    background: color-mix(in oklch, var(--color-warn), transparent 88%);
     padding: 8px 12px;
     border-radius: 6px;
-    border-left: 3px solid #f57f17;
+    border-left: 3px solid var(--color-warn);
     line-height: 1.4;
   }
 
@@ -43,8 +43,8 @@
     gap: 8px;
     padding: 12px;
     border-radius: 6px;
-    background: #ffebee;
-    color: #c62828;
+    background: color-mix(in oklch, var(--color-destructive), transparent 88%);
+    color: var(--color-destructive);
     font-size: 13px;
     margin-bottom: 16px;
 
@@ -70,9 +70,9 @@
     align-items: center;
     gap: 4px;
     padding: 20px;
-    background: #e8f5e9;
+    background: color-mix(in oklch, var(--color-accent-dark), transparent 88%);
     border-radius: 8px;
-    border: 2px dashed #2e7d32;
+    border: 2px dashed var(--color-accent-dark);
     margin-bottom: 12px;
   }
 
@@ -86,7 +86,7 @@
   &__pin-value {
     font-size: 32px;
     font-weight: 700;
-    color: #2e7d32;
+    color: var(--color-accent-dark);
     letter-spacing: 8px;
     font-family: monospace;
   }

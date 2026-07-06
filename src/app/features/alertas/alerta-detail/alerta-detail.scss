@@ -44,7 +44,7 @@
     transition: background-color var(--transition-fast);
 
     &:hover {
-      background: #f5f5f5;
+      background: var(--bg-hover);
     }
   }
 
@@ -75,7 +75,7 @@
     color: var(--text-secondary);
 
     &--coacao {
-      color: #c62828;
+      color: var(--color-destructive);
       animation: pulse-coacao 1s ease-in-out infinite;
     }
   }

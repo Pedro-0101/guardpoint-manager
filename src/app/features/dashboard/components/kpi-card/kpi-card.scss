@@ -52,7 +52,7 @@
   }
 
   &--primary .kpi-card__icon {
-    background: #e8eaf6;
+    background: color-mix(in oklch, var(--color-primary), transparent 88%);
     color: var(--color-primary);
   }
 
@@ -61,7 +61,7 @@
   }
 
   &--accent .kpi-card__icon {
-    background: #e0f2f1;
+    background: color-mix(in oklch, var(--color-accent-dark), transparent 88%);
     color: var(--color-accent-dark);
   }
 
@@ -70,7 +70,7 @@
   }
 
   &--warn .kpi-card__icon {
-    background: #ffebee;
+    background: color-mix(in oklch, var(--color-warn), transparent 88%);
     color: var(--color-warn);
   }
 
@@ -79,11 +79,11 @@
   }
 
   &--info .kpi-card__icon {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: color-mix(in oklch, var(--color-info), transparent 88%);
+    color: var(--color-info);
   }
 
   &--info .kpi-card__value {
-    color: #1565c0;
+    color: var(--color-info);
   }
 }

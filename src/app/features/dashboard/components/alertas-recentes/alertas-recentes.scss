@@ -38,7 +38,7 @@
     transition: background-color var(--transition-fast);
 
     &:hover {
-      background: #fafafa;
+      background: var(--bg-hover);
     }
   }
 
@@ -80,23 +80,24 @@
     letter-spacing: 0.5px;
 
     &--baixa {
-      background: #e8f5e9;
-      color: #2e7d32;
+      background: color-mix(in oklch, var(--color-accent-dark), transparent 85%);
+      color: var(--color-accent-dark);
     }
 
     &--media {
-      background: #fff3e0;
-      color: #e65100;
+      background: color-mix(in oklch, var(--color-warn), transparent 85%);
+      color: var(--color-warn);
     }
 
     &--alta {
-      background: #fce4ec;
-      color: #c62828;
+      background: color-mix(in oklch, var(--color-destructive), transparent 85%);
+      color: var(--color-destructive);
     }
 
     &--critica {
-      background: #ffebee;
-      color: #b71c1c;
+      background: color-mix(in oklch, var(--color-destructive), transparent 70%);
+      color: var(--color-destructive);
+      border: 1px solid color-mix(in oklch, var(--color-destructive), transparent 40%);
     }
   }
 
