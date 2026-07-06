@@ -1,21 +1,25 @@
 import { Injectable } from '@angular/core';
-import { toast } from 'ngx-sonner';
+import { toast, type ExternalToast } from 'ngx-sonner';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
-  success(message: string): void {
-    toast.success(message);
+  success(message: string, options?: ExternalToast): void {
+    toast.success(message, options);
   }
 
-  error(message: string): void {
-    toast.error(message);
+  error(message: string, options?: ExternalToast): void {
+    toast.error(message, options);
   }
 
-  warning(message: string): void {
-    toast(message);
+  warning(message: string, options?: ExternalToast): void {
+    toast.warning(message, options);
   }
 
-  info(message: string): void {
-    toast(message, { description: message });
+  info(message: string, options?: ExternalToast): void {
+    toast.info(message, options);
+  }
+
+  show(message: string, options?: ExternalToast): void {
+    toast(message, options);
   }
 }
