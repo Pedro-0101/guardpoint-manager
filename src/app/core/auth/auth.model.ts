@@ -3,6 +3,8 @@ export interface LoginRequest {
   senha: string;
 }
 
+export type LogoutReason = 'user' | 'expired';
+
 export interface AuthResponse {
   access_token: string;
   refresh_token: string;
