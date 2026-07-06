@@ -6,6 +6,14 @@
   <div class="header__spacer"></div>
 
   <div class="header__actions">
+    <button class="header__icon-btn" (click)="toggleTheme()" [attr.title]="theme() === 'light' ? 'Modo escuro' : 'Modo claro'">
+      @if (theme() === 'light') {
+        <ng-icon name="lucideMoon" />
+      } @else {
+        <ng-icon name="lucideSun" />
+      }
+    </button>
+
     <button class="header__icon-btn">
       <ng-icon name="lucideBell" />
       @if (notificationCount() > 0) {

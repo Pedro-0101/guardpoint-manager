@@ -18,7 +18,6 @@
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
     "@angular/forms": "^21.2.0",
-
     "@angular/platform-browser": "^21.2.0",
     "@angular/router": "^21.2.0",
     "@ng-icons/core": "^33.3.0",
@@ -34,6 +33,7 @@
     "ngx-sonner": "^3.1.0",
     "rxjs": "~7.8.0",
     "tailwindcss": "^4.3.2",
+    "tailwindcss-animate": "^1.0.7",
     "tslib": "^2.3.0"
   },
   "devDependencies": {
