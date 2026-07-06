@@ -1,0 +1,63 @@
+<div class="settings-page">
+  <gp-config-nav />
+
+  <header class="settings-page__header">
+    <div>
+      <h1 class="settings-page__title">Configurações gerais</h1>
+      <p class="settings-page__subtitle">Dados e preferências da empresa</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="settings-page__loading">
+      <gp-loading-spinner message="Carregando configurações..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="settings-page__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="settings-page__retry-btn" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="settings-form">
+      <mat-form-field appearance="outline" class="settings-form__field">
+        <mat-label>Nome da empresa</mat-label>
+        <input matInput formControlName="nome" placeholder="Razão social ou nome fantasia" />
+        @if (form.controls.nome.invalid && form.controls.nome.touched) {
+          <mat-error>
+            @if (form.controls.nome.errors?.['required']) {
+              Nome é obrigatório.
+            } @else {
+              Máximo de 255 caracteres.
+            }
+          </mat-error>
+        }
+      </mat-form-field>
+
+      <div class="settings-form__row">
+        <div class="settings-form__readonly">
+          <span class="settings-form__readonly-label">CNPJ</span>
+          <span class="settings-form__readonly-value">{{ empresa()?.cnpj }}</span>
+        </div>
+
+        <div class="settings-form__readonly">
+          <span class="settings-form__readonly-label">Status</span>
+          <gp-status-badge [status]="empresa()?.ativa ? 'ativo' : 'cancelado'" />
+        </div>
+      </div>
+
+      <mat-slide-toggle formControlName="alertaSonoro" class="settings-form__toggle">
+        Tocar som de alerta em coação
+      </mat-slide-toggle>
+
+      <div class="settings-form__actions">
+        <button type="submit" mat-flat-button color="primary" [disabled]="saving() || form.invalid">
+          @if (saving()) {
+            <mat-spinner diameter="20" />
+          }
+          Salvar
+        </button>
+      </div>
+    </form>
+  }
+</div>

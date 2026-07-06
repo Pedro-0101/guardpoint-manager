@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { BehaviorSubject, Observable, map, of, tap } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
@@ -6,6 +6,7 @@ import { WebSocketService } from '../../core/websocket/websocket.service';
 import { NewAlertPayload } from '../../core/websocket/websocket.types';
 import { NotificationService } from '../../core/services/notification.service';
 import { Alerta } from '../../core/models/alerta.model';
+import { ConfiguracoesService } from '../configuracoes/configuracoes.service';
 
 export interface AlertasFiltros {
   tipo?: Alerta['tipo'];
@@ -87,6 +88,7 @@ export class AlertasService {
   private readonly api = inject(ApiService);
   private readonly ws = inject(WebSocketService);
   private readonly notification = inject(NotificationService);
+  private readonly configuracoesService = inject(ConfiguracoesService);
 
   private readonly alertasSubject = new BehaviorSubject<Alerta[]>([]);
   readonly alertas$ = this.alertasSubject.asObservable();
@@ -98,6 +100,8 @@ export class AlertasService {
   );
 
   private audioContext: AudioContext | null = null;
+  /** Liga por padrão (comportamento atual) até a config real da empresa carregar. */
+  private readonly alertaSonoroHabilitado = signal(true);
 
   constructor() {
     this.ws
@@ -107,6 +111,13 @@ export class AlertasService {
     // Popula a lista assim que o serviço é instanciado (ver MainLayout), para que o
     // badge de alertas abertos já reflita o estado real logo após o login.
     this.carregarLista();
+
+    // Preferência de som fica em `/empresa`; falha silenciosamente enquanto essa rota
+    // não existir no backend, mantendo o som ligado (comportamento atual).
+    this.configuracoesService.obterEmpresa().subscribe({
+      next: (empresa) => this.alertaSonoroHabilitado.set(empresa.alertaSonoro),
+      error: () => void 0,
+    });
   }
 
   listar(filtros?: AlertasFiltros): Observable<Alerta[]> {
@@ -234,7 +245,7 @@ export class AlertasService {
     this.alertasSubject.next([alerta, ...current]);
 
     if (tipo === 'coacao') {
-      this.tocarSomCoacao();
+      if (this.alertaSonoroHabilitado()) this.tocarSomCoacao();
       this.notification.error('🚨 Alerta de coação detectado! Verifique o turno imediatamente.', true);
     }
   }

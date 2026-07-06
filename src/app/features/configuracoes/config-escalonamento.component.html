@@ -1,0 +1,123 @@
+<div class="list-page">
+  <gp-config-nav />
+
+  <header class="list-page__header">
+    <div>
+      <h1 class="list-page__title">Escalonamento de alertas</h1>
+      <p class="list-page__subtitle">
+        Configure os níveis de atraso e os destinatários notificados via WhatsApp
+      </p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <div class="list-page__loading">
+      <gp-loading-spinner message="Carregando níveis de escalonamento..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="list-page__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="list-page__retry-btn" (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else {
+    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+      @if (niveisArray.length === 0) {
+        <gp-empty-state
+          icon="list_alt"
+          title="Nenhum nível de escalonamento configurado"
+          description="Adicione um nível para começar a notificar atrasos via WhatsApp."
+        />
+      } @else {
+        <div class="niveis">
+          @for (nivel of niveisArray.controls; track $index) {
+            <div class="niveis__row" [formGroup]="nivel">
+              <mat-form-field appearance="outline" class="niveis__field niveis__field--small">
+                <mat-label>Nível</mat-label>
+                <input matInput type="number" formControlName="nivel" min="1" max="5" />
+                @if (nivelDuplicado($index)) {
+                  <mat-hint>Nível repetido em outra linha.</mat-hint>
+                }
+                @if (nivel.controls.nivel.invalid && nivel.controls.nivel.touched) {
+                  <mat-error>
+                    @if (nivel.controls.nivel.errors?.['required']) {
+                      Nível é obrigatório.
+                    } @else {
+                      Nível deve estar entre 1 e 5.
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="niveis__field">
+                <mat-label>Atraso (minutos)</mat-label>
+                <input matInput type="number" formControlName="atrasoMinutos" min="1" max="1440" />
+                @if (nivel.controls.atrasoMinutos.invalid && nivel.controls.atrasoMinutos.touched) {
+                  <mat-error>
+                    @if (nivel.controls.atrasoMinutos.errors?.['required']) {
+                      Atraso é obrigatório.
+                    } @else {
+                      Valor deve estar entre 1 e 1440 minutos.
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="niveis__field">
+                <mat-label>WhatsApp</mat-label>
+                <input
+                  matInput
+                  formControlName="whatsappPara"
+                  placeholder="Ex: 5511999999999"
+                />
+                @if (nivel.controls.whatsappPara.invalid && nivel.controls.whatsappPara.touched) {
+                  <mat-error>
+                    @if (nivel.controls.whatsappPara.errors?.['required']) {
+                      WhatsApp é obrigatório.
+                    } @else if (nivel.controls.whatsappPara.errors?.['maxlength']) {
+                      Máximo de 20 caracteres.
+                    } @else {
+                      Informe um número válido (10 a 15 dígitos).
+                    }
+                  </mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="niveis__field">
+                <mat-label>Cargo alvo</mat-label>
+                <input matInput formControlName="cargoAlvo" placeholder="Ex: Supervisor" />
+                @if (nivel.controls.cargoAlvo.invalid && nivel.controls.cargoAlvo.touched) {
+                  <mat-error>Máximo de 50 caracteres.</mat-error>
+                }
+              </mat-form-field>
+
+              <button
+                type="button"
+                mat-icon-button
+                color="warn"
+                (click)="removerNivel($index)"
+                aria-label="Remover nível"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="niveis__actions">
+        <button type="button" mat-stroked-button [disabled]="niveisArray.length >= 5" (click)="adicionarNivel()">
+          <mat-icon>add</mat-icon>
+          Adicionar nível
+        </button>
+
+        <button type="submit" mat-flat-button color="primary" [disabled]="saving() || form.invalid">
+          @if (saving()) {
+            <mat-spinner diameter="20" />
+          }
+          Salvar
+        </button>
+      </div>
+    </form>
+  }
+</div>

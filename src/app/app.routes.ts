@@ -92,6 +92,22 @@ export const routes: Routes = [
             (m) => m.EscalasListComponent
           ),
       },
+      {
+        path: 'configuracoes',
+        canActivate: [roleGuard(['admin'])],
+        loadComponent: () =>
+          import('./features/configuracoes/config-geral.component').then(
+            (m) => m.ConfigGeralComponent
+          ),
+      },
+      {
+        path: 'configuracoes/escalonamento',
+        canActivate: [roleGuard(['admin'])],
+        loadComponent: () =>
+          import('./features/configuracoes/config-escalonamento.component').then(
+            (m) => m.ConfigEscalonamentoComponent
+          ),
+      },
     ],
   },
 ];

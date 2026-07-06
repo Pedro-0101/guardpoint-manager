@@ -46,7 +46,7 @@ export class UsuariosFormComponent implements OnInit {
   form = this.fb.nonNullable.group({
     nome: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
-    senha: ['', [Validators.minLength(6)]],
+    senha: ['', [Validators.minLength(5)]],
     cargo: ['vigia' as Usuario['cargo'], [Validators.required]],
     ativo: [true],
   });

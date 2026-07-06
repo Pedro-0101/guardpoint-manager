@@ -453,9 +453,9 @@ export class TurnosService {
 - [x] Estatísticas e gráficos de alertas
 
 ### Fase 9 — Configurações e Escalonamento
-- [ ] Tela de configuração de níveis de escalonamento
-- [ ] CRUD dinâmico de níveis (adicionar/remover linhas)
-- [ ] Configurações gerais da empresa
+- [x] Tela de configuração de níveis de escalonamento
+- [x] CRUD dinâmico de níveis (adicionar/remover linhas)
+- [x] Configurações gerais da empresa
 
 ### Fase 10 — Relatórios e Histórico
 - [ ] Histórico de turnos com filtros (data, posto, vigia)

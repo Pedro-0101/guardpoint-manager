@@ -1,0 +1,22 @@
+<nav mat-tab-nav-bar [tabPanel]="tabPanel" class="config-nav">
+  <a
+    mat-tab-link
+    routerLink="/configuracoes"
+    routerLinkActive
+    #geral="routerLinkActive"
+    [routerLinkActiveOptions]="{ exact: true }"
+    [active]="geral.isActive"
+  >
+    Geral
+  </a>
+  <a
+    mat-tab-link
+    routerLink="/configuracoes/escalonamento"
+    routerLinkActive
+    #escalonamento="routerLinkActive"
+    [active]="escalonamento.isActive"
+  >
+    Escalonamento
+  </a>
+</nav>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
