@@ -17,7 +17,9 @@ import { checkboxVariants } from './checkbox.variants';
       (click)="toggle()"
     >
       @if (checked()) {
-        <span class="material-symbols-outlined text-current" style="font-size:14px;width:14px;height:14px;">check</span>
+        <svg class="size-3.5" viewBox="0 0 16 16" fill="none">
+          <path d="M13.5 4L6 12L2.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       }
     </button>
   `,

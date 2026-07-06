@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
 export function mergeClasses(...inputs: ClassValue[]): string {
-  return clsx(inputs);
+  return twMerge(clsx(inputs));
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function

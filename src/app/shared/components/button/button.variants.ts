@@ -18,6 +18,9 @@ export const buttonVariants = cva(
         lg: 'h-10 rounded-md px-8',
         icon: 'size-9',
       },
+      zFull: {
+        true: 'w-full',
+      },
     },
     defaultVariants: {
       zType: 'default',

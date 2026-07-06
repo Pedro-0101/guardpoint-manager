@@ -1,103 +1,50 @@
-<div class="login">
-  <div class="login__container">
-    <div z-card class="login__card">
-      <div class="login__header">
-        <div class="login__logo">
-          <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="8" fill="var(--color-primary)" />
-            <path d="M16 6L26 22H6L16 6Z" fill="white" opacity="0.9" />
-            <circle cx="16" cy="19" r="4" fill="white" />
-          </svg>
-        </div>
-        <h1 class="login__title">GuardPoint</h1>
-        <p class="login__subtitle">Painel Gerencial</p>
+<div class="flex min-h-screen flex-col lg:flex-row">
+  <div class="flex flex-1 items-center justify-center bg-background p-4 sm:p-8">
+    <div class="w-full max-w-md space-y-6 sm:space-y-8">
+      <div class="text-center">
+        <h1 class="text-2xl font-bold sm:text-3xl">GuardPoint</h1>
+        <p class="mt-2 text-sm text-muted-foreground sm:text-base">Painel Gerencial</p>
       </div>
 
-      <div class="login__content">
-        @if (expiredSession()) {
-          <z-alert zType="destructive" zTitle="Sua sessão expirou. Faça login novamente." class="mb-4" />
+      <z-card class="p-4 sm:p-6 lg:p-8">
+        @if (loginError(); as error) {
+          <div class="mb-4 rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+            {{ error }}
+          </div>
         }
 
-        @if (loginError()) {
-          <z-alert zType="destructive" [zTitle]="loginError()!" class="mb-4" />
-        }
+        <form [formGroup]="loginForm" (ngSubmit)="submit()" class="space-y-4 sm:space-y-6">
+          <z-form-field>
+            <z-form-label [zRequired]="true">Email</z-form-label>
+            <z-form-control>
+              <input z-input type="email" formControlName="email" placeholder="seu@email.com" class="w-full" />
+            </z-form-control>
+          </z-form-field>
 
-        <form [formGroup]="form" (ngSubmit)="submit()" class="login__form" novalidate>
-          <div class="login__field">
-            <label class="login__label" for="email">Email</label>
-            <div class="login__input-wrapper">
-              <ng-icon name="lucideMail" class="login__input-icon" />
-              <input
-                id="email"
-                z-input
-                type="email"
-                formControlName="email"
-                placeholder="seu@email.com"
-                autocomplete="email"
-                [class.login__input--error]="emailControl.invalid && emailControl.touched"
-              />
+          <z-form-field>
+            <div class="flex items-center justify-between">
+              <z-form-label [zRequired]="true">Senha</z-form-label>
+              <a z-button zType="link" class="p-0" href="#">Esqueceu a senha?</a>
             </div>
-            @if (emailControl.invalid && emailControl.touched) {
-              <p class="login__error">
-                @if (emailControl.errors?.['required']) {
-                  Email é obrigatório.
-                } @else if (emailControl.errors?.['email']) {
-                  Email inválido.
-                }
-              </p>
-            }
+            <z-form-control>
+              <input z-input type="password" formControlName="senha" placeholder="••••••••" class="w-full" />
+            </z-form-control>
+          </z-form-field>
+
+          <div class="flex items-center gap-2">
+            <z-checkbox id="remember" formControlName="rememberMe"></z-checkbox>
+            <label for="remember" class="text-sm cursor-pointer select-none">Lembrar-me por 30 dias</label>
           </div>
 
-          <div class="login__field">
-            <label class="login__label" for="senha">Senha</label>
-            <div class="login__input-wrapper">
-              <ng-icon name="lucideLock" class="login__input-icon" />
-              <input
-                id="senha"
-                z-input
-                [type]="hidePassword() ? 'password' : 'text'"
-                formControlName="senha"
-                placeholder="Sua senha"
-                autocomplete="current-password"
-                [class.login__input--error]="senhaControl.invalid && senhaControl.touched"
-              />
-              <button
-                type="button"
-                z-button
-                zType="ghost"
-                zSize="icon"
-                class="login__visibility-btn"
-                (click)="hidePassword.set(!hidePassword())"
-                [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
-              >
-                <ng-icon [name]="hidePassword() ? 'lucideEyeOff' : 'lucideEye'" />
-              </button>
-            </div>
-            @if (senhaControl.invalid && senhaControl.touched) {
-              <p class="login__error">
-                @if (senhaControl.errors?.['required']) {
-                  Senha é obrigatória.
-                } @else if (senhaControl.errors?.['minlength']) {
-                  Mínimo de 6 caracteres.
-                }
-              </p>
-            }
-          </div>
-
-          <z-checkbox formControlName="rememberMe" class="login__remember">
-            Lembrar-me
-          </z-checkbox>
-
-          <button type="submit" z-button class="login__submit" [zDisabled]="loading()">
-            @if (loading()) {
-              <span class="login__spinner"></span>
-              <span class="login__submit-text">Entrando...</span>
-            } @else {
-              <span class="login__submit-text">Entrar</span>
-            }
-          </button>
+          <button type="submit" z-button [zFull]="true" [zLoading]="isLoading()" [disabled]="isLoading()">Entrar</button>
         </form>
-      </div>
+      </z-card>
+
+      <p class="text-center text-sm text-muted-foreground">
+        Não tem uma conta?
+        <a z-button zType="link" href="#" class="px-0">Cadastre-se</a>
+      </p>
     </div>
   </div>
+  <aside class="hidden flex-1 items-center justify-center bg-muted p-8 lg:flex"></aside>
 </div>

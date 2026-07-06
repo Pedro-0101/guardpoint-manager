@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 
 export const cardVariants = cva(
-  'rounded-xl border bg-card text-card-foreground shadow-sm',
+  'block rounded-xl border bg-card text-card-foreground shadow-sm',
   {
     variants: {
       zType: {

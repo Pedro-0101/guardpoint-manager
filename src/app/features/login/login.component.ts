@@ -1,77 +1,73 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { NgIcon } from '@ng-icons/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
-import { ZardCardComponent } from '@/shared/components/card/card.component';
-import { ZardInputDirective } from '@/shared/components/input/input.directive';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
+import { ZardInputDirective } from '@/shared/components/input/input.directive';
+import { ZardFormFieldComponent, ZardFormLabelComponent, ZardFormControlComponent } from '@/shared/components/form/form.component';
 
 @Component({
   selector: 'gp-login',
+  standalone: true,
   imports: [
     ReactiveFormsModule,
-    NgIcon,
-    ZardAlertComponent,
-    ZardCardComponent,
-    ZardInputDirective,
     ZardButtonComponent,
+    ZardCardComponent,
     ZardCheckboxComponent,
+    ZardInputDirective,
+    ZardFormFieldComponent,
+    ZardFormLabelComponent,
+    ZardFormControlComponent,
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly notification = inject(NotificationService);
 
-  readonly loading = signal(false);
-  readonly hidePassword = signal(true);
-  readonly loginError = signal<string | null>(null);
-  readonly expiredSession = signal(false);
+  protected readonly isLoading = signal(false);
+  protected readonly loginError = signal<string | null>(null);
 
-  form = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
-    senha: ['', [Validators.required, Validators.minLength(6)]],
-    rememberMe: [false],
+  protected readonly loginForm = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    senha: new FormControl('', [Validators.required, Validators.minLength(6)]),
+    rememberMe: new FormControl(false),
   });
 
   constructor() {
     this.route.queryParams.subscribe((params) => {
       if (params['expired'] === 'true') {
-        this.expiredSession.set(true);
         this.notification.warning('Sua sessão expirou. Faça login novamente.');
       }
     });
   }
 
   submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
-    this.loading.set(true);
+    this.isLoading.set(true);
     this.loginError.set(null);
 
-    const { email, senha, rememberMe } = this.form.getRawValue();
+    const { email, senha, rememberMe } = this.loginForm.getRawValue() as { email: string; senha: string; rememberMe: boolean };
 
     this.authService.login({ email, senha }, rememberMe).subscribe({
       next: () => {
-        this.loading.set(false);
+        this.isLoading.set(false);
         const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
         this.router.navigateByUrl(returnUrl);
       },
       error: (err: HttpErrorResponse) => {
-        this.loading.set(false);
+        this.isLoading.set(false);
         if (err.status === 401) {
           this.loginError.set('Email ou senha inválidos.');
         } else if (err.status === 0) {
@@ -81,13 +77,5 @@ export class LoginComponent {
         }
       },
     });
-  }
-
-  get emailControl() {
-    return this.form.controls.email;
-  }
-
-  get senhaControl() {
-    return this.form.controls.senha;
   }
 }
