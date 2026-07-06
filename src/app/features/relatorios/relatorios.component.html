@@ -1,0 +1,192 @@
+<div class="relatorios">
+  <header class="relatorios__header">
+    <div>
+      <h1 class="relatorios__title">Relatórios</h1>
+      <p class="relatorios__subtitle">Histórico de turnos, gráficos e exportação</p>
+    </div>
+  </header>
+
+  <section class="relatorios__filters">
+    <mat-form-field appearance="outline" class="relatorios__filter-field">
+      <mat-label>Data Início</mat-label>
+      <input matInput type="date" [formControl]="dataInicioControl" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="relatorios__filter-field">
+      <mat-label>Data Fim</mat-label>
+      <input matInput type="date" [formControl]="dataFimControl" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="relatorios__filter-field">
+      <mat-label>Posto</mat-label>
+      <mat-select [formControl]="postoControl">
+        <mat-option value="">Todos</mat-option>
+        @for (posto of postos(); track posto.id) {
+          <mat-option [value]="posto.id">{{ posto.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="relatorios__filter-field">
+      <mat-label>Vigia</mat-label>
+      <mat-select [formControl]="usuarioControl">
+        <mat-option value="">Todos</mat-option>
+        @for (usuario of usuarios(); track usuario.id) {
+          <mat-option [value]="usuario.id">{{ usuario.nome }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="relatorios__filter-field">
+      <mat-label>Status</mat-label>
+      <mat-select [formControl]="statusControl">
+        @for (filtro of statusFilters; track filtro.value) {
+          <mat-option [value]="filtro.value">{{ filtro.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <div class="relatorios__filter-actions">
+      <button mat-flat-button color="primary" (click)="buscar()" [disabled]="loading()">
+        <mat-icon>search</mat-icon>
+        Buscar
+      </button>
+      <button mat-stroked-button (click)="limparFiltros()">
+        <mat-icon>clear</mat-icon>
+        Limpar
+      </button>
+    </div>
+  </section>
+
+  @if (loading()) {
+    <div class="relatorios__loading">
+      <gp-loading-spinner message="Carregando histórico..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="relatorios__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="relatorios__retry-btn" (click)="buscar()">Tentar novamente</button>
+    </div>
+  } @else {
+    @if (dataSource().length === 0) {
+      <gp-empty-state
+        icon="assessment"
+        title="Nenhum turno encontrado"
+        [description]="
+          dataInicioControl.value || dataFimControl.value || postoControl.value || usuarioControl.value || statusControl.value
+            ? 'Nenhum turno corresponde aos filtros aplicados.'
+            : 'Utilize os filtros acima para buscar o histórico de turnos.'
+        "
+      />
+    } @else {
+      <div class="relatorios__table-section">
+        <div class="relatorios__table-toolbar">
+          <span class="relatorios__table-count">
+            {{ total() }} registro(s) encontrado(s)
+          </span>
+          <div class="relatorios__export-buttons">
+            <button
+              mat-stroked-button
+              (click)="exportarCSV()"
+              [disabled]="exporting()"
+              matTooltip="Exportar como CSV"
+            >
+              <mat-icon>table_view</mat-icon>
+              CSV
+            </button>
+            <button
+              mat-stroked-button
+              (click)="exportarPDF()"
+              [disabled]="exporting()"
+              matTooltip="Exportar como PDF"
+            >
+              <mat-icon>picture_as_pdf</mat-icon>
+              PDF
+            </button>
+          </div>
+        </div>
+
+        @if (exporting()) {
+          <mat-progress-bar mode="indeterminate" class="relatorios__export-progress" />
+        }
+
+        <div class="relatorios__table-wrapper">
+          <table mat-table [dataSource]="dataSource()" class="relatorios__table">
+            <ng-container matColumnDef="usuarioNome">
+              <th mat-header-cell *matHeaderCellDef>Vigia</th>
+              <td mat-cell *matCellDef="let turno">{{ turno.usuarioNome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="postoNome">
+              <th mat-header-cell *matHeaderCellDef>Posto</th>
+              <td mat-cell *matCellDef="let turno">{{ turno.postoNome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let turno">
+                <gp-status-badge [status]="turno.status" />
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="inicioPrevisto">
+              <th mat-header-cell *matHeaderCellDef>Início Previsto</th>
+              <td mat-cell *matCellDef="let turno">{{ formatarData(turno.inicioPrevisto) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="fimPrevisto">
+              <th mat-header-cell *matHeaderCellDef>Fim Previsto</th>
+              <td mat-cell *matCellDef="let turno">{{ formatarData(turno.fimPrevisto) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="inicioReal">
+              <th mat-header-cell *matHeaderCellDef>Início Real</th>
+              <td mat-cell *matCellDef="let turno">{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="fimReal">
+              <th mat-header-cell *matHeaderCellDef>Fim Real</th>
+              <td mat-cell *matCellDef="let turno">{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+
+        <mat-paginator
+          [length]="total()"
+          [pageSize]="pageSize()"
+          [pageIndex]="pageIndex()"
+          [pageSizeOptions]="pageSizeOptions"
+          [showFirstLastButtons]="true"
+          (page)="onPageChange($event)"
+          aria-label="Paginação do histórico"
+        />
+      </div>
+
+      <section class="relatorios__charts">
+        <div class="relatorios__chart-card">
+          <h3 class="relatorios__chart-title">Turnos por Dia</h3>
+          <p class="relatorios__chart-subtitle">
+            Agregação dos turnos exibidos na tabela, agrupados por dia de início previsto.
+          </p>
+          <div class="relatorios__chart-container">
+            <canvas #turnosPorDiaCanvas></canvas>
+          </div>
+        </div>
+
+        <div class="relatorios__chart-card">
+          <h3 class="relatorios__chart-title">Alertas por Mês</h3>
+          <p class="relatorios__chart-subtitle">
+            Distribuição mensal dos alertas registrados no sistema.
+          </p>
+          <div class="relatorios__chart-container">
+            <canvas #alertasPorMesCanvas></canvas>
+          </div>
+        </div>
+      </section>
+    }
+  }
+</div>

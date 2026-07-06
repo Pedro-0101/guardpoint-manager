@@ -93,6 +93,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'relatorios',
+        canActivate: [roleGuard(['admin', 'supervisor'])],
+        loadComponent: () =>
+          import('./features/relatorios/relatorios.component').then(
+            (m) => m.RelatoriosComponent
+          ),
+      },
+      {
         path: 'configuracoes',
         canActivate: [roleGuard(['admin'])],
         loadComponent: () =>
