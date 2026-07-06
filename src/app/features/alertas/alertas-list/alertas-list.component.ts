@@ -13,7 +13,6 @@ import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -34,6 +33,7 @@ import {
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { AlertasService, AlertasEstatisticas } from '../alertas.service';
 import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardTableImports } from '@/shared/components/table';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -87,7 +87,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     AsyncPipe,
     ReactiveFormsModule,
     MatTabsModule,
-    MatTableModule,
+    ZardTableImports,
     MatButtonModule,
     MatIconModule,
     MatInputModule,
@@ -165,15 +165,6 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
       return result;
     }),
   );
-
-  readonly displayedColumns: string[] = [
-    'tipo',
-    'gravidade',
-    'status',
-    'mensagem',
-    'data',
-    'acoes',
-  ];
 
   private readonly porTipoCanvas = viewChild<ElementRef<HTMLCanvasElement>>('porTipoCanvas');
   private readonly porGravidadeCanvas = viewChild<ElementRef<HTMLCanvasElement>>('porGravidadeCanvas');

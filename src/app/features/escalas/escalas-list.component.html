@@ -38,63 +38,44 @@
         />
       } @else {
         <div class="list-page__table-wrapper">
-          <table mat-table [dataSource]="escalas" class="list-page__table">
-            <ng-container matColumnDef="nome">
-              <th mat-header-cell *matHeaderCellDef>Nome</th>
-              <td mat-cell *matCellDef="let escala">{{ escala.nome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="posto">
-              <th mat-header-cell *matHeaderCellDef>Posto</th>
-              <td mat-cell *matCellDef="let escala">{{ escala.postoNome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="usuario">
-              <th mat-header-cell *matHeaderCellDef>Usuário</th>
-              <td mat-cell *matCellDef="let escala">{{ escala.usuarioNome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="dias">
-              <th mat-header-cell *matHeaderCellDef>Dias</th>
-              <td mat-cell *matCellDef="let escala">{{ formatarDias(escala.diasSemana) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="vigencia">
-              <th mat-header-cell *matHeaderCellDef>Vigência</th>
-              <td mat-cell *matCellDef="let escala">{{ formatarVigencia(escala.dataInicio, escala.dataFim) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="horario">
-              <th mat-header-cell *matHeaderCellDef>Horário</th>
-              <td mat-cell *matCellDef="let escala">{{ formatarHorario(escala.horaInicio, escala.horaFim) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="tolerancia">
-              <th mat-header-cell *matHeaderCellDef>Tolerância</th>
-              <td mat-cell *matCellDef="let escala">{{ escala.toleranciaMin }} min</td>
-            </ng-container>
-
-            <ng-container matColumnDef="ativo">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let escala">
-                <gp-status-badge [status]="escala.ativo ? 'ativo' : 'cancelado'" />
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="acoes">
-              <th mat-header-cell *matHeaderCellDef>Ações</th>
-              <td mat-cell *matCellDef="let escala" class="list-page__actions">
-                <button mat-icon-button color="primary" (click)="abrirFormulario(escala)" aria-label="Editar escala">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button color="warn" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <table z-table zType="striped" class="list-page__table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Posto</th>
+                <th>Usuário</th>
+                <th>Dias</th>
+                <th>Vigência</th>
+                <th>Horário</th>
+                <th>Tolerância</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (escala of escalas; track escala.id) {
+                <tr>
+                  <td>{{ escala.nome }}</td>
+                  <td>{{ escala.postoNome }}</td>
+                  <td>{{ escala.usuarioNome }}</td>
+                  <td>{{ formatarDias(escala.diasSemana) }}</td>
+                  <td>{{ formatarVigencia(escala.dataInicio, escala.dataFim) }}</td>
+                  <td>{{ formatarHorario(escala.horaInicio, escala.horaFim) }}</td>
+                  <td>{{ escala.toleranciaMin }} min</td>
+                  <td>
+                    <gp-status-badge [status]="escala.ativo ? 'ativo' : 'cancelado'" />
+                  </td>
+                  <td class="list-page__actions">
+                    <button mat-icon-button color="primary" (click)="abrirFormulario(escala)" aria-label="Editar escala">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
           </table>
         </div>
       }

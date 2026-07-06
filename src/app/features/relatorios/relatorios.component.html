@@ -112,46 +112,33 @@
         }
 
         <div class="relatorios__table-wrapper">
-          <table mat-table [dataSource]="dataSource()" class="relatorios__table">
-            <ng-container matColumnDef="usuarioNome">
-              <th mat-header-cell *matHeaderCellDef>Vigia</th>
-              <td mat-cell *matCellDef="let turno">{{ turno.usuarioNome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="postoNome">
-              <th mat-header-cell *matHeaderCellDef>Posto</th>
-              <td mat-cell *matCellDef="let turno">{{ turno.postoNome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let turno">
-                <gp-status-badge [status]="turno.status" />
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="inicioPrevisto">
-              <th mat-header-cell *matHeaderCellDef>Início Previsto</th>
-              <td mat-cell *matCellDef="let turno">{{ formatarData(turno.inicioPrevisto) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="fimPrevisto">
-              <th mat-header-cell *matHeaderCellDef>Fim Previsto</th>
-              <td mat-cell *matCellDef="let turno">{{ formatarData(turno.fimPrevisto) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="inicioReal">
-              <th mat-header-cell *matHeaderCellDef>Início Real</th>
-              <td mat-cell *matCellDef="let turno">{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="fimReal">
-              <th mat-header-cell *matHeaderCellDef>Fim Real</th>
-              <td mat-cell *matCellDef="let turno">{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <table z-table zType="striped" zSize="compact" class="relatorios__table">
+            <thead>
+              <tr>
+                <th>Vigia</th>
+                <th>Posto</th>
+                <th>Status</th>
+                <th>Início Previsto</th>
+                <th>Fim Previsto</th>
+                <th>Início Real</th>
+                <th>Fim Real</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (turno of dataSource(); track turno.id) {
+                <tr>
+                  <td>{{ turno.usuarioNome }}</td>
+                  <td>{{ turno.postoNome }}</td>
+                  <td>
+                    <gp-status-badge [status]="turno.status" />
+                  </td>
+                  <td>{{ formatarData(turno.inicioPrevisto) }}</td>
+                  <td>{{ formatarData(turno.fimPrevisto) }}</td>
+                  <td>{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
+                  <td>{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
+                </tr>
+              }
+            </tbody>
           </table>
         </div>
 

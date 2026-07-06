@@ -4,6 +4,10 @@
       <h1 class="list-page__title">Turnos</h1>
       <p class="list-page__subtitle">Monitoramento de turnos ativos</p>
     </div>
+    <button mat-flat-button color="primary" (click)="abrirFormulario()">
+      <mat-icon>add</mat-icon>
+      Novo turno
+    </button>
   </header>
 
   @if (loading()) {
@@ -43,49 +47,38 @@
         />
       } @else {
         <div class="list-page__table-wrapper">
-          <table mat-table [dataSource]="turnos" class="list-page__table">
-            <ng-container matColumnDef="usuarioNome">
-              <th mat-header-cell *matHeaderCellDef>Vigia</th>
-              <td mat-cell *matCellDef="let turno">{{ turno.usuarioNome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="postoNome">
-              <th mat-header-cell *matHeaderCellDef>Posto</th>
-              <td mat-cell *matCellDef="let turno">{{ turno.postoNome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="status">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let turno">
-                <gp-status-badge [status]="turno.status" />
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="inicio">
-              <th mat-header-cell *matHeaderCellDef>Início</th>
-              <td mat-cell *matCellDef="let turno">{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="acoes">
-              <th mat-header-cell *matHeaderCellDef>Ações</th>
-              <td mat-cell *matCellDef="let turno" class="list-page__actions">
-                <button
-                  mat-icon-button
-                  color="primary"
-                  (click)="verDetalhe(turno)"
-                  aria-label="Ver detalhes do turno"
-                >
-                  <mat-icon>visibility</mat-icon>
-                </button>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr
-              mat-row
-              *matRowDef="let row; columns: displayedColumns"
-              class="list-page__row"
-            ></tr>
+          <table z-table zType="striped" class="list-page__table">
+            <thead>
+              <tr>
+                <th>Vigia</th>
+                <th>Posto</th>
+                <th>Status</th>
+                <th>Início</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (turno of turnos; track turno.id) {
+                <tr class="list-page__row">
+                  <td>{{ turno.usuarioNome }}</td>
+                  <td>{{ turno.postoNome }}</td>
+                  <td>
+                    <gp-status-badge [status]="turno.status" />
+                  </td>
+                  <td>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
+                  <td class="list-page__actions">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      (click)="verDetalhe(turno)"
+                      aria-label="Ver detalhes do turno"
+                    >
+                      <mat-icon>visibility</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
           </table>
         </div>
       }

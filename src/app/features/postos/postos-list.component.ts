@@ -1,7 +1,6 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +11,7 @@ import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'r
 import { PostosService } from './postos.service';
 import { PostosFormComponent } from './postos-form.component';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardTableImports } from '@/shared/components/table';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
@@ -23,7 +23,7 @@ import { Posto } from '../../core/models/posto.model';
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    MatTableModule,
+    ZardTableImports,
     MatButtonModule,
     MatIconModule,
     MatInputModule,
@@ -67,8 +67,6 @@ export class PostosListComponent implements OnInit, OnDestroy {
       );
     })
   );
-
-  readonly displayedColumns: string[] = ['nome', 'geo', 'raio', 'ativo', 'acoes'];
 
   ngOnInit(): void {
     this.carregarPostos();

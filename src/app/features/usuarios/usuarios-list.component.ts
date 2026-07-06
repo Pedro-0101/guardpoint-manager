@@ -1,7 +1,6 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +11,7 @@ import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'r
 import { UsuariosService } from './usuarios.service';
 import { UsuariosFormComponent } from './usuarios-form.component';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardTableImports } from '@/shared/components/table';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
@@ -29,7 +29,7 @@ const CARGO_LABELS: Record<string, string> = {
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    MatTableModule,
+    ZardTableImports,
     MatButtonModule,
     MatIconModule,
     MatInputModule,
@@ -74,8 +74,6 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       );
     })
   );
-
-  readonly displayedColumns: string[] = ['nome', 'email', 'cargo', 'ativo', 'acoes'];
 
   ngOnInit(): void {
     this.carregarUsuarios();

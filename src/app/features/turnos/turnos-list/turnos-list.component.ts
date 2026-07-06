@@ -1,16 +1,18 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { TurnosService } from '../turnos.service';
+import { TurnoFormComponent } from '../turno-form.component';
+import { ZardTableImports } from '@/shared/components/table';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -35,12 +37,13 @@ const STATUS_FILTERS: StatusFilter[] = [
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    MatTableModule,
+    ZardTableImports,
     MatButtonModule,
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule,
+    MatDialogModule,
     LoadingSpinner,
     StatusBadge,
     EmptyState,
@@ -51,6 +54,7 @@ const STATUS_FILTERS: StatusFilter[] = [
 export class TurnosListComponent implements OnInit, OnDestroy {
   private readonly turnosService = inject(TurnosService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   private readonly destroy$ = new Subject<void>();
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -92,14 +96,6 @@ export class TurnosListComponent implements OnInit, OnDestroy {
     }),
   );
 
-  readonly displayedColumns: string[] = [
-    'usuarioNome',
-    'postoNome',
-    'status',
-    'inicio',
-    'acoes',
-  ];
-
   ngOnInit(): void {
     this.carregarTurnos();
   }
@@ -129,6 +125,21 @@ export class TurnosListComponent implements OnInit, OnDestroy {
 
   verDetalhe(turno: Turno): void {
     this.router.navigate(['/turnos', turno.id]);
+  }
+
+  abrirFormulario(): void {
+    const dialogRef = this.dialog.open(TurnoFormComponent, {
+      width: '520px',
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.carregarTurnos();
+        }
+      });
   }
 
   formatarData(iso: string): string {

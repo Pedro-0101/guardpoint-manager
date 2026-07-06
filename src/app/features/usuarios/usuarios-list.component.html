@@ -38,45 +38,38 @@
         />
       } @else {
         <div class="list-page__table-wrapper">
-          <table mat-table [dataSource]="usuarios" class="list-page__table">
-            <ng-container matColumnDef="nome">
-              <th mat-header-cell *matHeaderCellDef>Nome</th>
-              <td mat-cell *matCellDef="let usuario">{{ usuario.nome }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="email">
-              <th mat-header-cell *matHeaderCellDef>Email</th>
-              <td mat-cell *matCellDef="let usuario">{{ usuario.email }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="cargo">
-              <th mat-header-cell *matHeaderCellDef>Cargo</th>
-              <td mat-cell *matCellDef="let usuario">{{ cargoLabel(usuario.cargo) }}</td>
-            </ng-container>
-
-            <ng-container matColumnDef="ativo">
-              <th mat-header-cell *matHeaderCellDef>Status</th>
-              <td mat-cell *matCellDef="let usuario">
-                <gp-status-badge [status]="usuario.ativo ? 'ativo' : 'cancelado'" />
-              </td>
-            </ng-container>
-
-            <ng-container matColumnDef="acoes">
-              <th mat-header-cell *matHeaderCellDef>Ações</th>
-              <td mat-cell *matCellDef="let usuario" class="list-page__actions">
-                <button mat-icon-button color="primary" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                @if (usuario.ativo) {
-                  <button mat-icon-button color="warn" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
-                    <mat-icon>block</mat-icon>
-                  </button>
-                }
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          <table z-table zType="striped" class="list-page__table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Cargo</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (usuario of usuarios; track usuario.id) {
+                <tr>
+                  <td>{{ usuario.nome }}</td>
+                  <td>{{ usuario.email }}</td>
+                  <td>{{ cargoLabel(usuario.cargo) }}</td>
+                  <td>
+                    <gp-status-badge [status]="usuario.ativo ? 'ativo' : 'cancelado'" />
+                  </td>
+                  <td class="list-page__actions">
+                    <button mat-icon-button color="primary" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    @if (usuario.ativo) {
+                      <button mat-icon-button color="warn" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
+                        <mat-icon>block</mat-icon>
+                      </button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
           </table>
         </div>
       }

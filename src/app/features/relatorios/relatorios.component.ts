@@ -10,7 +10,6 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -27,6 +26,7 @@ import { PostosService } from '../postos/postos.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { AlertasService } from '../alertas/alertas.service';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
+import { ZardTableImports } from '@/shared/components/table';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { Turno } from '../../core/models/turno.model';
@@ -55,7 +55,7 @@ const STATUS_FILTERS: StatusFilter[] = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     ReactiveFormsModule,
-    MatTableModule,
+    ZardTableImports,
     MatButtonModule,
     MatIconModule,
     MatInputModule,
@@ -98,16 +98,6 @@ export class RelatoriosComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly pageSize = signal(10);
   readonly pageIndex = signal(0);
   readonly pageSizeOptions = [10, 25, 50, 100];
-
-  readonly displayedColumns: string[] = [
-    'usuarioNome',
-    'postoNome',
-    'status',
-    'inicioPrevisto',
-    'fimPrevisto',
-    'inicioReal',
-    'fimReal',
-  ];
 
   private readonly turnosPorDiaCanvas = viewChild<ElementRef<HTMLCanvasElement>>('turnosPorDiaCanvas');
   private readonly alertasPorMesCanvas = viewChild<ElementRef<HTMLCanvasElement>>('alertasPorMesCanvas');
