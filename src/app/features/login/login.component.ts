@@ -10,6 +10,7 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
 import { ZardFormFieldComponent, ZardFormLabelComponent, ZardFormControlComponent } from '@/shared/components/form/form.component';
+import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
 
 @Component({
   selector: 'gp-login',
@@ -31,6 +32,7 @@ export class LoginComponent {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly notification = inject(NotificationService);
+  private readonly alertDialog = inject(ZardAlertDialogService);
 
   protected readonly isLoading = signal(false);
   protected readonly loginError = signal<string | null>(null);
@@ -47,6 +49,20 @@ export class LoginComponent {
         this.notification.warning('Sua sessão expirou. Faça login novamente.');
       }
     });
+
+    if (this.authService.isAuthenticated()) {
+      this.alertDialog.confirm({
+        zTitle: 'Sessão ativa encontrada',
+        zDescription: `Você já está conectado como ${this.authService.userName()}. Deseja continuar nessa conta?`,
+        zOkText: 'Continuar',
+        zCancelText: 'Entrar com outra conta',
+        zOnOk: () => {
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+          this.router.navigateByUrl(returnUrl);
+        },
+        zOnCancel: () => this.authService.logout(),
+      });
+    }
   }
 
   submit(): void {

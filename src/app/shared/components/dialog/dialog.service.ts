@@ -84,7 +84,7 @@ export class ZardDialogService {
           dialogRef,
         } as T),
       );
-    } else if (typeof componentOrTemplateRef !== 'string') {
+    } else if (componentOrTemplateRef && typeof componentOrTemplateRef !== 'string') {
       const injector = this.createInjector<T, U>(dialogRef, config);
       const contentRef = dialogContainer.attachComponentPortal<T>(
         new ComponentPortal(componentOrTemplateRef, config.zViewContainerRef, injector),
