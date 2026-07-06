@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
-import { firstValueFrom } from 'rxjs';
-import { Subject } from 'rxjs';
+import { firstValueFrom, Subject } from 'rxjs';
+import { filter, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { TurnosService } from './turnos.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
@@ -31,8 +31,12 @@ describe('TurnosService', () => {
 
   beforeEach(() => {
     wsEventSubject = new Subject();
-    const wsSpy = {
-      onEvent: () => wsEventSubject.asObservable(),
+    const wsSpy: Pick<WebSocketService, 'onEvent'> = {
+      onEvent: <T>(type: string) =>
+        wsEventSubject.pipe(
+          filter((e: unknown) => (e as { type: string }).type === type),
+          map((e: unknown) => (e as { payload: T }).payload),
+        ),
     };
 
     TestBed.configureTestingModule({

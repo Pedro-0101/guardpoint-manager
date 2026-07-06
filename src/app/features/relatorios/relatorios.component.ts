@@ -20,7 +20,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, forkJoin } from 'rxjs';
-import { takeUntil, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize, filter, take } from 'rxjs/operators';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { RelatoriosService } from './relatorios.service';
 import { PostosService } from '../postos/postos.service';
@@ -282,14 +282,13 @@ export class RelatoriosComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private carregarAlertasPorMes(): void {
-    this.alertasService
-      .listar()
-      .pipe(takeUntil(this.destroy$))
-      .      subscribe({
-        next: () => {
-          setTimeout(() => this.renderizarGraficos(), 150);
-        },
-      });
+    this.alertasService.alertas$
+      .pipe(
+        filter((alertas) => alertas.length > 0),
+        take(1),
+        takeUntil(this.destroy$),
+      )
+      .subscribe(() => this.renderizarGraficos());
   }
 
   private renderizarGraficos(): void {
@@ -376,20 +375,13 @@ export class RelatoriosComponent implements OnInit, OnDestroy, AfterViewInit {
       this.alertasPorMesChart.destroy();
     }
 
-    const alertasAtuais = this.alertasService.alertas$;
-    let alertas: Alerta[] = [];
-
-    const sub = alertasAtuais.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (data) => {
-        alertas = data;
-        sub.unsubscribe();
-        this.doRenderAlertasPorMes(canvas, alertas);
-      },
-      error: () => {
-        alertas = [];
-        sub.unsubscribe();
-      },
-    });
+    this.alertasService.alertas$
+      .pipe(take(1), takeUntil(this.destroy$))
+      .subscribe({
+        next: (alertas) => {
+          this.doRenderAlertasPorMes(canvas, alertas);
+        },
+      });
   }
 
   private doRenderAlertasPorMes(canvas: HTMLCanvasElement, alertas: Alerta[]): void {
