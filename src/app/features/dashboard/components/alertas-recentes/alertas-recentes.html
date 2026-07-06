@@ -7,9 +7,7 @@
     <ul class="alertas-recentes__list">
       @for (alerta of alertas(); track alerta.id) {
         <li class="alertas-recentes__item">
-          <span class="alertas-recentes__tipo-icon material-symbols-outlined">
-            {{ tipoIcon(alerta.tipo) }}
-          </span>
+          <ng-icon [name]="tipoIcon(alerta.tipo)" class="alertas-recentes__tipo-icon" />
           <div class="alertas-recentes__info">
             <span class="alertas-recentes__mensagem">{{ alerta.mensagem }}</span>
             <span class="alertas-recentes__meta">

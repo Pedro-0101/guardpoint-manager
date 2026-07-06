@@ -34,7 +34,7 @@
 
     @if (error()) {
       <div class="mapa-page__error-banner">
-        <span class="material-symbols-outlined">error_outline</span>
+        <ng-icon name="lucideAlertCircle" />
         <span>{{ error() }}</span>
         <button class="mapa-page__retry-btn" (click)="recarregar()">Tentar novamente</button>
       </div>
@@ -51,11 +51,11 @@
     @if (!loading() && turnosComPosicao.length === 0 && !error()) {
       <div class="mapa-page__empty-overlay">
         <gp-empty-state
-          icon="map"
+          icon="lucideMap"
           title="Nenhum vigia em campo"
           description="Não há turnos ativos com localização disponível neste momento." />
         <button class="mapa-page__refresh-btn" (click)="recarregar()">
-          <span class="material-symbols-outlined">refresh</span>
+          <ng-icon name="lucideRefreshCw" />
           Atualizar
         </button>
       </div>

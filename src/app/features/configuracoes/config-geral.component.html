@@ -14,25 +14,25 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="settings-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="settings-page__retry-btn" (click)="carregar()">Tentar novamente</button>
     </div>
   } @else {
     <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="settings-form">
-      <mat-form-field appearance="outline" class="settings-form__field">
-        <mat-label>Nome da empresa</mat-label>
-        <input matInput formControlName="nome" placeholder="Razão social ou nome fantasia" />
+      <div class="form-field settings-form__field">
+        <label class="form-label">Nome da empresa</label>
+        <input z-input formControlName="nome" placeholder="Razão social ou nome fantasia" />
         @if (form.controls.nome.invalid && form.controls.nome.touched) {
-          <mat-error>
+          <p class="form-field__error">
             @if (form.controls.nome.errors?.['required']) {
               Nome é obrigatório.
             } @else {
               Máximo de 255 caracteres.
             }
-          </mat-error>
+          </p>
         }
-      </mat-form-field>
+      </div>
 
       <div class="settings-form__row">
         <div class="settings-form__readonly">
@@ -51,9 +51,9 @@
       </mat-slide-toggle>
 
       <div class="settings-form__actions">
-        <button type="submit" mat-flat-button color="primary" [disabled]="saving() || form.invalid">
+        <button type="submit" z-button [zDisabled]="saving() || form.invalid">
           @if (saving()) {
-            <mat-spinner diameter="20" />
+            <gp-loading-spinner size="sm" />
           }
           Salvar
         </button>

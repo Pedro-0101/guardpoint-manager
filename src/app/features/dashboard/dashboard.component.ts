@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { map } from 'rxjs/operators';
+import { NgIcon } from '@ng-icons/core';
 import { DashboardService } from './dashboard.service';
 
 import { KpiCard } from './components/kpi-card/kpi-card';
@@ -10,7 +11,7 @@ import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-
 
 @Component({
   selector: 'gp-dashboard',
-  imports: [AsyncPipe, KpiCard, AlertasRecentes, TurnosResumo, LoadingSpinner],
+  imports: [AsyncPipe, NgIcon, KpiCard, AlertasRecentes, TurnosResumo, LoadingSpinner],
   providers: [DashboardService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',

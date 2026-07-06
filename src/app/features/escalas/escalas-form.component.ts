@@ -1,13 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
+
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { forkJoin } from 'rxjs';
@@ -15,6 +9,10 @@ import { EscalasService } from './escalas.service';
 import { PostosService } from '../postos/postos.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ZardInputDirective } from '@/shared/components/input';
+import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
+import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
+import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Escala } from '../../core/models/escala.model';
 import { Posto } from '../../core/models/posto.model';
 import { Usuario } from '../../core/models/usuario.model';
@@ -23,14 +21,9 @@ import { Usuario } from '../../core/models/usuario.model';
   selector: 'gp-escalas-form',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
+    ZardInputDirective,
+    LoadingSpinner,
     MatButtonToggleModule,
-    MatProgressSpinnerModule,
-    MatDialogModule,
-    MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule,
   ],
@@ -42,9 +35,9 @@ export class EscalasFormComponent implements OnInit {
   private readonly escalasService = inject(EscalasService);
   private readonly postosService = inject(PostosService);
   private readonly usuariosService = inject(UsuariosService);
-  private readonly dialogRef = inject(MatDialogRef<EscalasFormComponent>);
+  private readonly dialogRef = inject(ZardDialogRef<EscalasFormComponent>);
   private readonly notification = inject(NotificationService);
-  readonly data = inject<Escala | null>(MAT_DIALOG_DATA, { optional: true }) ?? null;
+  readonly data = inject<Escala | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   readonly loading = signal(false);
   readonly loadingDeps = signal(false);
@@ -137,6 +130,7 @@ export class EscalasFormComponent implements OnInit {
   }
 
   submit(): void {
+    if (this.loading()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

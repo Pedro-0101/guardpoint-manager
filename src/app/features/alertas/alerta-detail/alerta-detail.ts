@@ -1,23 +1,22 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatDialog } from '@angular/material/dialog';
+import { NgIcon } from '@ng-icons/core';
 import { Subject, of } from 'rxjs';
-import { takeUntil, catchError, filter, finalize } from 'rxjs/operators';
+import { takeUntil, catchError, finalize } from 'rxjs/operators';
 
 import { AlertasService } from '../alertas.service';
-import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardDialogService } from '@/shared/components/dialog';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Alerta } from '../../../core/models/alerta.model';
 
 const TIPO_ICON: Record<Alerta['tipo'], string> = {
-  atraso: 'schedule',
-  ausencia: 'person_off',
-  coacao: 'warning',
-  sabotagem: 'gpp_bad',
+  atraso: 'lucideClock',
+  ausencia: 'lucideUserX',
+  coacao: 'lucideTriangleAlert',
+  sabotagem: 'lucideShieldAlert',
 };
 
 const TIPO_LABEL: Record<Alerta['tipo'], string> = {
@@ -36,7 +35,7 @@ const GRAVIDADE_LABEL: Record<Alerta['gravidade'], string> = {
 
 @Component({
   selector: 'gp-alerta-detail',
-  imports: [RouterLink, MatButtonModule, MatIconModule, LoadingSpinner, StatusBadge],
+  imports: [RouterLink, NgIcon, ZardButtonComponent, LoadingSpinner, StatusBadge],
   templateUrl: './alerta-detail.html',
   styleUrl: './alerta-detail.scss',
 })
@@ -44,7 +43,7 @@ export class AlertaDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly alertasService = inject(AlertasService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
 
@@ -90,43 +89,23 @@ export class AlertaDetailComponent implements OnInit, OnDestroy {
   }
 
   confirmarReconhecer(alerta: Alerta): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      data: {
-        title: 'Reconhecer alerta',
-        message: 'Deseja reconhecer este alerta?',
-        confirmLabel: 'Reconhecer',
-        cancelLabel: 'Cancelar',
-      },
+    this.dialog.create({
+      zTitle: 'Reconhecer alerta',
+      zDescription: 'Deseja reconhecer este alerta?',
+      zOkText: 'Reconhecer',
+      zCancelText: 'Cancelar',
+      zOnOk: () => this.reconhecer(alerta),
     });
-
-    dialogRef
-      .afterClosed()
-      .pipe(
-        takeUntil(this.destroy$),
-        filter((confirmed) => confirmed),
-      )
-      .subscribe(() => this.reconhecer(alerta));
   }
 
   confirmarEncerrar(alerta: Alerta): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      data: {
-        title: 'Encerrar alerta',
-        message: 'Deseja encerrar este alerta?',
-        confirmLabel: 'Encerrar',
-        cancelLabel: 'Cancelar',
-      },
+    this.dialog.create({
+      zTitle: 'Encerrar alerta',
+      zDescription: 'Deseja encerrar este alerta?',
+      zOkText: 'Encerrar',
+      zCancelText: 'Cancelar',
+      zOnOk: () => this.encerrar(alerta),
     });
-
-    dialogRef
-      .afterClosed()
-      .pipe(
-        takeUntil(this.destroy$),
-        filter((confirmed) => confirmed),
-      )
-      .subscribe(() => this.encerrar(alerta));
   }
 
   private reconhecer(alerta: Alerta): void {
@@ -156,7 +135,7 @@ export class AlertaDetailComponent implements OnInit, OnDestroy {
   }
 
   tipoIcon(tipo: Alerta['tipo']): string {
-    return TIPO_ICON[tipo] ?? 'error';
+    return TIPO_ICON[tipo] ?? 'lucideAlertCircle';
   }
 
   tipoLabel(tipo: Alerta['tipo']): string {

@@ -15,24 +15,18 @@
 
       <mat-card-content>
         @if (expiredSession()) {
-          <div class="login__alert login__alert--warning">
-            <span class="material-symbols-outlined">timer_off</span>
-            <span>Sua sessão expirou. Faça login novamente.</span>
-          </div>
+          <z-alert zType="destructive" zTitle="Sua sessão expirou. Faça login novamente." class="mb-4" />
         }
 
         @if (loginError()) {
-          <div class="login__alert login__alert--error">
-            <span class="material-symbols-outlined">error</span>
-            <span>{{ loginError() }}</span>
-          </div>
+          <z-alert zType="destructive" [zTitle]="loginError()!" class="mb-4" />
         }
 
         <form [formGroup]="form" (ngSubmit)="submit()" class="login__form" novalidate>
           <mat-form-field appearance="outline" class="login__field">
             <mat-label>Email</mat-label>
             <input matInput type="email" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
-            <mat-icon matPrefix>mail</mat-icon>
+            <ng-icon name="lucideMail" matPrefix />
             @if (emailControl.invalid && emailControl.touched) {
               <mat-error>
                 @if (emailControl.errors?.['required']) {
@@ -47,9 +41,9 @@
           <mat-form-field appearance="outline" class="login__field">
             <mat-label>Senha</mat-label>
             <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="senha" placeholder="Sua senha" autocomplete="current-password" />
-            <mat-icon matPrefix>lock</mat-icon>
+            <ng-icon name="lucideLock" matPrefix />
             <button type="button" mat-icon-button matSuffix class="login__visibility-btn" (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'">
-              <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+              <ng-icon [name]="hidePassword() ? 'lucideEyeOff' : 'lucideEye'" />
             </button>
             @if (senhaControl.invalid && senhaControl.touched) {
               <mat-error>

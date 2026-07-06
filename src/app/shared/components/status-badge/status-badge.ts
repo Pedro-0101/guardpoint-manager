@@ -1,4 +1,5 @@
 import { Component, computed, input } from '@angular/core';
+import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
 
 export type StatusType =
   | 'ativo'
@@ -15,31 +16,33 @@ export type StatusType =
   | 'reconhecido'
   | 'encerrado';
 
+type ZardBadgeType = 'default' | 'secondary' | 'destructive' | 'outline';
+
 interface StatusConfig {
-  color: string;
-  bg: string;
+  variant: ZardBadgeType;
+  class?: string;
   label: string;
 }
 
 const STATUS_MAP: Record<StatusType, StatusConfig> = {
-  ativo: { color: '#2e7d32', bg: '#e8f5e9', label: 'Ativo' },
-  agendado: { color: '#78909c', bg: '#eceff1', label: 'Agendado' },
-  em_andamento: { color: '#1565c0', bg: '#e3f2fd', label: 'Em andamento' },
-  pausado: { color: '#f57f17', bg: '#fff8e1', label: 'Pausado' },
-  finalizado: { color: '#546e7a', bg: '#eceff1', label: 'Finalizado' },
-  cancelado: { color: '#c62828', bg: '#ffebee', label: 'Cancelado' },
-  critico: { color: '#b71c1c', bg: '#ffebee', label: 'Crítico' },
-  pendente: { color: '#6a1b9a', bg: '#f3e5f5', label: 'Pendente' },
-  enviado: { color: '#00695c', bg: '#e0f2f1', label: 'Enviado' },
-  erro: { color: '#b71c1c', bg: '#ffebee', label: 'Erro' },
-  aberto: { color: '#e65100', bg: '#fff3e0', label: 'Aberto' },
-  reconhecido: { color: '#1565c0', bg: '#e3f2fd', label: 'Reconhecido' },
-  encerrado: { color: '#2e7d32', bg: '#e8f5e9', label: 'Encerrado' },
+  ativo: { variant: 'default', class: 'bg-green-600 text-white hover:bg-green-700', label: 'Ativo' },
+  agendado: { variant: 'secondary', class: 'bg-slate-400 text-white', label: 'Agendado' },
+  em_andamento: { variant: 'default', class: 'bg-blue-600 text-white hover:bg-blue-700', label: 'Em andamento' },
+  pausado: { variant: 'secondary', class: 'bg-amber-500 text-white', label: 'Pausado' },
+  finalizado: { variant: 'secondary', class: 'bg-slate-500 text-white', label: 'Finalizado' },
+  cancelado: { variant: 'destructive', label: 'Cancelado' },
+  critico: { variant: 'destructive', label: 'Crítico' },
+  pendente: { variant: 'secondary', class: 'bg-purple-600 text-white', label: 'Pendente' },
+  enviado: { variant: 'default', class: 'bg-teal-600 text-white hover:bg-teal-700', label: 'Enviado' },
+  erro: { variant: 'destructive', label: 'Erro' },
+  aberto: { variant: 'secondary', class: 'bg-orange-600 text-white', label: 'Aberto' },
+  reconhecido: { variant: 'default', class: 'bg-blue-600 text-white hover:bg-blue-700', label: 'Reconhecido' },
+  encerrado: { variant: 'default', class: 'bg-green-600 text-white hover:bg-green-700', label: 'Encerrado' },
 };
 
 @Component({
   selector: 'gp-status-badge',
-  imports: [],
+  imports: [ZardBadgeComponent],
   templateUrl: './status-badge.html',
   styleUrl: './status-badge.scss',
 })

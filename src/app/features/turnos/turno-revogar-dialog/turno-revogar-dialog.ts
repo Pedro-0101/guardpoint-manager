@@ -1,11 +1,11 @@
 import { Component, inject, signal } from '@angular/core';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { NgIcon } from '@ng-icons/core';
 import { finalize } from 'rxjs/operators';
 import { TurnosService, RevogarSessaoResponse } from '../turnos.service';
-import { NotificationService } from '../../../core/services/notification.service';
+import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
+import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { Turno } from '../../../core/models/turno.model';
 
 export interface TurnoRevogarDialogData {
@@ -14,20 +14,14 @@ export interface TurnoRevogarDialogData {
 
 @Component({
   selector: 'gp-turno-revogar-dialog',
-  imports: [
-    MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-  ],
+  imports: [NgIcon, ZardButtonComponent, LoadingSpinner],
   templateUrl: './turno-revogar-dialog.html',
   styleUrl: './turno-revogar-dialog.scss',
 })
 export class TurnoRevogarDialog {
-  private readonly data = inject<TurnoRevogarDialogData>(MAT_DIALOG_DATA);
-  private readonly dialogRef = inject(MatDialogRef<TurnoRevogarDialog>);
+  private readonly data = inject<TurnoRevogarDialogData>(Z_MODAL_DATA);
+  private readonly dialogRef = inject(ZardDialogRef<TurnoRevogarDialog>);
   private readonly turnosService = inject(TurnosService);
-  private readonly notification = inject(NotificationService);
 
   readonly turno = this.data.turno;
 
@@ -45,7 +39,6 @@ export class TurnoRevogarDialog {
       .subscribe({
         next: (res) => {
           this.resultado.set(res);
-          this.notification.success('Sessão revogada com sucesso.');
         },
         error: (err) => {
           this.erro.set(err.message ?? 'Erro ao revogar sessão.');

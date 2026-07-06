@@ -1,91 +1,77 @@
-<h2 mat-dialog-title>{{ isEdit() ? 'Editar posto' : 'Novo posto' }}</h2>
+<form [formGroup]="form" novalidate>
+  <div class="form-field">
+    <label class="form-label">Nome</label>
+    <input z-input formControlName="nome" placeholder="Ex: Portaria Principal" />
+    @if (form.controls.nome.invalid && form.controls.nome.touched) {
+      <p class="form-field__error">
+        @if (form.controls.nome.errors?.['required']) {
+          Nome é obrigatório.
+        } @else if (form.controls.nome.errors?.['minlength']) {
+          Mínimo de 3 caracteres.
+        }
+      </p>
+    }
+  </div>
 
-<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-  <mat-dialog-content>
-    <mat-form-field appearance="outline" class="form__field">
-      <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome" placeholder="Ex: Portaria Principal" />
-      @if (form.controls.nome.invalid && form.controls.nome.touched) {
-        <mat-error>
-          @if (form.controls.nome.errors?.['required']) {
-            Nome é obrigatório.
-          } @else if (form.controls.nome.errors?.['minlength']) {
-            Mínimo de 3 caracteres.
+  <div class="form__row">
+    <div class="form-field flex-1">
+      <label class="form-label">Latitude</label>
+      <input
+        z-input
+        type="number"
+        formControlName="latitude"
+        step="any"
+        (paste)="onColarCoordenadas($event)"
+      />
+      @if (form.controls.latitude.invalid && form.controls.latitude.touched) {
+        <p class="form-field__error">
+          @if (form.controls.latitude.errors?.['required']) {
+            Latitude é obrigatória.
+          } @else {
+            Valor deve estar entre -90 e 90.
           }
-        </mat-error>
+        </p>
       }
-    </mat-form-field>
-
-    <div class="form__row">
-      <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Latitude</mat-label>
-        <input
-          matInput
-          type="number"
-          formControlName="latitude"
-          step="any"
-          (paste)="onColarCoordenadas($event)"
-        />
-        @if (form.controls.latitude.invalid && form.controls.latitude.touched) {
-          <mat-error>
-            @if (form.controls.latitude.errors?.['required']) {
-              Latitude é obrigatória.
-            } @else {
-              Valor deve estar entre -90 e 90.
-            }
-          </mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Longitude</mat-label>
-        <input
-          matInput
-          type="number"
-          formControlName="longitude"
-          step="any"
-          (paste)="onColarCoordenadas($event)"
-        />
-        @if (form.controls.longitude.invalid && form.controls.longitude.touched) {
-          <mat-error>
-            @if (form.controls.longitude.errors?.['required']) {
-              Longitude é obrigatória.
-            } @else {
-              Valor deve estar entre -180 e 180.
-            }
-          </mat-error>
-        }
-      </mat-form-field>
     </div>
 
-    <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
-    <p class="form__mapa-hint">
-      Clique no mapa ou arraste o marcador para posicionar o posto. Você também pode colar
-      coordenadas do Google Maps (ex.: 23°12'05.6"S 47°35'56.3"W) nos campos acima.
-    </p>
-
-    <mat-form-field appearance="outline" class="form__field">
-      <mat-label>Raio de tolerância (metros)</mat-label>
-      <input matInput type="number" formControlName="raioM" min="10" max="5000" />
-      @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
-        <mat-error>
-          @if (form.controls.raioM.errors?.['required']) {
-            Raio é obrigatório.
+    <div class="form-field flex-1">
+      <label class="form-label">Longitude</label>
+      <input
+        z-input
+        type="number"
+        formControlName="longitude"
+        step="any"
+        (paste)="onColarCoordenadas($event)"
+      />
+      @if (form.controls.longitude.invalid && form.controls.longitude.touched) {
+        <p class="form-field__error">
+          @if (form.controls.longitude.errors?.['required']) {
+            Longitude é obrigatória.
           } @else {
-            Valor deve estar entre 10 e 5000 metros.
+            Valor deve estar entre -180 e 180.
           }
-        </mat-error>
+        </p>
       }
-    </mat-form-field>
-  </mat-dialog-content>
+    </div>
+  </div>
 
-  <mat-dialog-actions align="end">
-    <button type="button" mat-button mat-dialog-close [disabled]="loading()">Cancelar</button>
-    <button type="submit" mat-flat-button color="primary" [disabled]="loading()">
-      @if (loading()) {
-        <mat-spinner diameter="20" />
-      }
-      {{ isEdit() ? 'Salvar' : 'Criar' }}
-    </button>
-  </mat-dialog-actions>
+  <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
+  <p class="form__mapa-hint">
+    Clique no mapa ou arraste o marcador para posicionar o posto. Você também pode colar
+    coordenadas do Google Maps (ex.: 23°12'05.6"S 47°35'56.3"W) nos campos acima.
+  </p>
+
+  <div class="form-field">
+    <label class="form-label">Raio de tolerância (metros)</label>
+    <input z-input type="number" formControlName="raioM" min="10" max="5000" />
+    @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
+      <p class="form-field__error">
+        @if (form.controls.raioM.errors?.['required']) {
+          Raio é obrigatório.
+        } @else {
+          Valor deve estar entre 10 e 5000 metros.
+        }
+      </p>
+    }
+  </div>
 </form>

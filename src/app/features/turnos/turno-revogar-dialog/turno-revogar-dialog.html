@@ -1,6 +1,6 @@
 <div class="revogar-dialog">
   <h2 class="revogar-dialog__title">
-    <span class="material-symbols-outlined revogar-dialog__icon">warning</span>
+    <ng-icon name="lucideTriangleAlert" class="revogar-dialog__icon" />
     Revogar Sessão
   </h2>
 
@@ -33,7 +33,7 @@
 
       @if (erro(); as errorMsg) {
         <div class="revogar-dialog__error">
-          <span class="material-symbols-outlined">error</span>
+          <ng-icon name="lucideAlertCircle" />
           {{ errorMsg }}
         </div>
       }
@@ -42,19 +42,19 @@
 
   <div class="revogar-dialog__actions">
     @if (resultado()) {
-      <button mat-flat-button color="primary" (click)="fechar()">Fechar</button>
+      <button z-button (click)="fechar()">Fechar</button>
     } @else {
-      <button mat-stroked-button [disabled]="revogando()" (click)="fechar()">
+      <button z-button zType="outline" [zDisabled]="revogando()" (click)="fechar()">
         Cancelar
       </button>
       <button
-        mat-flat-button
-        color="warn"
-        [disabled]="revogando()"
+        z-button
+        zType="destructive"
+        [zDisabled]="revogando()"
         (click)="revogar()"
       >
         @if (revogando()) {
-          <mat-spinner diameter="20" class="revogar-dialog__spinner" />
+          <gp-loading-spinner size="sm" />
         } @else {
           Revogar Sessão
         }

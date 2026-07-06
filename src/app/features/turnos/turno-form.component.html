@@ -1,0 +1,36 @@
+<form [formGroup]="form" novalidate>
+  @if (loadingDeps()) {
+    <div class="form__loading">
+      <gp-loading-spinner size="sm" />
+      <span>Carregando dados...</span>
+    </div>
+  } @else {
+    <div class="form-field">
+      <label class="form-label">Device ID</label>
+      <input z-input formControlName="device_id" placeholder="ID do dispositivo do vigia" />
+      @if (form.controls.device_id.invalid && form.controls.device_id.touched) {
+        <p class="form-field__error">Device ID é obrigatório.</p>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Posto</label>
+      <select z-input formControlName="posto_id">
+        @for (posto of postos(); track posto.id) {
+          <option [value]="posto.id">{{ posto.nome }}</option>
+        }
+      </select>
+      @if (form.controls.posto_id.invalid && form.controls.posto_id.touched) {
+        <p class="form-field__error">Posto é obrigatório.</p>
+      }
+    </div>
+
+    <div class="form-field">
+      <label class="form-label">Intervalo de check-in (minutos)</label>
+      <input z-input type="number" formControlName="intervalo_min" min="1" max="120" placeholder="Opcional" />
+      @if (form.controls.intervalo_min.invalid && form.controls.intervalo_min.touched) {
+        <p class="form-field__error">Valor deve estar entre 1 e 120 minutos.</p>
+      }
+    </div>
+  }
+</form>

@@ -1,17 +1,15 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { NgIcon } from '@ng-icons/core';
 import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { EscalasService } from './escalas.service';
 import { EscalasFormComponent } from './escalas-form.component';
-import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
@@ -34,11 +32,9 @@ const DIA_LABELS: Record<number, string> = {
     AsyncPipe,
     ReactiveFormsModule,
     ZardTableImports,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatDialogModule,
+    ZardButtonComponent,
+    ZardInputDirective,
+    NgIcon,
     LoadingSpinner,
     StatusBadge,
     EmptyState,
@@ -48,7 +44,7 @@ const DIA_LABELS: Record<number, string> = {
 })
 export class EscalasListComponent implements OnInit, OnDestroy {
   private readonly escalasService = inject(EscalasService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
 
@@ -109,13 +105,20 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   }
 
   abrirFormulario(escala?: Escala): void {
-    const dialogRef = this.dialog.open(EscalasFormComponent, {
-      width: '640px',
-      data: escala ?? null,
+    const dialogRef = this.dialog.create({
+      zTitle: escala ? 'Editar escala' : 'Nova escala',
+      zContent: EscalasFormComponent,
+      zWidth: '640px',
+      zData: escala ?? null,
+      zOkText: escala ? 'Salvar' : 'Criar',
+      zOnOk: (instance) => {
+        instance.submit();
+        return false;
+      },
     });
 
     dialogRef
-      .afterClosed()
+      .afterClosed
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
@@ -125,34 +128,26 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   }
 
   confirmarExclusao(escala: Escala): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      data: {
-        title: 'Desativar escala',
-        message: `Tem certeza que deseja desativar a escala "${escala.nome}"?`,
-        confirmLabel: 'Desativar',
-        cancelLabel: 'Cancelar',
+    this.dialog.create({
+      zTitle: 'Desativar escala',
+      zDescription: `Tem certeza que deseja desativar a escala "${escala.nome}"?`,
+      zOkText: 'Desativar',
+      zCancelText: 'Cancelar',
+      zOkDestructive: true,
+      zOnOk: () => {
+        this.escalasService.excluir(escala.id).subscribe({
+          next: () => {
+            this.notification.success(`Escala "${escala.nome}" desativada com sucesso.`);
+            this.carregarEscalas();
+          },
+          error: (err) => {
+            this.notification.error(
+              err.message ?? 'Erro ao desativar escala.'
+            );
+          },
+        });
       },
     });
-
-    dialogRef
-      .afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((confirmed) => {
-        if (confirmed) {
-          this.escalasService.excluir(escala.id).subscribe({
-            next: () => {
-              this.notification.success(`Escala "${escala.nome}" desativada com sucesso.`);
-              this.carregarEscalas();
-            },
-            error: (err) => {
-              this.notification.error(
-                err.message ?? 'Erro ao desativar escala.'
-              );
-            },
-          });
-        }
-      });
   }
 
   formatarDias(dias: number[]): string {

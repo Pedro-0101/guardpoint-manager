@@ -246,7 +246,7 @@ export class AlertasService {
 
     if (tipo === 'coacao') {
       if (this.alertaSonoroHabilitado()) this.tocarSomCoacao();
-      this.notification.error('🚨 Alerta de coação detectado! Verifique o turno imediatamente.', true);
+      this.notification.error('🚨 Alerta de coação detectado! Verifique o turno imediatamente.');
     }
   }
 

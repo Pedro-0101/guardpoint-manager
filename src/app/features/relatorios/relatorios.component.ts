@@ -10,11 +10,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
+import { NgIcon } from '@ng-icons/core';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -27,6 +23,8 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { AlertasService } from '../alertas/alertas.service';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { Turno } from '../../core/models/turno.model';
@@ -56,11 +54,9 @@ const STATUS_FILTERS: StatusFilter[] = [
   imports: [
     ReactiveFormsModule,
     ZardTableImports,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
+    ZardButtonComponent,
+    ZardInputDirective,
+    NgIcon,
     MatPaginatorModule,
     MatProgressBarModule,
     MatTooltipModule,

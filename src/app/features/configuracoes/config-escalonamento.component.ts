@@ -9,12 +9,13 @@ import {
 } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { NgIcon } from '@ng-icons/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
 import { ConfiguracoesService } from './configuracoes.service';
 import { ConfigNavComponent } from './config-nav.component';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { NotificationService } from '../../core/services/notification.service';
@@ -31,11 +32,9 @@ interface NivelGroup {
   selector: 'gp-config-escalonamento',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
+    ZardInputDirective,
+    NgIcon,
+    ZardButtonComponent,
     ConfigNavComponent,
     LoadingSpinner,
     EmptyState,

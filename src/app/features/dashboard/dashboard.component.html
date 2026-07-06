@@ -9,7 +9,7 @@
     </div>
   } @else if (error$ | async; as errorMsg) {
     <div class="dashboard__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="dashboard__retry-btn" (click)="retry()">Tentar novamente</button>
     </div>
@@ -18,25 +18,25 @@
     @if (kpis$ | async; as kpis) {
       <section class="dashboard__kpis">
         <gp-kpi-card
-          icon="groups"
+          icon="lucideUsers"
           [value]="kpis.turnosAtivos"
           label="Turnos ativos"
           color="primary"
         />
         <gp-kpi-card
-          icon="warning"
+          icon="lucideTriangleAlert"
           [value]="kpis.alertasAbertos"
           label="Alertas abertos"
           color="warn"
         />
         <gp-kpi-card
-          icon="check_circle"
+          icon="lucideCheckCircle"
           [value]="kpis.checkinsUltimaHora"
           label="Check-ins (última hora)"
           color="accent"
         />
         <gp-kpi-card
-          icon="alt_route"
+          icon="lucideGitBranchPlus"
           [value]="kpis.desviosRota"
           label="Desvios de rota"
           color="info"

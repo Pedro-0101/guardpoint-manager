@@ -5,14 +5,14 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="detail-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="detail-page__retry-btn" (click)="voltar()">Voltar para turnos</button>
     </div>
   } @else if (turno(); as turno) {
     <header class="detail-page__header">
-      <button mat-icon-button (click)="voltar()" aria-label="Voltar">
-        <mat-icon>arrow_back</mat-icon>
+      <button z-button zType="ghost" zSize="icon" (click)="voltar()" aria-label="Voltar">
+        <ng-icon name="lucideArrowLeft" />
       </button>
       <div class="detail-page__header-info">
         <h1 class="detail-page__title">
@@ -73,8 +73,8 @@
 
         @if (isAdmin && (turno.status === 'em_andamento' || turno.status === 'pausado')) {
           <div class="detail-page__admin-actions">
-            <button mat-flat-button color="warn" (click)="abrirRevogarDialog()">
-              <mat-icon>block</mat-icon>
+            <button z-button zType="destructive" (click)="abrirRevogarDialog()">
+              <ng-icon name="lucideBan" />
               Revogar Sessão
             </button>
           </div>
@@ -88,16 +88,16 @@
             <div #mapContainer class="detail-page__map"></div>
           </div>
           <p class="detail-page__map-hint">
-            <span class="material-symbols-outlined detail-page__map-legend-icon detail-page__map-legend-icon--start"></span>
+            <ng-icon name="lucideMapPin" class="detail-page__map-legend-icon detail-page__map-legend-icon--start" />
             Início
-            <span class="material-symbols-outlined detail-page__map-legend-icon detail-page__map-legend-icon--end"></span>
+            <ng-icon name="lucideMapPin" class="detail-page__map-legend-icon detail-page__map-legend-icon--end" />
             Último
-            <span class="material-symbols-outlined detail-page__map-legend-icon detail-page__map-legend-icon--middle"></span>
+            <ng-icon name="lucideMapPin" class="detail-page__map-legend-icon detail-page__map-legend-icon--middle" />
             Intermediário
           </p>
         } @else {
           <div class="detail-page__map-empty">
-            <span class="material-symbols-outlined">map_off</span>
+            <ng-icon name="lucideMapPinOff" />
             <p>Nenhum check-in registrado para este turno.</p>
           </div>
         }
@@ -118,7 +118,7 @@
                 class="detail-page__timeline-marker"
                 [style.--marker-color]="entry.color"
               >
-                <span class="material-symbols-outlined">{{ entry.icon }}</span>
+                <ng-icon [name]="entry.icon" />
               </div>
               <div class="detail-page__timeline-content">
                 <div class="detail-page__timeline-header">
@@ -129,7 +129,7 @@
                 </div>
                 <div class="detail-page__timeline-details">
                   <span class="detail-page__timeline-coord">
-                    <span class="material-symbols-outlined">location_on</span>
+                    <ng-icon name="lucideMapPin" />
                     {{ formatarCoordenada(entry.checkin.latitude, entry.checkin.longitude) }}
                   </span>
                 </div>
@@ -139,7 +139,7 @@
         </div>
       } @else {
         <gp-empty-state
-          icon="timeline"
+          icon="lucideTimeline"
           title="Nenhum check-in encontrado"
           description="Este turno ainda não possui check-ins registrados."
         />

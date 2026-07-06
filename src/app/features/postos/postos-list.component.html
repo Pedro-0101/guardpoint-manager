@@ -4,8 +4,8 @@
       <h1 class="list-page__title">Postos</h1>
       <p class="list-page__subtitle">Gerencie os postos de trabalho</p>
     </div>
-    <button mat-flat-button color="primary" (click)="abrirFormulario()">
-      <mat-icon>add</mat-icon>
+    <button z-button (click)="abrirFormulario()">
+      <ng-icon name="lucidePlus" />
       Novo posto
     </button>
   </header>
@@ -16,23 +16,25 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="list-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="list-page__retry-btn" (click)="carregarPostos()">Tentar novamente</button>
     </div>
   } @else {
     <div class="list-page__toolbar">
-      <mat-form-field appearance="outline" class="list-page__search">
-        <mat-label>Buscar posto</mat-label>
-        <input matInput [formControl]="searchControl" placeholder="Nome do posto..." />
-        <mat-icon matPrefix>search</mat-icon>
-      </mat-form-field>
+      <div class="list-page__search-wrapper">
+        <label class="form-label">Buscar posto</label>
+        <div class="flex items-center gap-2">
+          <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
+          <input z-input class="flex-1" [formControl]="searchControl" placeholder="Nome do posto..." />
+        </div>
+      </div>
     </div>
 
     @if (filteredPostos$ | async; as postos) {
       @if (postos.length === 0) {
         <gp-empty-state
-          icon="location_off"
+          icon="lucideMapPinOff"
           title="Nenhum posto encontrado"
           [description]="searchControl.value ? 'Nenhum posto corresponde à busca.' : 'Nenhum posto cadastrado.'"
         />
@@ -58,12 +60,12 @@
                     <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
                   </td>
                   <td class="list-page__actions">
-                    <button mat-icon-button color="primary" (click)="abrirFormulario(posto)" aria-label="Editar posto">
-                      <mat-icon>edit</mat-icon>
+                    <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(posto)" aria-label="Editar posto">
+                      <ng-icon name="lucidePencil" />
                     </button>
                     @if (posto.ativo) {
-                      <button mat-icon-button color="warn" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
-                        <mat-icon>block</mat-icon>
+                      <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
+                        <ng-icon name="lucideBan" />
                       </button>
                     }
                   </td>

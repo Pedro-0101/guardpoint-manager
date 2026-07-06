@@ -9,16 +9,16 @@ import {
   viewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { NgIcon } from '@ng-icons/core';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatDialog } from '@angular/material/dialog';
 import { Subject, of } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import * as L from 'leaflet';
 
 import { TurnosService } from '../turnos.service';
 import { TurnoRevogarDialog } from '../turno-revogar-dialog/turno-revogar-dialog';
+import { ZardDialogService } from '@/shared/components/dialog';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -34,18 +34,18 @@ interface TimelineEntry {
 }
 
 const TIPO_CHECKIN_MAP: Record<string, { icon: string; label: string; color: string }> = {
-  padrao: { icon: 'schedule', label: 'Check-in padrão', color: '#1565c0' },
-  coacao: { icon: 'warning', label: 'Check-in de coação', color: '#c62828' },
-  finalizacao: { icon: 'stop_circle', label: 'Finalização', color: '#546e7a' },
-  sabotagem: { icon: 'gpp_bad', label: 'Sabotagem', color: '#e65100' },
+  padrao: { icon: 'lucideClock', label: 'Check-in padrão', color: '#1565c0' },
+  coacao: { icon: 'lucideTriangleAlert', label: 'Check-in de coação', color: '#c62828' },
+  finalizacao: { icon: 'lucideCircleStop', label: 'Finalização', color: '#546e7a' },
+  sabotagem: { icon: 'lucideShieldAlert', label: 'Sabotagem', color: '#e65100' },
 };
 
 @Component({
   selector: 'gp-turno-detail',
   imports: [
-    MatButtonModule,
-    MatIconModule,
+    NgIcon,
     MatChipsModule,
+    ZardButtonComponent,
     LoadingSpinner,
     StatusBadge,
     EmptyState,
@@ -57,7 +57,7 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly turnosService = inject(TurnosService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(ZardDialogService);
   private readonly authService = inject(AuthService);
   private readonly destroy$ = new Subject<void>();
 
@@ -136,7 +136,7 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const entries: TimelineEntry[] = sorted.map((c) => {
       const config = TIPO_CHECKIN_MAP[c.tipoSenha] ?? {
-        icon: 'help',
+        icon: 'lucideHelpCircle',
         label: c.tipoSenha,
         color: '#757575',
       };
@@ -243,14 +243,16 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     const turnoValue = this.turno();
     if (!turnoValue) return;
 
-    const dialogRef = this.dialog.open(TurnoRevogarDialog, {
-      width: '480px',
-      data: { turno: turnoValue },
-      disableClose: true,
+    const dialogRef = this.dialog.create({
+      zContent: TurnoRevogarDialog,
+      zWidth: '480px',
+      zData: { turno: turnoValue },
+      zMaskClosable: false,
+      zHideFooter: true,
     });
 
     dialogRef
-      .afterClosed()
+      .afterClosed
       .pipe(takeUntil(this.destroy$))
       .subscribe((revogado) => {
         if (revogado) {

@@ -1,134 +1,124 @@
-<h2 mat-dialog-title>{{ isEdit() ? 'Editar escala' : 'Nova escala' }}</h2>
-
 @if (loadingDeps()) {
-  <mat-dialog-content class="form__loading">
-    <mat-spinner diameter="32" />
+  <div class="form__loading">
+    <gp-loading-spinner size="sm" />
     <span>Carregando...</span>
-  </mat-dialog-content>
+  </div>
 } @else {
-  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <mat-dialog-content>
-      <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Nome</mat-label>
-        <input matInput formControlName="nome" placeholder="Ex: Escala diurna" />
-        @if (form.controls.nome.invalid && form.controls.nome.touched) {
-          <mat-error>
-            @if (form.controls.nome.errors?.['required']) {
-              Nome é obrigatório.
-            } @else if (form.controls.nome.errors?.['minlength']) {
-              Mínimo de 3 caracteres.
-            }
-          </mat-error>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Posto</mat-label>
-        <mat-select formControlName="postoId">
-          @for (posto of postos(); track posto.id) {
-            <mat-option [value]="posto.id">{{ posto.nome }}</mat-option>
+  <form [formGroup]="form" novalidate>
+    <div class="form-field">
+      <label class="form-label">Nome</label>
+      <input z-input formControlName="nome" placeholder="Ex: Escala diurna" />
+      @if (form.controls.nome.invalid && form.controls.nome.touched) {
+        <p class="form-field__error">
+          @if (form.controls.nome.errors?.['required']) {
+            Nome é obrigatório.
+          } @else if (form.controls.nome.errors?.['minlength']) {
+            Mínimo de 3 caracteres.
           }
-        </mat-select>
-        @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
-          <mat-error>Posto é obrigatório.</mat-error>
-        }
-      </mat-form-field>
+        </p>
+      }
+    </div>
 
-      <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Usuário</mat-label>
-        <mat-select formControlName="usuarioId">
-          @for (usuario of usuarios(); track usuario.id) {
-            <mat-option [value]="usuario.id">{{ usuario.nome }}</mat-option>
-          }
-        </mat-select>
-        @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
-          <mat-error>Usuário é obrigatório.</mat-error>
+    <div class="form-field">
+      <label class="form-label">Posto</label>
+      <select z-input formControlName="postoId">
+        @for (posto of postos(); track posto.id) {
+          <option [value]="posto.id">{{ posto.nome }}</option>
         }
-      </mat-form-field>
+      </select>
+      @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
+        <p class="form-field__error">Posto é obrigatório.</p>
+      }
+    </div>
 
-      <div class="form__field">
-        <span class="form__label">Dias da semana</span>
-        <div class="form__dias">
-          @for (dia of diasSemana; track dia.value) {
-            <button type="button" class="form__dia" [class.form__dia--active]="isDiaSelecionado(dia.value)" (click)="toggleDia(dia.value)">
-              {{ dia.label }}
-            </button>
-          }
-        </div>
-        @if (form.controls.diasSemana.invalid && form.controls.diasSemana.touched) {
-          <span class="form__error">Selecione pelo menos um dia.</span>
+    <div class="form-field">
+      <label class="form-label">Usuário</label>
+      <select z-input formControlName="usuarioId">
+        @for (usuario of usuarios(); track usuario.id) {
+          <option [value]="usuario.id">{{ usuario.nome }}</option>
+        }
+      </select>
+      @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
+        <p class="form-field__error">Usuário é obrigatório.</p>
+      }
+    </div>
+
+    <div class="form-field">
+      <span class="form__label">Dias da semana</span>
+      <div class="form__dias">
+        @for (dia of diasSemana; track dia.value) {
+          <button type="button" class="form__dia" [class.form__dia--active]="isDiaSelecionado(dia.value)" (click)="toggleDia(dia.value)">
+            {{ dia.label }}
+          </button>
         }
       </div>
+      @if (form.controls.diasSemana.invalid && form.controls.diasSemana.touched) {
+        <span class="form__error">Selecione pelo menos um dia.</span>
+      }
+    </div>
 
-      <div class="form__row">
-        <mat-form-field appearance="outline" class="form__field">
-          <mat-label>Data início</mat-label>
-          <input matInput [matDatepicker]="pickerInicio" formControlName="dataInicio" />
-          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio" />
+    <div class="form__row">
+      <div class="form-field flex-1">
+        <label class="form-label">Data início</label>
+        <div class="flex gap-2 items-center">
+          <input z-input class="flex-1" [matDatepicker]="pickerInicio" formControlName="dataInicio" />
+          <mat-datepicker-toggle [for]="pickerInicio" />
           <mat-datepicker #pickerInicio />
-          @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
-            <mat-error>Data início é obrigatória.</mat-error>
-          }
-        </mat-form-field>
+        </div>
+        @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
+          <p class="form-field__error">Data início é obrigatória.</p>
+        }
+      </div>
 
-        <mat-form-field appearance="outline" class="form__field">
-          <mat-label>Data fim</mat-label>
-          <input matInput [matDatepicker]="pickerFim" formControlName="dataFim" />
-          <mat-datepicker-toggle matIconSuffix [for]="pickerFim" />
+      <div class="form-field flex-1">
+        <label class="form-label">Data fim</label>
+        <div class="flex gap-2 items-center">
+          <input z-input class="flex-1" [matDatepicker]="pickerFim" formControlName="dataFim" />
+          <mat-datepicker-toggle [for]="pickerFim" />
           <mat-datepicker #pickerFim />
-          @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
-            <mat-error>Data fim é obrigatória.</mat-error>
-          }
-        </mat-form-field>
+        </div>
+        @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
+          <p class="form-field__error">Data fim é obrigatória.</p>
+        }
+      </div>
+    </div>
+
+    <div class="form__row">
+      <div class="form-field flex-1">
+        <label class="form-label">Hora início</label>
+        <input z-input type="time" formControlName="horaInicio" />
+        @if (form.controls.horaInicio.invalid && form.controls.horaInicio.touched) {
+          <p class="form-field__error">
+            @if (form.controls.horaInicio.errors?.['required']) {
+              Hora início é obrigatória.
+            } @else {
+              Formato inválido (HH:mm).
+            }
+          </p>
+        }
       </div>
 
-      <div class="form__row">
-        <mat-form-field appearance="outline" class="form__field">
-          <mat-label>Hora início</mat-label>
-          <input matInput type="time" formControlName="horaInicio" />
-          @if (form.controls.horaInicio.invalid && form.controls.horaInicio.touched) {
-            <mat-error>
-              @if (form.controls.horaInicio.errors?.['required']) {
-                Hora início é obrigatória.
-              } @else {
-                Formato inválido (HH:mm).
-              }
-            </mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="form__field">
-          <mat-label>Hora fim</mat-label>
-          <input matInput type="time" formControlName="horaFim" />
-          @if (form.controls.horaFim.invalid && form.controls.horaFim.touched) {
-            <mat-error>
-              @if (form.controls.horaFim.errors?.['required']) {
-                Hora fim é obrigatória.
-              } @else {
-                Formato inválido (HH:mm).
-              }
-            </mat-error>
-          }
-        </mat-form-field>
+      <div class="form-field flex-1">
+        <label class="form-label">Hora fim</label>
+        <input z-input type="time" formControlName="horaFim" />
+        @if (form.controls.horaFim.invalid && form.controls.horaFim.touched) {
+          <p class="form-field__error">
+            @if (form.controls.horaFim.errors?.['required']) {
+              Hora fim é obrigatória.
+            } @else {
+              Formato inválido (HH:mm).
+            }
+          </p>
+        }
       </div>
+    </div>
 
-      <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Tolerância (minutos)</mat-label>
-        <input matInput type="number" formControlName="toleranciaMin" min="0" max="120" />
-        @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
-          <mat-error>Valor entre 0 e 120 minutos.</mat-error>
-        }
-      </mat-form-field>
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-      <button type="button" mat-button mat-dialog-close [disabled]="loading()">Cancelar</button>
-      <button type="submit" mat-flat-button color="primary" [disabled]="loading()">
-        @if (loading()) {
-          <mat-spinner diameter="20" />
-        }
-        {{ isEdit() ? 'Salvar' : 'Criar' }}
-      </button>
-    </mat-dialog-actions>
+    <div class="form-field">
+      <label class="form-label">Tolerância (minutos)</label>
+      <input z-input type="number" formControlName="toleranciaMin" min="0" max="120" />
+      @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
+        <p class="form-field__error">Valor entre 0 e 120 minutos.</p>
+      }
+    </div>
   </form>
 }

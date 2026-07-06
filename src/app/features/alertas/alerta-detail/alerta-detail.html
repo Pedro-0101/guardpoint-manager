@@ -5,23 +5,22 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="detail-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="detail-page__retry-btn" (click)="voltar()">Voltar para alertas</button>
     </div>
   } @else if (alerta(); as alerta) {
     <header class="detail-page__header">
-      <button mat-icon-button (click)="voltar()" aria-label="Voltar">
-        <mat-icon>arrow_back</mat-icon>
+      <button z-button zType="ghost" zSize="icon" (click)="voltar()" aria-label="Voltar">
+        <ng-icon name="lucideArrowLeft" />
       </button>
       <div class="detail-page__header-info">
         <h1 class="detail-page__title">
-          <mat-icon
+          <ng-icon
+            [name]="tipoIcon(alerta.tipo)"
             class="detail-page__tipo-icon"
             [class.detail-page__tipo-icon--coacao]="alerta.tipo === 'coacao' && alerta.status === 'aberto'"
-          >
-            {{ tipoIcon(alerta.tipo) }}
-          </mat-icon>
+          />
           {{ tipoLabel(alerta.tipo) }}
         </h1>
         <span class="detail-page__subtitle">{{ alerta.mensagem || 'Sem mensagem registrada' }}</span>
@@ -71,13 +70,13 @@
       @if (alerta.status !== 'encerrado') {
         <div class="detail-page__admin-actions">
           @if (alerta.status === 'aberto') {
-            <button mat-flat-button color="primary" (click)="confirmarReconhecer(alerta)">
-              <mat-icon>check_circle</mat-icon>
+            <button z-button (click)="confirmarReconhecer(alerta)">
+              <ng-icon name="lucideCheckCircle" />
               Reconhecer
             </button>
           }
-          <button mat-flat-button color="warn" (click)="confirmarEncerrar(alerta)">
-            <mat-icon>cancel</mat-icon>
+          <button z-button zType="destructive" (click)="confirmarEncerrar(alerta)">
+            <ng-icon name="lucideX" />
             Encerrar
           </button>
         </div>

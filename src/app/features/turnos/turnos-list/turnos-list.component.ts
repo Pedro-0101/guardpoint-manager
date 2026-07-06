@@ -1,18 +1,16 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { TurnosService } from '../turnos.service';
 import { TurnoFormComponent } from '../turno-form.component';
+import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -38,12 +36,9 @@ const STATUS_FILTERS: StatusFilter[] = [
     AsyncPipe,
     ReactiveFormsModule,
     ZardTableImports,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatDialogModule,
+    ZardButtonComponent,
+    ZardInputDirective,
+    NgIcon,
     LoadingSpinner,
     StatusBadge,
     EmptyState,
@@ -54,7 +49,7 @@ const STATUS_FILTERS: StatusFilter[] = [
 export class TurnosListComponent implements OnInit, OnDestroy {
   private readonly turnosService = inject(TurnosService);
   private readonly router = inject(Router);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(ZardDialogService);
   private readonly destroy$ = new Subject<void>();
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -128,12 +123,19 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   }
 
   abrirFormulario(): void {
-    const dialogRef = this.dialog.open(TurnoFormComponent, {
-      width: '520px',
+    const dialogRef = this.dialog.create({
+      zTitle: 'Iniciar turno',
+      zContent: TurnoFormComponent,
+      zWidth: '520px',
+      zOkText: 'Iniciar',
+      zOnOk: (instance) => {
+        instance.submit();
+        return false;
+      },
     });
 
     dialogRef
-      .afterClosed()
+      .afterClosed
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {

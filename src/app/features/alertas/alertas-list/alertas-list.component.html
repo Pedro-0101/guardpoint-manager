@@ -6,7 +6,7 @@
     </div>
     @if (coacaoCount() > 0) {
       <div class="list-page__coacao-badge">
-        <mat-icon>warning</mat-icon>
+        <ng-icon name="lucideTriangleAlert" />
         <span>{{ coacaoCount() }} alerta(s) de coação ativo(s)</span>
       </div>
     }
@@ -24,55 +24,55 @@
         </div>
       } @else if (error(); as errorMsg) {
         <div class="list-page__error">
-          <span class="material-symbols-outlined">error_outline</span>
+          <ng-icon name="lucideAlertCircle" />
           <p>{{ errorMsg }}</p>
           <button class="list-page__retry-btn" (click)="carregarAlertas()">Tentar novamente</button>
         </div>
       } @else {
         <div class="list-page__toolbar">
-          <mat-form-field appearance="outline" class="list-page__search">
-            <mat-label>Buscar alerta</mat-label>
-            <input matInput [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
-            <mat-icon matPrefix>search</mat-icon>
-          </mat-form-field>
+          <div class="list-page__search-wrapper">
+            <label class="form-label">Buscar alerta</label>
+            <div class="flex items-center gap-2">
+              <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
+              <input z-input class="flex-1" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
+            </div>
+          </div>
 
-          <mat-form-field appearance="outline" class="list-page__filter">
-            <mat-label>Tipo</mat-label>
-            <mat-select [formControl]="tipoControl">
+          <div class="list-page__filter-wrapper">
+            <label class="form-label">Tipo</label>
+            <select z-input [formControl]="tipoControl">
               @for (filtro of tipoFilters; track filtro.value) {
-                <mat-option [value]="filtro.value">
-                  <span class="list-page__filter-option">
-                    <mat-icon class="list-page__filter-icon">{{ filtro.icon }}</mat-icon>
-                    {{ filtro.label }}
-                  </span>
-                </mat-option>
+                <option [value]="filtro.value">
+                  <ng-icon [name]="filtro.icon" class="list-page__filter-icon" />
+                  {{ filtro.label }}
+                </option>
               }
-            </mat-select>
-          </mat-form-field>
+            </select>
+          </div>
 
-          <mat-form-field appearance="outline" class="list-page__filter">
-            <mat-label>Gravidade</mat-label>
-            <mat-select [formControl]="gravidadeControl">
+          <div class="list-page__filter-wrapper">
+            <label class="form-label">Gravidade</label>
+            <select z-input [formControl]="gravidadeControl">
               @for (filtro of gravidadeFilters; track filtro.value) {
-                <mat-option [value]="filtro.value">{{ filtro.label }}</mat-option>
+                <option [value]="filtro.value">{{ filtro.label }}</option>
               }
-            </mat-select>
-          </mat-form-field>
+            </select>
+          </div>
 
-          <mat-form-field appearance="outline" class="list-page__filter">
-            <mat-label>Status</mat-label>
-            <mat-select [formControl]="statusControl">
+          <div class="list-page__filter-wrapper">
+            <label class="form-label">Status</label>
+            <select z-input [formControl]="statusControl">
               @for (filtro of statusFilters; track filtro.value) {
-                <mat-option [value]="filtro.value">{{ filtro.label }}</mat-option>
+                <option [value]="filtro.value">{{ filtro.label }}</option>
               }
-            </mat-select>
-          </mat-form-field>
+            </select>
+          </div>
         </div>
 
         @if (filteredAlertas$ | async; as alertas) {
           @if (alertas.length === 0) {
             <gp-empty-state
-              icon="notifications_off"
+              icon="lucideBellOff"
               title="Nenhum alerta encontrado"
               [description]="
                 searchControl.value || tipoControl.value || gravidadeControl.value || statusControl.value
@@ -98,13 +98,7 @@
                     <tr [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
                       <td>
                         <span class="list-page__tipo">
-                          <mat-icon
-                            class="list-page__tipo-icon"
-                            [class.list-page__tipo-icon--coacao]="isCoercaoAberto(alerta)"
-                            [matTooltip]="tipoLabel(alerta.tipo)"
-                          >
-                            {{ tipoIcon(alerta.tipo) }}
-                          </mat-icon>
+                          <ng-icon [name]="tipoIcon(alerta.tipo)" />
                           {{ tipoLabel(alerta.tipo) }}
                         </span>
                       </td>
@@ -125,41 +119,48 @@
                       <td>{{ formatarData(alerta.createdAt) }}</td>
                       <td class="list-page__actions">
                         <button
-                          mat-icon-button
+                          z-button
+                          zType="ghost"
+                          zSize="icon"
                           (click)="verDetalhes(alerta)"
-                          matTooltip="Ver detalhes"
+                          [matTooltip]="'Ver detalhes'"
                           aria-label="Ver detalhes do alerta"
                         >
-                          <mat-icon>visibility</mat-icon>
+                          <ng-icon name="lucideEye" />
                         </button>
                         @if (alerta.status === 'aberto') {
                           <button
-                            mat-icon-button
-                            color="primary"
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
                             (click)="confirmarReconhecer(alerta)"
                             matTooltip="Reconhecer alerta"
                             aria-label="Reconhecer alerta"
                           >
-                            <mat-icon>check_circle</mat-icon>
+                            <ng-icon name="lucideCheckCircle" />
                           </button>
                           <button
-                            mat-icon-button
-                            color="warn"
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
+                            class="text-destructive"
                             (click)="confirmarEncerrar(alerta)"
                             matTooltip="Encerrar alerta"
                             aria-label="Encerrar alerta"
                           >
-                            <mat-icon>cancel</mat-icon>
+                            <ng-icon name="lucideX" />
                           </button>
                         } @else if (alerta.status === 'reconhecido') {
                           <button
-                            mat-icon-button
-                            color="warn"
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
+                            class="text-destructive"
                             (click)="confirmarEncerrar(alerta)"
                             matTooltip="Encerrar alerta"
                             aria-label="Encerrar alerta"
                           >
-                            <mat-icon>cancel</mat-icon>
+                            <ng-icon name="lucideX" />
                           </button>
                         } @else {
                           <span class="list-page__acoes-empty">—</span>

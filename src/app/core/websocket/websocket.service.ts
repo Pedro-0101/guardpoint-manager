@@ -88,7 +88,7 @@ export class WebSocketService implements OnDestroy {
   private handleClose(): void {
     if (this.manualDisconnect) return;
     this.wasConnected = true;
-    this.notification.warning('Conexão perdida. Reconectando...', true);
+    this.notification.warning('Conexão perdida. Reconectando...');
     this.scheduleReconnect();
   }
 

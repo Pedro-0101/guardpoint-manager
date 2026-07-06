@@ -4,8 +4,8 @@
       <h1 class="list-page__title">Turnos</h1>
       <p class="list-page__subtitle">Monitoramento de turnos ativos</p>
     </div>
-    <button mat-flat-button color="primary" (click)="abrirFormulario()">
-      <mat-icon>add</mat-icon>
+    <button z-button (click)="abrirFormulario()">
+      <ng-icon name="lucidePlus" />
       Novo turno
     </button>
   </header>
@@ -16,32 +16,34 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="list-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="list-page__retry-btn" (click)="carregarTurnos()">Tentar novamente</button>
     </div>
   } @else {
     <div class="list-page__toolbar">
-      <mat-form-field appearance="outline" class="list-page__search">
-        <mat-label>Buscar turno</mat-label>
-        <input matInput [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
-        <mat-icon matPrefix>search</mat-icon>
-      </mat-form-field>
+      <div class="list-page__search-wrapper">
+        <label class="form-label">Buscar turno</label>
+        <div class="flex items-center gap-2">
+          <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
+          <input z-input class="flex-1" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
+        </div>
+      </div>
 
-      <mat-form-field appearance="outline" class="list-page__status-filter">
-        <mat-label>Status</mat-label>
-        <mat-select [formControl]="statusControl">
+      <div class="list-page__filter-wrapper">
+        <label class="form-label">Status</label>
+        <select z-input [formControl]="statusControl">
           @for (filtro of statusFilters; track filtro.value) {
-            <mat-option [value]="filtro.value">{{ filtro.label }}</mat-option>
+            <option [value]="filtro.value">{{ filtro.label }}</option>
           }
-        </mat-select>
-      </mat-form-field>
+        </select>
+      </div>
     </div>
 
     @if (filteredTurnos$ | async; as turnos) {
       @if (turnos.length === 0) {
         <gp-empty-state
-          icon="schedule"
+          icon="lucideClock"
           title="Nenhum turno encontrado"
           [description]="searchControl.value || statusControl.value ? 'Nenhum turno corresponde aos filtros aplicados.' : 'Nenhum turno registrado.'"
         />
@@ -67,14 +69,15 @@
                   </td>
                   <td>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
                   <td class="list-page__actions">
-                    <button
-                      mat-icon-button
-                      color="primary"
-                      (click)="verDetalhe(turno)"
-                      aria-label="Ver detalhes do turno"
-                    >
-                      <mat-icon>visibility</mat-icon>
-                    </button>
+                      <button
+                        z-button
+                        zType="ghost"
+                        zSize="icon"
+                        (click)="verDetalhe(turno)"
+                        aria-label="Ver detalhes do turno"
+                      >
+                        <ng-icon name="lucideEye" />
+                      </button>
                   </td>
                 </tr>
               }

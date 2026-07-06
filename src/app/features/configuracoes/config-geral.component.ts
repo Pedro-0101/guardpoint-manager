@@ -1,12 +1,11 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ConfiguracoesService } from './configuracoes.service';
 import { ConfigNavComponent } from './config-nav.component';
+import { NgIcon } from '@ng-icons/core';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { NotificationService } from '../../core/services/notification.service';
@@ -16,12 +15,11 @@ import { Empresa } from '../../core/models/empresa.model';
   selector: 'gp-config-geral',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
     MatSlideToggleModule,
+    ZardInputDirective,
+    ZardButtonComponent,
     ConfigNavComponent,
+    NgIcon,
     LoadingSpinner,
     StatusBadge,
   ],

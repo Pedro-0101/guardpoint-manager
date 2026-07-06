@@ -4,13 +4,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { NgIcon } from '@ng-icons/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../core/auth/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
 
 @Component({
   selector: 'gp-login',
@@ -19,10 +20,11 @@ import { HttpErrorResponse } from '@angular/common/http';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule,
+    NgIcon,
     MatCheckboxModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    ZardAlertComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -49,7 +51,7 @@ export class LoginComponent {
     this.route.queryParams.subscribe((params) => {
       if (params['expired'] === 'true') {
         this.expiredSession.set(true);
-        this.notification.warning('Sua sessão expirou. Faça login novamente.', true);
+        this.notification.warning('Sua sessão expirou. Faça login novamente.');
       }
     });
   }

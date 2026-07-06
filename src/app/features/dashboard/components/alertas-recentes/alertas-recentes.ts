@@ -1,11 +1,12 @@
 import { Component, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { NgIcon } from '@ng-icons/core';
 import { Alerta } from '../../../../core/models/alerta.model';
 import { StatusBadge } from '../../../../shared/components/status-badge/status-badge';
 
 @Component({
   selector: 'gp-alertas-recentes',
-  imports: [DatePipe, StatusBadge],
+  imports: [DatePipe, NgIcon, StatusBadge],
   templateUrl: './alertas-recentes.html',
   styleUrl: './alertas-recentes.scss',
 })
@@ -28,11 +29,11 @@ export class AlertasRecentes {
 
   tipoIcon(t: Alerta['tipo']): string {
     const icons: Record<Alerta['tipo'], string> = {
-      atraso: 'schedule',
-      ausencia: 'person_off',
-      coacao: 'warning',
-      sabotagem: 'gpp_bad',
+      atraso: 'lucideClock',
+      ausencia: 'lucideUserX',
+      coacao: 'lucideTriangleAlert',
+      sabotagem: 'lucideShieldAlert',
     };
-    return icons[t] ?? 'error';
+    return icons[t] ?? 'lucideAlertCircle';
   }
 }

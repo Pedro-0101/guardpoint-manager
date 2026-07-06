@@ -19,7 +19,7 @@ module.exports = defineConfig([
         'error',
         {
           type: 'attribute',
-          prefix: 'gp',
+          prefix: ['gp', 'z'],
           style: 'camelCase',
         },
       ],
@@ -27,10 +27,25 @@ module.exports = defineConfig([
         'error',
         {
           type: 'element',
-          prefix: 'gp',
+          prefix: ['gp', 'z'],
           style: 'kebab-case',
         },
       ],
+    },
+  },
+  {
+    files: ['src/app/shared/components/table/**/*.ts'],
+    rules: {
+      '@angular-eslint/component-selector': 'off',
+    },
+  },
+  {
+    files: [
+      'src/app/shared/components/toast/**/*.ts',
+      'src/app/shared/components/alert/**/*.ts',
+    ],
+    rules: {
+      '@angular-eslint/component-selector': 'off',
     },
   },
   {

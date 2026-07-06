@@ -9,17 +9,14 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import * as L from 'leaflet';
 import { PostosService } from './postos.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ZardInputDirective } from '@/shared/components/input';
+import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
+import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Posto } from '../../core/models/posto.model';
 import { parseCoordenadas } from '../../shared/utils/coordenadas.util';
 
@@ -29,12 +26,7 @@ const CENTRO_BRASIL: L.LatLngExpression = [-14.235, -51.9253];
   selector: 'gp-postos-form',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatDialogModule,
+    ZardInputDirective,
   ],
   templateUrl: './postos-form.component.html',
   styleUrl: './postos-form.component.scss',
@@ -42,9 +34,9 @@ const CENTRO_BRASIL: L.LatLngExpression = [-14.235, -51.9253];
 export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly postosService = inject(PostosService);
-  private readonly dialogRef = inject(MatDialogRef<PostosFormComponent>);
+  private readonly dialogRef = inject(ZardDialogRef<PostosFormComponent>);
   private readonly notification = inject(NotificationService);
-  readonly data = inject<Posto | null>(MAT_DIALOG_DATA, { optional: true }) ?? null;
+  readonly data = inject<Posto | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
 
@@ -102,6 +94,7 @@ export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   submit(): void {
+    if (this.loading()) return;
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;

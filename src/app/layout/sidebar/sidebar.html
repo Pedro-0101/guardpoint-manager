@@ -20,7 +20,7 @@
         routerLinkActive="sidebar__link--active"
         [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
       >
-        <span class="sidebar__icon material-symbols-outlined">{{ item.icon }}</span>
+        <ng-icon [name]="item.icon" class="sidebar__icon" />
         @if (!collapsed()) {
           <span class="sidebar__label">{{ item.label }}</span>
         }
@@ -30,9 +30,7 @@
 
   <div class="sidebar__footer">
     <button class="sidebar__toggle" (click)="toggleSidebar.emit()">
-      <span class="material-symbols-outlined sidebar__icon">
-        {{ collapsed() ? 'chevron_right' : 'chevron_left' }}
-      </span>
+      <ng-icon [name]="collapsed() ? 'lucideChevronRight' : 'lucideChevronLeft'" class="sidebar__icon" />
     </button>
   </div>
 </aside>

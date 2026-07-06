@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
+import { NgIcon } from '@ng-icons/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
@@ -39,7 +39,7 @@ const PIN_COLORS: Record<PinColor, string> = {
   selector: 'gp-mapa',
   imports: [
     MatButtonModule,
-    MatIconModule,
+    NgIcon,
     MatTooltipModule,
     LoadingSpinner,
     EmptyState,

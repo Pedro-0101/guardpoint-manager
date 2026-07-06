@@ -1,8 +1,9 @@
 import { Component, input, output } from '@angular/core';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'gp-header',
-  imports: [],
+  imports: [NgIcon],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })

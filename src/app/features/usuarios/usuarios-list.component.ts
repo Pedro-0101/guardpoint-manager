@@ -1,17 +1,15 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { NgIcon } from '@ng-icons/core';
 import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosFormComponent } from './usuarios-form.component';
-import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
@@ -30,11 +28,9 @@ const CARGO_LABELS: Record<string, string> = {
     AsyncPipe,
     ReactiveFormsModule,
     ZardTableImports,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatDialogModule,
+    ZardButtonComponent,
+    ZardInputDirective,
+    NgIcon,
     LoadingSpinner,
     StatusBadge,
     EmptyState,
@@ -44,7 +40,7 @@ const CARGO_LABELS: Record<string, string> = {
 })
 export class UsuariosListComponent implements OnInit, OnDestroy {
   private readonly usuariosService = inject(UsuariosService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
 
@@ -104,13 +100,20 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   abrirFormulario(usuario?: Usuario): void {
-    const dialogRef = this.dialog.open(UsuariosFormComponent, {
-      width: '520px',
-      data: usuario ?? null,
+    const dialogRef = this.dialog.create({
+      zTitle: usuario ? 'Editar usuário' : 'Novo usuário',
+      zContent: UsuariosFormComponent,
+      zWidth: '520px',
+      zData: usuario ?? null,
+      zOkText: usuario ? 'Salvar' : 'Criar',
+      zOnOk: (instance) => {
+        instance.submit();
+        return false;
+      },
     });
 
     dialogRef
-      .afterClosed()
+      .afterClosed
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
@@ -120,34 +123,26 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   confirmarExclusao(usuario: Usuario): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      data: {
-        title: 'Inativar usuário',
-        message: `Tem certeza que deseja inativar o usuário "${usuario.nome}"?`,
-        confirmLabel: 'Inativar',
-        cancelLabel: 'Cancelar',
+    this.dialog.create({
+      zTitle: 'Inativar usuário',
+      zDescription: `Tem certeza que deseja inativar o usuário "${usuario.nome}"?`,
+      zOkText: 'Inativar',
+      zCancelText: 'Cancelar',
+      zOkDestructive: true,
+      zOnOk: () => {
+        this.usuariosService.inativar(usuario.id).subscribe({
+          next: () => {
+            this.notification.success(`Usuário "${usuario.nome}" inativado com sucesso.`);
+            this.carregarUsuarios();
+          },
+          error: (err) => {
+            this.notification.error(
+              err.message ?? 'Erro ao inativar usuário.'
+            );
+          },
+        });
       },
     });
-
-    dialogRef
-      .afterClosed()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((confirmed) => {
-        if (confirmed) {
-          this.usuariosService.inativar(usuario.id).subscribe({
-            next: () => {
-              this.notification.success(`Usuário "${usuario.nome}" inativado com sucesso.`);
-              this.carregarUsuarios();
-            },
-            error: (err) => {
-              this.notification.error(
-                err.message ?? 'Erro ao inativar usuário.'
-              );
-            },
-          });
-        }
-      });
   }
 
   cargoLabel(cargo: string): string {

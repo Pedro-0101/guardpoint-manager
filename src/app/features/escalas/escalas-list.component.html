@@ -4,8 +4,8 @@
       <h1 class="list-page__title">Escalas</h1>
       <p class="list-page__subtitle">Gerencie as escalas de trabalho</p>
     </div>
-    <button mat-flat-button color="primary" (click)="abrirFormulario()">
-      <mat-icon>add</mat-icon>
+    <button z-button (click)="abrirFormulario()">
+      <ng-icon name="lucidePlus" />
       Nova escala
     </button>
   </header>
@@ -16,23 +16,25 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="list-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="list-page__retry-btn" (click)="carregarEscalas()">Tentar novamente</button>
     </div>
   } @else {
     <div class="list-page__toolbar">
-      <mat-form-field appearance="outline" class="list-page__search">
-        <mat-label>Buscar escala</mat-label>
-        <input matInput [formControl]="searchControl" placeholder="Nome, posto ou usuário..." />
-        <mat-icon matPrefix>search</mat-icon>
-      </mat-form-field>
+      <div class="list-page__search-wrapper">
+        <label class="form-label">Buscar escala</label>
+        <div class="flex items-center gap-2">
+          <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
+          <input z-input class="flex-1" [formControl]="searchControl" placeholder="Nome, posto ou usuário..." />
+        </div>
+      </div>
     </div>
 
     @if (filteredEscalas$ | async; as escalas) {
       @if (escalas.length === 0) {
         <gp-empty-state
-          icon="event_busy"
+          icon="lucideCalendarOff"
           title="Nenhuma escala encontrada"
           [description]="searchControl.value ? 'Nenhuma escala corresponde à busca.' : 'Nenhuma escala cadastrada.'"
         />
@@ -66,11 +68,11 @@
                     <gp-status-badge [status]="escala.ativo ? 'ativo' : 'cancelado'" />
                   </td>
                   <td class="list-page__actions">
-                    <button mat-icon-button color="primary" (click)="abrirFormulario(escala)" aria-label="Editar escala">
-                      <mat-icon>edit</mat-icon>
+                    <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(escala)" aria-label="Editar escala">
+                      <ng-icon name="lucidePencil" />
                     </button>
-                    <button mat-icon-button color="warn" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
-                      <mat-icon>delete</mat-icon>
+                    <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
+                      <ng-icon name="lucideTrash2" />
                     </button>
                   </td>
                 </tr>

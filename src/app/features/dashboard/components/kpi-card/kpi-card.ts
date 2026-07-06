@@ -1,8 +1,9 @@
 import { Component, input } from '@angular/core';
+import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'gp-kpi-card',
-  imports: [],
+  imports: [NgIcon],
   templateUrl: './kpi-card.html',
   styleUrl: './kpi-card.scss',
 })

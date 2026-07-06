@@ -1,72 +1,68 @@
-<h2 mat-dialog-title>{{ isEdit() ? 'Editar usuário' : 'Novo usuário' }}</h2>
-
-<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-  <mat-dialog-content>
-    <mat-form-field appearance="outline" class="form__field">
-      <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome" placeholder="Ex: João Silva" />
-      @if (form.controls.nome.invalid && form.controls.nome.touched) {
-        <mat-error>
-          @if (form.controls.nome.errors?.['required']) {
-            Nome é obrigatório.
-          } @else if (form.controls.nome.errors?.['minlength']) {
-            Mínimo de 3 caracteres.
-          }
-        </mat-error>
-      }
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="form__field">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" placeholder="Ex: joao@email.com" />
-      @if (form.controls.email.invalid && form.controls.email.touched) {
-        <mat-error>
-          @if (form.controls.email.errors?.['required']) {
-            Email é obrigatório.
-          } @else if (form.controls.email.errors?.['email']) {
-            Email inválido.
-          }
-        </mat-error>
-      }
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="form__field">
-      <mat-label>{{ isEdit() ? 'Nova senha (opcional)' : 'Senha' }}</mat-label>
-      <input matInput [type]="hideSenha() ? 'password' : 'text'" formControlName="senha" />
-      <button type="button" mat-icon-button matSuffix (click)="hideSenha.set(!hideSenha())" [attr.aria-label]="hideSenha() ? 'Mostrar senha' : 'Ocultar senha'" tabindex="-1">
-        <mat-icon>{{ hideSenha() ? 'visibility_off' : 'visibility' }}</mat-icon>
-      </button>
-      @if (form.controls.senha.invalid && form.controls.senha.touched) {
-        <mat-error>
-          @if (form.controls.senha.errors?.['required']) {
-            Senha é obrigatória.
-          } @else if (form.controls.senha.errors?.['minlength']) {
-            Mínimo de 6 caracteres.
-          }
-        </mat-error>
-      }
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="form__field">
-      <mat-label>Cargo</mat-label>
-      <mat-select formControlName="cargo">
-        @for (cargo of cargos; track cargo.value) {
-          <mat-option [value]="cargo.value">{{ cargo.label }}</mat-option>
+<form [formGroup]="form" novalidate>
+  <div class="form-field">
+    <label class="form-label">Nome</label>
+    <input z-input formControlName="nome" placeholder="Ex: João Silva" />
+    @if (form.controls.nome.invalid && form.controls.nome.touched) {
+      <p class="form-field__error">
+        @if (form.controls.nome.errors?.['required']) {
+          Nome é obrigatório.
+        } @else if (form.controls.nome.errors?.['minlength']) {
+          Mínimo de 3 caracteres.
         }
-      </mat-select>
-      @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
-        <mat-error>Cargo é obrigatório.</mat-error>
-      }
-    </mat-form-field>
-  </mat-dialog-content>
+      </p>
+    }
+  </div>
 
-  <mat-dialog-actions align="end">
-    <button type="button" mat-button mat-dialog-close [disabled]="loading()">Cancelar</button>
-    <button type="submit" mat-flat-button color="primary" [disabled]="loading()">
-      @if (loading()) {
-        <mat-spinner diameter="20" />
+  <div class="form-field">
+    <label class="form-label">Email</label>
+    <input z-input type="email" formControlName="email" placeholder="Ex: joao@email.com" />
+    @if (form.controls.email.invalid && form.controls.email.touched) {
+      <p class="form-field__error">
+        @if (form.controls.email.errors?.['required']) {
+          Email é obrigatório.
+        } @else if (form.controls.email.errors?.['email']) {
+          Email inválido.
+        }
+      </p>
+    }
+  </div>
+
+  <div class="form-field">
+    <label class="form-label">{{ isEdit() ? 'Nova senha (opcional)' : 'Senha' }}</label>
+    <div class="flex gap-2 items-center">
+      <input z-input class="flex-1" [type]="hideSenha() ? 'password' : 'text'" formControlName="senha" />
+      <button
+        z-button
+        zType="ghost"
+        zSize="icon"
+        type="button"
+        (click)="hideSenha.set(!hideSenha())"
+        [attr.aria-label]="hideSenha() ? 'Mostrar senha' : 'Ocultar senha'"
+        tabindex="-1"
+      >
+        <ng-icon [name]="hideSenha() ? 'lucideEyeOff' : 'lucideEye'" />
+      </button>
+    </div>
+    @if (form.controls.senha.invalid && form.controls.senha.touched) {
+      <p class="form-field__error">
+        @if (form.controls.senha.errors?.['required']) {
+          Senha é obrigatória.
+        } @else if (form.controls.senha.errors?.['minlength']) {
+          Mínimo de 6 caracteres.
+        }
+      </p>
+    }
+  </div>
+
+  <div class="form-field">
+    <label class="form-label">Cargo</label>
+    <select z-input formControlName="cargo">
+      @for (cargo of cargos; track cargo.value) {
+        <option [value]="cargo.value">{{ cargo.label }}</option>
       }
-      {{ isEdit() ? 'Salvar' : 'Criar' }}
-    </button>
-  </mat-dialog-actions>
+    </select>
+    @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
+      <p class="form-field__error">Cargo é obrigatório.</p>
+    }
+  </div>
 </form>

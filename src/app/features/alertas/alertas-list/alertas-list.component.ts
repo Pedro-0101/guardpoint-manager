@@ -13,12 +13,7 @@ import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { NgIcon } from '@ng-icons/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { Subject, combineLatest } from 'rxjs';
@@ -32,8 +27,10 @@ import {
 } from 'rxjs/operators';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { AlertasService, AlertasEstatisticas } from '../alertas.service';
-import { ConfirmDialog } from '../../../shared/components/confirm-dialog/confirm-dialog';
+import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -49,11 +46,11 @@ interface TipoFilter {
 }
 
 const TIPO_FILTERS: TipoFilter[] = [
-  { value: '', label: 'Todos', icon: 'error' },
-  { value: 'atraso', label: 'Atraso', icon: 'schedule' },
-  { value: 'ausencia', label: 'Ausência', icon: 'person_off' },
-  { value: 'coacao', label: 'Coação', icon: 'warning' },
-  { value: 'sabotagem', label: 'Sabotagem', icon: 'gpp_bad' },
+  { value: '', label: 'Todos', icon: 'lucideAlertCircle' },
+  { value: 'atraso', label: 'Atraso', icon: 'lucideClock' },
+  { value: 'ausencia', label: 'Ausência', icon: 'lucideUserX' },
+  { value: 'coacao', label: 'Coação', icon: 'lucideTriangleAlert' },
+  { value: 'sabotagem', label: 'Sabotagem', icon: 'lucideShieldAlert' },
 ];
 
 interface GravidadeFilter {
@@ -88,12 +85,9 @@ const STATUS_FILTERS: StatusFilter[] = [
     ReactiveFormsModule,
     MatTabsModule,
     ZardTableImports,
-    MatButtonModule,
-    MatIconModule,
-    MatInputModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    MatDialogModule,
+    ZardButtonComponent,
+    ZardInputDirective,
+    NgIcon,
     MatTooltipModule,
     MatChipsModule,
     LoadingSpinner,
@@ -105,7 +99,7 @@ const STATUS_FILTERS: StatusFilter[] = [
 })
 export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly alertasService = inject(AlertasService);
-  private readonly dialog = inject(MatDialog);
+  private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
@@ -224,43 +218,23 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   confirmarReconhecer(alerta: Alerta): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      data: {
-        title: 'Reconhecer alerta',
-        message: `Deseja reconhecer este alerta?`,
-        confirmLabel: 'Reconhecer',
-        cancelLabel: 'Cancelar',
-      },
+    this.dialog.create({
+      zTitle: 'Reconhecer alerta',
+      zDescription: 'Deseja reconhecer este alerta?',
+      zOkText: 'Reconhecer',
+      zCancelText: 'Cancelar',
+      zOnOk: () => this.reconhecer(alerta),
     });
-
-    dialogRef
-      .afterClosed()
-      .pipe(
-        takeUntil(this.destroy$),
-        filter((confirmed) => confirmed),
-      )
-      .subscribe(() => this.reconhecer(alerta));
   }
 
   confirmarEncerrar(alerta: Alerta): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '420px',
-      data: {
-        title: 'Encerrar alerta',
-        message: `Deseja encerrar este alerta?`,
-        confirmLabel: 'Encerrar',
-        cancelLabel: 'Cancelar',
-      },
+    this.dialog.create({
+      zTitle: 'Encerrar alerta',
+      zDescription: 'Deseja encerrar este alerta?',
+      zOkText: 'Encerrar',
+      zCancelText: 'Cancelar',
+      zOnOk: () => this.encerrar(alerta),
     });
-
-    dialogRef
-      .afterClosed()
-      .pipe(
-        takeUntil(this.destroy$),
-        filter((confirmed) => confirmed),
-      )
-      .subscribe(() => this.encerrar(alerta));
   }
 
   private reconhecer(alerta: Alerta): void {
@@ -293,12 +267,12 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   tipoIcon(tipo: Alerta['tipo']): string {
     const icons: Record<Alerta['tipo'], string> = {
-      atraso: 'schedule',
-      ausencia: 'person_off',
-      coacao: 'warning',
-      sabotagem: 'gpp_bad',
+      atraso: 'lucideClock',
+      ausencia: 'lucideUserX',
+      coacao: 'lucideTriangleAlert',
+      sabotagem: 'lucideShieldAlert',
     };
-    return icons[tipo] ?? 'error';
+    return icons[tipo] ?? 'lucideAlertCircle';
   }
 
   tipoLabel(tipo: Alerta['tipo']): string {

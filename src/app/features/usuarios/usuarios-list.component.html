@@ -4,8 +4,8 @@
       <h1 class="list-page__title">Usuários</h1>
       <p class="list-page__subtitle">Gerencie os usuários do sistema</p>
     </div>
-    <button mat-flat-button color="primary" (click)="abrirFormulario()">
-      <mat-icon>add</mat-icon>
+    <button z-button (click)="abrirFormulario()">
+      <ng-icon name="lucidePlus" />
       Novo usuário
     </button>
   </header>
@@ -16,23 +16,25 @@
     </div>
   } @else if (error(); as errorMsg) {
     <div class="list-page__error">
-      <span class="material-symbols-outlined">error_outline</span>
+      <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
       <button class="list-page__retry-btn" (click)="carregarUsuarios()">Tentar novamente</button>
     </div>
   } @else {
     <div class="list-page__toolbar">
-      <mat-form-field appearance="outline" class="list-page__search">
-        <mat-label>Buscar usuário</mat-label>
-        <input matInput [formControl]="searchControl" placeholder="Nome ou email..." />
-        <mat-icon matPrefix>search</mat-icon>
-      </mat-form-field>
+      <div class="list-page__search-wrapper">
+        <label class="form-label">Buscar usuário</label>
+        <div class="flex items-center gap-2">
+          <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
+          <input z-input class="flex-1" [formControl]="searchControl" placeholder="Nome ou email..." />
+        </div>
+      </div>
     </div>
 
     @if (filteredUsuarios$ | async; as usuarios) {
       @if (usuarios.length === 0) {
         <gp-empty-state
-          icon="person_off"
+          icon="lucideUserX"
           title="Nenhum usuário encontrado"
           [description]="searchControl.value ? 'Nenhum usuário corresponde à busca.' : 'Nenhum usuário cadastrado.'"
         />
@@ -58,12 +60,12 @@
                     <gp-status-badge [status]="usuario.ativo ? 'ativo' : 'cancelado'" />
                   </td>
                   <td class="list-page__actions">
-                    <button mat-icon-button color="primary" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
-                      <mat-icon>edit</mat-icon>
+                    <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
+                      <ng-icon name="lucidePencil" />
                     </button>
                     @if (usuario.ativo) {
-                      <button mat-icon-button color="warn" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
-                        <mat-icon>block</mat-icon>
+                      <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
+                        <ng-icon name="lucideBan" />
                       </button>
                     }
                   </td>

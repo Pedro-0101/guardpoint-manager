@@ -1,8 +1,9 @@
 import { Component, input } from '@angular/core';
+import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
 
 @Component({
   selector: 'gp-empty-state',
-  imports: [],
+  imports: [ZardEmptyComponent],
   templateUrl: './empty-state.html',
   styleUrl: './empty-state.scss',
 })

@@ -1,8 +1,9 @@
 import { Component, input } from '@angular/core';
+import { ZardLoaderComponent } from '@/shared/components/loader/loader.component';
 
 @Component({
   selector: 'gp-loading-spinner',
-  imports: [],
+  imports: [ZardLoaderComponent],
   templateUrl: './loading-spinner.html',
   styleUrl: './loading-spinner.scss',
 })
