@@ -8,7 +8,9 @@ import {
   ElementRef,
   viewChild,
 } from '@angular/core';
-import { AsyncPipe, DatePipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AsyncPipe } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -52,9 +54,6 @@ const TIPO_FILTERS: TipoFilter[] = [
   { value: 'ausencia', label: 'Ausência', icon: 'person_off' },
   { value: 'coacao', label: 'Coação', icon: 'warning' },
   { value: 'sabotagem', label: 'Sabotagem', icon: 'gpp_bad' },
-  { value: 'bateria_baixa', label: 'Bateria Baixa', icon: 'battery_alert' },
-  { value: 'fora_raio', label: 'Fora do Raio', icon: 'location_off' },
-  { value: 'sessao_expirada', label: 'Sessão Expirada', icon: 'timer_off' },
 ];
 
 interface GravidadeFilter {
@@ -86,7 +85,6 @@ const STATUS_FILTERS: StatusFilter[] = [
   selector: 'gp-alertas-list',
   imports: [
     AsyncPipe,
-    DatePipe,
     ReactiveFormsModule,
     MatTabsModule,
     MatTableModule,
@@ -109,6 +107,7 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
   private readonly alertasService = inject(AlertasService);
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
+  private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -186,28 +185,18 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
   private porStatusChart: Chart | null = null;
   private porDiaChart: Chart | null = null;
 
-  private readonly coacaoAlertas = new Set<string>();
-  private audioContext: AudioContext | null = null;
-
-  readonly coacaoCount = signal(0);
+  // Som e toast de coação agora disparam globalmente a partir do AlertasService
+  // (funcionam em qualquer tela, não só aqui). Este signal só alimenta o destaque
+  // visual local (badge no cabeçalho + linhas piscando na tabela).
+  readonly coacaoCount = toSignal(
+    this.alertas$.pipe(
+      map((alertas) => alertas.filter((a) => a.tipo === 'coacao' && a.status === 'aberto').length),
+    ),
+    { initialValue: 0 },
+  );
 
   ngOnInit(): void {
     this.carregarAlertas();
-
-    this.alertas$
-      .pipe(
-        takeUntil(this.destroy$),
-        map((alertas) => alertas.filter((a) => a.tipo === 'coacao' && a.status === 'aberto')),
-      )
-      .subscribe((coacaoAlertas) => {
-        for (const a of coacaoAlertas) {
-          if (!this.coacaoAlertas.has(a.id)) {
-            this.coacaoAlertas.add(a.id);
-            this.tocarSomCoacao();
-          }
-        }
-        this.coacaoCount.set(coacaoAlertas.length);
-      });
   }
 
   ngAfterViewInit(): void {
@@ -218,10 +207,6 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.destroy$.next();
     this.destroy$.complete();
     this.destruirGraficos();
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
-    }
   }
 
   carregarAlertas(): void {
@@ -233,7 +218,7 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (alertas) => {
-          this.alertasService['alertasSubject'].next(alertas);
+          this.alertasService.substituirLista(alertas);
           this.loading.set(false);
         },
         error: (err) => {
@@ -241,6 +226,10 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
           this.loading.set(false);
         },
       });
+  }
+
+  verDetalhes(alerta: Alerta): void {
+    this.router.navigate(['/alertas', alerta.id]);
   }
 
   confirmarReconhecer(alerta: Alerta): void {
@@ -317,9 +306,6 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
       ausencia: 'person_off',
       coacao: 'warning',
       sabotagem: 'gpp_bad',
-      bateria_baixa: 'battery_alert',
-      fora_raio: 'location_off',
-      sessao_expirada: 'timer_off',
     };
     return icons[tipo] ?? 'error';
   }
@@ -330,9 +316,6 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
       ausencia: 'Ausência',
       coacao: 'Coação',
       sabotagem: 'Sabotagem',
-      bateria_baixa: 'Bateria Baixa',
-      fora_raio: 'Fora do Raio',
-      sessao_expirada: 'Sessão Expirada',
     };
     return labels[tipo] ?? tipo;
   }
@@ -406,14 +389,7 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
         datasets: [
           {
             data: stats.porTipo.map((d) => d.total),
-            backgroundColor: [
-              '#ff9800',
-              '#9c27b0',
-              '#f44336',
-              '#ff5722',
-              '#4caf50',
-              '#607d8b',
-            ],
+            backgroundColor: ['#ff9800', '#9c27b0', '#f44336', '#ff5722'],
             borderWidth: 0,
           },
         ],
@@ -521,33 +497,5 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     const diaCanvas = this.porDiaCanvas()?.nativeElement;
     if (diaCanvas) this.porDiaChart = new Chart(diaCanvas, configPorDia);
-  }
-
-  private tocarSomCoacao(): void {
-    try {
-      if (!this.audioContext) {
-        this.audioContext = new AudioContext();
-      }
-      const ctx = this.audioContext;
-
-      const oscilador = ctx.createOscillator();
-      const ganho = ctx.createGain();
-
-      oscilador.connect(ganho);
-      ganho.connect(ctx.destination);
-
-      oscilador.type = 'square';
-      oscilador.frequency.setValueAtTime(880, ctx.currentTime);
-      oscilador.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
-      oscilador.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
-
-      ganho.gain.setValueAtTime(0.3, ctx.currentTime);
-      ganho.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
-
-      oscilador.start(ctx.currentTime);
-      oscilador.stop(ctx.currentTime + 0.5);
-    } catch {
-      // som não suportado ou contexto de áudio bloqueado
-    }
   }
 }

@@ -1,8 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { BehaviorSubject, Observable, map, of, tap } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
 import { NewAlertPayload } from '../../core/websocket/websocket.types';
+import { NotificationService } from '../../core/services/notification.service';
 import { Alerta } from '../../core/models/alerta.model';
 
 export interface AlertasFiltros {
@@ -58,9 +60,6 @@ function normalizarTipo(raw: string): Alerta['tipo'] {
   if (raw === 'no_show') return 'ausencia';
   if (raw === 'coacao') return 'coacao';
   if (raw === 'sabotagem') return 'sabotagem';
-  if (raw === 'bateria_baixa' || raw === 'fora_raio' || raw === 'sessao_expirada') {
-    return raw;
-  }
   return 'atraso';
 }
 
@@ -87,24 +86,52 @@ function gravidadePorTipo(raw: string, nivel: number): Alerta['gravidade'] {
 export class AlertasService {
   private readonly api = inject(ApiService);
   private readonly ws = inject(WebSocketService);
+  private readonly notification = inject(NotificationService);
 
   private readonly alertasSubject = new BehaviorSubject<Alerta[]>([]);
   readonly alertas$ = this.alertasSubject.asObservable();
+
+  /** Contagem de alertas abertos, usada no badge do menu lateral (global, qualquer tela). */
+  readonly alertasAbertosCount = toSignal(
+    this.alertas$.pipe(map((alertas) => alertas.filter((a) => a.status === 'aberto').length)),
+    { initialValue: 0 },
+  );
+
+  private audioContext: AudioContext | null = null;
 
   constructor() {
     this.ws
       .onEvent<NewAlertPayload>('new_alert')
       .subscribe((payload) => this.handleNewAlert(payload));
+
+    // Popula a lista assim que o serviço é instanciado (ver MainLayout), para que o
+    // badge de alertas abertos já reflita o estado real logo após o login.
+    this.carregarLista();
   }
 
   listar(filtros?: AlertasFiltros): Observable<Alerta[]> {
     // Apenas `status` é filtrado no servidor; tipo/gravidade/busca são aplicados no
     // cliente (o `tipo` do domínio não corresponde 1:1 ao `tipo` do backend).
-    const params: Record<string, string> = {};
+    // `limit=100` (teto aceito pelo backend) evita o default de 20 itens truncar a
+    // lista silenciosamente; não há paginador nesta tela.
+    const params: Record<string, string> = { limit: '100' };
     if (filtros?.status) params['status'] = filtros.status;
     return this.api
       .get<AlertaListResponse>('/alertas', params)
       .pipe(map((resp) => (resp?.data ?? []).map((dto) => this.mapAlertaFromDto(dto))));
+  }
+
+  /** Busca um alerta pelo id na lista já carregada; recarrega uma vez se não encontrar
+   *  (cobre deep-link/refresh direto em `/alertas/:id` — o backend não expõe
+   *  `GET /alertas/{id}`). */
+  obterPorId(id: string): Observable<Alerta | undefined> {
+    const existente = this.alertasSubject.value.find((a) => a.id === id);
+    if (existente) return of(existente);
+
+    return this.listar().pipe(
+      tap((alertas) => this.substituirLista(alertas)),
+      map((alertas) => alertas.find((a) => a.id === id)),
+    );
   }
 
   reconhecer(id: string): Observable<{ status: string }> {
@@ -123,9 +150,13 @@ export class AlertasService {
 
   carregarLista(filtros?: AlertasFiltros): void {
     this.listar(filtros).subscribe({
-      next: (alertas) => this.alertasSubject.next(alertas),
+      next: (alertas) => this.substituirLista(alertas),
       error: (err) => console.error('[AlertasService] Erro ao listar:', err.message),
     });
+  }
+
+  substituirLista(alertas: Alerta[]): void {
+    this.alertasSubject.next(alertas);
   }
 
   atualizarStatusLocal(id: string, status: Alerta['status']): void {
@@ -186,10 +217,12 @@ export class AlertasService {
 
     if (current.some((a) => a.id === payload.alertaId)) return;
 
+    const tipo = normalizarTipo(payload.tipo);
+
     const alerta: Alerta = {
       id: payload.alertaId,
       turnoId: payload.turnoId ?? '',
-      tipo: normalizarTipo(payload.tipo),
+      tipo,
       gravidade: gravidadePorTipo(payload.tipo, payload.nivel),
       status: 'aberto',
       mensagem: '',
@@ -199,5 +232,40 @@ export class AlertasService {
       updatedAt: new Date().toISOString(),
     };
     this.alertasSubject.next([alerta, ...current]);
+
+    if (tipo === 'coacao') {
+      this.tocarSomCoacao();
+      this.notification.error('🚨 Alerta de coação detectado! Verifique o turno imediatamente.', true);
+    }
+  }
+
+  /** Som de alerta (Web Audio API) para coação — dispara globalmente, em qualquer tela,
+   *  não só quando o usuário está em `/alertas`. */
+  private tocarSomCoacao(): void {
+    try {
+      if (!this.audioContext) {
+        this.audioContext = new AudioContext();
+      }
+      const ctx = this.audioContext;
+
+      const oscilador = ctx.createOscillator();
+      const ganho = ctx.createGain();
+
+      oscilador.connect(ganho);
+      ganho.connect(ctx.destination);
+
+      oscilador.type = 'square';
+      oscilador.frequency.setValueAtTime(880, ctx.currentTime);
+      oscilador.frequency.setValueAtTime(440, ctx.currentTime + 0.15);
+      oscilador.frequency.setValueAtTime(880, ctx.currentTime + 0.3);
+
+      ganho.gain.setValueAtTime(0.3, ctx.currentTime);
+      ganho.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+      oscilador.start(ctx.currentTime);
+      oscilador.stop(ctx.currentTime + 0.5);
+    } catch {
+      // som não suportado ou contexto de áudio bloqueado
+    }
   }
 }

@@ -77,6 +77,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'alertas/:id',
+        canActivate: [roleGuard(['admin', 'supervisor'])],
+        loadComponent: () =>
+          import('./features/alertas/alerta-detail/alerta-detail').then(
+            (m) => m.AlertaDetailComponent
+          ),
+      },
+      {
         path: 'escalas',
         canActivate: [featureEscalasGuard], // TODO(F8): remover guard quando /api/escalas existir
         loadComponent: () =>

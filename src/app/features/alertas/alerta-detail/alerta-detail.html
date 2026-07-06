@@ -1,0 +1,87 @@
+<div class="detail-page">
+  @if (loading()) {
+    <div class="detail-page__loading">
+      <gp-loading-spinner message="Carregando alerta..." />
+    </div>
+  } @else if (error(); as errorMsg) {
+    <div class="detail-page__error">
+      <span class="material-symbols-outlined">error_outline</span>
+      <p>{{ errorMsg }}</p>
+      <button class="detail-page__retry-btn" (click)="voltar()">Voltar para alertas</button>
+    </div>
+  } @else if (alerta(); as alerta) {
+    <header class="detail-page__header">
+      <button mat-icon-button (click)="voltar()" aria-label="Voltar">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="detail-page__header-info">
+        <h1 class="detail-page__title">
+          <mat-icon
+            class="detail-page__tipo-icon"
+            [class.detail-page__tipo-icon--coacao]="alerta.tipo === 'coacao' && alerta.status === 'aberto'"
+          >
+            {{ tipoIcon(alerta.tipo) }}
+          </mat-icon>
+          {{ tipoLabel(alerta.tipo) }}
+        </h1>
+        <span class="detail-page__subtitle">{{ alerta.mensagem || 'Sem mensagem registrada' }}</span>
+      </div>
+      <div class="detail-page__header-status">
+        <gp-status-badge [status]="alerta.status" />
+      </div>
+    </header>
+
+    <section class="detail-page__info">
+      <h2 class="detail-page__section-title">Informações do Alerta</h2>
+      <div class="detail-page__info-grid">
+        <div class="detail-page__info-item">
+          <span class="detail-page__info-label">Tipo</span>
+          <span class="detail-page__info-value">{{ tipoLabel(alerta.tipo) }}</span>
+        </div>
+        <div class="detail-page__info-item">
+          <span class="detail-page__info-label">Gravidade</span>
+          <span class="detail-page__info-value">{{ gravidadeLabel(alerta.gravidade) }}</span>
+        </div>
+        <div class="detail-page__info-item">
+          <span class="detail-page__info-label">Status</span>
+          <span class="detail-page__info-value">
+            <gp-status-badge [status]="alerta.status" />
+          </span>
+        </div>
+        <div class="detail-page__info-item">
+          <span class="detail-page__info-label">Criado em</span>
+          <span class="detail-page__info-value">{{ formatarData(alerta.createdAt) }}</span>
+        </div>
+        @if (alerta.status === 'encerrado') {
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Resolvido em</span>
+            <span class="detail-page__info-value">{{ formatarData(alerta.updatedAt) }}</span>
+          </div>
+        }
+        @if (alerta.turnoId) {
+          <div class="detail-page__info-item">
+            <span class="detail-page__info-label">Turno</span>
+            <span class="detail-page__info-value">
+              <a [routerLink]="['/turnos', alerta.turnoId]">Ver turno</a>
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (alerta.status !== 'encerrado') {
+        <div class="detail-page__admin-actions">
+          @if (alerta.status === 'aberto') {
+            <button mat-flat-button color="primary" (click)="confirmarReconhecer(alerta)">
+              <mat-icon>check_circle</mat-icon>
+              Reconhecer
+            </button>
+          }
+          <button mat-flat-button color="warn" (click)="confirmarEncerrar(alerta)">
+            <mat-icon>cancel</mat-icon>
+            Encerrar
+          </button>
+        </div>
+      }
+    </section>
+  }
+</div>

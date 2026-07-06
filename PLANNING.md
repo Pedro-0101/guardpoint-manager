@@ -447,10 +447,10 @@ export class TurnosService {
 - [x] Substituir polling do dashboard por dados em tempo real
 
 ### Fase 8 — Alertas
-- [ ] Lista de alertas com filtros
-- [ ] Ações reconhecer/encerrar
-- [ ] Destaque visual e sonoro para alertas de coação
-- [ ] Estatísticas e gráficos de alertas
+- [x] Lista de alertas com filtros
+- [x] Ações reconhecer/encerrar
+- [x] Destaque visual e sonoro para alertas de coação (global — funciona em qualquer tela, com toast persistente e badge no header)
+- [x] Estatísticas e gráficos de alertas
 
 ### Fase 9 — Configurações e Escalonamento
 - [ ] Tela de configuração de níveis de escalonamento

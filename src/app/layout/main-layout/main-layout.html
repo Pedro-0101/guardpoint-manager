@@ -5,7 +5,13 @@
     (toggleSidebar)="onToggleSidebar()"
   />
   <div class="layout__main">
-    <gp-header (toggleSidebar)="onToggleSidebar()" [userName]="userName()" [userRole]="userRole()" (logout)="authService.logout()" />
+    <gp-header
+      (toggleSidebar)="onToggleSidebar()"
+      [userName]="userName()"
+      [userRole]="userRole()"
+      [notificationCount]="alertasAbertosCount()"
+      (logout)="authService.logout()"
+    />
     <div class="layout__content">
       <router-outlet />
     </div>
