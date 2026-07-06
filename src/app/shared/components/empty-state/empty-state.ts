@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ZardEmptyComponent } from '@/shared/components/empty/empty.component';
+import { ZardEmptyComponent } from '../empty/empty.component';
 
 @Component({
   selector: 'gp-empty-state',

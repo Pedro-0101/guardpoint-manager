@@ -9,9 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatButtonModule } from '@angular/material/button';
 import { NgIcon } from '@ng-icons/core';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject } from 'rxjs';
 import { takeUntil, catchError } from 'rxjs/operators';
 import * as L from 'leaflet';
@@ -38,9 +36,7 @@ const PIN_COLORS: Record<PinColor, string> = {
 @Component({
   selector: 'gp-mapa',
   imports: [
-    MatButtonModule,
     NgIcon,
-    MatTooltipModule,
     LoadingSpinner,
     EmptyState,
   ],

@@ -12,10 +12,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatTabsModule } from '@angular/material/tabs';
 import { NgIcon } from '@ng-icons/core';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatChipsModule } from '@angular/material/chips';
 import { Subject, combineLatest } from 'rxjs';
 import {
   takeUntil,
@@ -83,13 +80,10 @@ const STATUS_FILTERS: StatusFilter[] = [
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    MatTabsModule,
     ZardTableImports,
     ZardButtonComponent,
     ZardInputDirective,
     NgIcon,
-    MatTooltipModule,
-    MatChipsModule,
     LoadingSpinner,
     StatusBadge,
     EmptyState,

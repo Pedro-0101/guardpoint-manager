@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ZardLoaderComponent } from '@/shared/components/loader/loader.component';
+import { ZardLoaderComponent } from '../loader/loader.component';
 
 @Component({
   selector: 'gp-loading-spinner',

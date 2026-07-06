@@ -1,30 +1,27 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { NgIcon } from '@ng-icons/core';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../core/auth/auth.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { HttpErrorResponse } from '@angular/common/http';
+
 import { ZardAlertComponent } from '@/shared/components/alert/alert.component';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { ZardInputDirective } from '@/shared/components/input/input.directive';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
 
 @Component({
   selector: 'gp-login',
   imports: [
     ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
     NgIcon,
-    MatCheckboxModule,
-    MatProgressSpinnerModule,
-    MatCardModule,
     ZardAlertComponent,
+    ZardCardComponent,
+    ZardInputDirective,
+    ZardButtonComponent,
+    ZardCheckboxComponent,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',

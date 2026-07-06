@@ -46,9 +46,10 @@
         </div>
       </div>
 
-      <mat-slide-toggle formControlName="alertaSonoro" class="settings-form__toggle">
+      <label class="settings-form__toggle">
+        <z-switch formControlName="alertaSonoro" />
         Tocar som de alerta em coação
-      </mat-slide-toggle>
+      </label>
 
       <div class="settings-form__actions">
         <button type="submit" z-button [zDisabled]="saving() || form.invalid">

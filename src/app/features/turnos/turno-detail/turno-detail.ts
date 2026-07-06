@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgIcon } from '@ng-icons/core';
-import { MatChipsModule } from '@angular/material/chips';
 import { Subject, of } from 'rxjs';
 import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import * as L from 'leaflet';
@@ -44,7 +43,6 @@ const TIPO_CHECKIN_MAP: Record<string, { icon: string; label: string; color: str
   selector: 'gp-turno-detail',
   imports: [
     NgIcon,
-    MatChipsModule,
     ZardButtonComponent,
     LoadingSpinner,
     StatusBadge,

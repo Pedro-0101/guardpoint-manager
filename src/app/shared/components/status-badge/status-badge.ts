@@ -1,5 +1,5 @@
 import { Component, computed, input } from '@angular/core';
-import { ZardBadgeComponent } from '@/shared/components/badge/badge.component';
+import { ZardBadgeComponent } from '../badge/badge.component';
 
 export type StatusType =
   | 'ativo'

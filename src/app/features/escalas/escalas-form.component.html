@@ -60,11 +60,7 @@
     <div class="form__row">
       <div class="form-field flex-1">
         <label class="form-label">Data início</label>
-        <div class="flex gap-2 items-center">
-          <input z-input class="flex-1" [matDatepicker]="pickerInicio" formControlName="dataInicio" />
-          <mat-datepicker-toggle [for]="pickerInicio" />
-          <mat-datepicker #pickerInicio />
-        </div>
+        <input z-input type="date" formControlName="dataInicio" />
         @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
           <p class="form-field__error">Data início é obrigatória.</p>
         }
@@ -72,11 +68,7 @@
 
       <div class="form-field flex-1">
         <label class="form-label">Data fim</label>
-        <div class="flex gap-2 items-center">
-          <input z-input class="flex-1" [matDatepicker]="pickerFim" formControlName="dataFim" />
-          <mat-datepicker-toggle [for]="pickerFim" />
-          <mat-datepicker #pickerFim />
-        </div>
+        <input z-input type="date" formControlName="dataFim" />
         @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
           <p class="form-field__error">Data fim é obrigatória.</p>
         }

@@ -1,11 +1,11 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ConfiguracoesService } from './configuracoes.service';
 import { ConfigNavComponent } from './config-nav.component';
 import { NgIcon } from '@ng-icons/core';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardSwitchComponent } from '@/shared/components/switch/switch.component';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { NotificationService } from '../../core/services/notification.service';
@@ -15,7 +15,7 @@ import { Empresa } from '../../core/models/empresa.model';
   selector: 'gp-config-geral',
   imports: [
     ReactiveFormsModule,
-    MatSlideToggleModule,
+    ZardSwitchComponent,
     ZardInputDirective,
     ZardButtonComponent,
     ConfigNavComponent,

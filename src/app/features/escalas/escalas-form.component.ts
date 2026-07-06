@@ -1,9 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
 import { forkJoin } from 'rxjs';
 import { EscalasService } from './escalas.service';
 import { PostosService } from '../postos/postos.service';
@@ -23,9 +19,6 @@ import { Usuario } from '../../core/models/usuario.model';
     ReactiveFormsModule,
     ZardInputDirective,
     LoadingSpinner,
-    MatButtonToggleModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
   ],
   templateUrl: './escalas-form.component.html',
   styleUrl: './escalas-form.component.scss',
@@ -63,8 +56,8 @@ export class EscalasFormComponent implements OnInit {
     diasSemana: [[] as number[], [Validators.required, Validators.minLength(1)]],
     horaInicio: ['08:00', [Validators.required, Validators.pattern(/^\d{2}:\d{2}$/)]],
     horaFim: ['18:00', [Validators.required, Validators.pattern(/^\d{2}:\d{2}$/)]],
-    dataInicio: [new Date(), [Validators.required]],
-    dataFim: [new Date(), [Validators.required]],
+    dataInicio: [new Date().toISOString().slice(0, 10), [Validators.required]],
+    dataFim: [new Date().toISOString().slice(0, 10), [Validators.required]],
     toleranciaMin: [0, [Validators.required, Validators.min(0), Validators.max(120)]],
     ativo: [true],
   });
@@ -81,8 +74,8 @@ export class EscalasFormComponent implements OnInit {
         diasSemana: this.data.diasSemana,
         horaInicio: this.data.horaInicio,
         horaFim: this.data.horaFim,
-        dataInicio: new Date(this.data.dataInicio + 'T00:00:00'),
-        dataFim: new Date(this.data.dataFim + 'T00:00:00'),
+        dataInicio: this.data.dataInicio,
+        dataFim: this.data.dataFim,
         toleranciaMin: this.data.toleranciaMin,
         ativo: this.data.ativo,
       });
@@ -122,11 +115,8 @@ export class EscalasFormComponent implements OnInit {
     return this.form.controls.diasSemana.value.includes(dia);
   }
 
-  private toDateString(date: Date): string {
-    const ano = date.getFullYear();
-    const mes = String(date.getMonth() + 1).padStart(2, '0');
-    const dia = String(date.getDate()).padStart(2, '0');
-    return `${ano}-${mes}-${dia}`;
+  private toDateString(date: string): string {
+    return date;
   }
 
   submit(): void {

@@ -86,11 +86,11 @@
             {{ total() }} registro(s) encontrado(s)
           </span>
           <div class="relatorios__export-buttons">
-            <button z-button zType="outline" (click)="exportarCSV()" [zDisabled]="exporting()" [matTooltip]="'Exportar como CSV'">
+            <button z-button zType="outline" (click)="exportarCSV()" [zDisabled]="exporting()" title="Exportar como CSV">
               <ng-icon name="lucideTable" />
               CSV
             </button>
-            <button z-button zType="outline" (click)="exportarPDF()" [zDisabled]="exporting()" [matTooltip]="'Exportar como PDF'">
+            <button z-button zType="outline" (click)="exportarPDF()" [zDisabled]="exporting()" title="Exportar como PDF">
               <ng-icon name="lucideFileText" />
               PDF
             </button>
@@ -98,7 +98,9 @@
         </div>
 
         @if (exporting()) {
-          <mat-progress-bar mode="indeterminate" class="relatorios__export-progress" />
+          <div class="relatorios__export-progress">
+            <div class="relatorios__export-progress-bar"></div>
+          </div>
         }
 
         <div class="relatorios__table-wrapper">
@@ -132,14 +134,11 @@
           </table>
         </div>
 
-        <mat-paginator
-          [length]="total()"
+        <z-pagination
+          [totalItems]="total()"
           [pageSize]="pageSize()"
-          [pageIndex]="pageIndex()"
-          [pageSizeOptions]="pageSizeOptions"
-          [showFirstLastButtons]="true"
-          (page)="onPageChange($event)"
-          aria-label="Paginação do histórico"
+          [currentPage]="pageIndex() + 1"
+          (pageChange)="onPageChange($event)"
         />
       </div>
 

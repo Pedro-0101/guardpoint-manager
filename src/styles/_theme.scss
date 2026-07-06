@@ -1,14 +1,3 @@
-@use '@angular/material' as mat;
-
-html {
+:root {
   color-scheme: light;
-  @include mat.theme((
-    color: (
-      theme-type: light,
-      primary: mat.$azure-palette,
-      tertiary: mat.$cyan-palette,
-    ),
-    typography: Roboto,
-    density: 0,
-  ));
 }

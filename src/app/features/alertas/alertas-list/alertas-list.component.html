@@ -12,118 +12,130 @@
     }
   </header>
 
-  <mat-tab-group
-    [selectedIndex]="activeTab()"
-    (selectedIndexChange)="onTabChange($event)"
-    animationDuration="0"
-  >
-    <mat-tab label="Lista">
-      @if (loading()) {
-        <div class="list-page__loading">
-          <gp-loading-spinner message="Carregando alertas..." />
-        </div>
-      } @else if (error(); as errorMsg) {
-        <div class="list-page__error">
-          <ng-icon name="lucideAlertCircle" />
-          <p>{{ errorMsg }}</p>
-          <button class="list-page__retry-btn" (click)="carregarAlertas()">Tentar novamente</button>
-        </div>
-      } @else {
-        <div class="list-page__toolbar">
-          <div class="list-page__search-wrapper">
-            <label class="form-label">Buscar alerta</label>
-            <div class="flex items-center gap-2">
-              <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
-              <input z-input class="flex-1" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
-            </div>
-          </div>
+  <div class="list-page__tabs">
+    <button
+      class="list-page__tab"
+      [class.list-page__tab--active]="activeTab() === 0"
+      (click)="onTabChange(0)"
+    >
+      Lista
+    </button>
+    <button
+      class="list-page__tab"
+      [class.list-page__tab--active]="activeTab() === 1"
+      (click)="onTabChange(1)"
+    >
+      Estatísticas
+    </button>
+  </div>
 
-          <div class="list-page__filter-wrapper">
-            <label class="form-label">Tipo</label>
-            <select z-input [formControl]="tipoControl">
-              @for (filtro of tipoFilters; track filtro.value) {
-                <option [value]="filtro.value">
-                  <ng-icon [name]="filtro.icon" class="list-page__filter-icon" />
-                  {{ filtro.label }}
-                </option>
-              }
-            </select>
-          </div>
-
-          <div class="list-page__filter-wrapper">
-            <label class="form-label">Gravidade</label>
-            <select z-input [formControl]="gravidadeControl">
-              @for (filtro of gravidadeFilters; track filtro.value) {
-                <option [value]="filtro.value">{{ filtro.label }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="list-page__filter-wrapper">
-            <label class="form-label">Status</label>
-            <select z-input [formControl]="statusControl">
-              @for (filtro of statusFilters; track filtro.value) {
-                <option [value]="filtro.value">{{ filtro.label }}</option>
-              }
-            </select>
+  @if (activeTab() === 0) {
+    @if (loading()) {
+      <div class="list-page__loading">
+        <gp-loading-spinner message="Carregando alertas..." />
+      </div>
+    } @else if (error(); as errorMsg) {
+      <div class="list-page__error">
+        <ng-icon name="lucideAlertCircle" />
+        <p>{{ errorMsg }}</p>
+        <button class="list-page__retry-btn" (click)="carregarAlertas()">Tentar novamente</button>
+      </div>
+    } @else {
+      <div class="list-page__toolbar">
+        <div class="list-page__search-wrapper">
+          <label class="form-label">Buscar alerta</label>
+          <div class="flex items-center gap-2">
+            <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
+            <input z-input class="flex-1" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
           </div>
         </div>
 
-        @if (filteredAlertas$ | async; as alertas) {
-          @if (alertas.length === 0) {
-            <gp-empty-state
-              icon="lucideBellOff"
-              title="Nenhum alerta encontrado"
-              [description]="
-                searchControl.value || tipoControl.value || gravidadeControl.value || statusControl.value
-                  ? 'Nenhum alerta corresponde aos filtros aplicados.'
-                  : 'Nenhum alerta registrado.'
-              "
-            />
-          } @else {
-            <div class="list-page__table-wrapper">
-              <table z-table zType="striped" class="list-page__table">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Gravidade</th>
-                    <th>Status</th>
-                    <th>Mensagem</th>
-                    <th>Data</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (alerta of alertas; track alerta.id) {
-                    <tr [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
-                      <td>
-                        <span class="list-page__tipo">
-                          <ng-icon [name]="tipoIcon(alerta.tipo)" />
-                          {{ tipoLabel(alerta.tipo) }}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          class="list-page__gravidade"
-                          [class]="'list-page__gravidade--' + alerta.gravidade"
-                        >
-                          {{ gravidadeLabel(alerta.gravidade) }}
-                        </span>
-                      </td>
-                      <td>
-                        <gp-status-badge [status]="alerta.status" />
-                      </td>
-                      <td class="list-page__mensagem-cell">
-                        {{ alerta.mensagem || '—' }}
-                      </td>
-                      <td>{{ formatarData(alerta.createdAt) }}</td>
-                      <td class="list-page__actions">
+        <div class="list-page__filter-wrapper">
+          <label class="form-label">Tipo</label>
+          <select z-input [formControl]="tipoControl">
+            @for (filtro of tipoFilters; track filtro.value) {
+              <option [value]="filtro.value">
+                <ng-icon [name]="filtro.icon" class="list-page__filter-icon" />
+                {{ filtro.label }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="list-page__filter-wrapper">
+          <label class="form-label">Gravidade</label>
+          <select z-input [formControl]="gravidadeControl">
+            @for (filtro of gravidadeFilters; track filtro.value) {
+              <option [value]="filtro.value">{{ filtro.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="list-page__filter-wrapper">
+          <label class="form-label">Status</label>
+          <select z-input [formControl]="statusControl">
+            @for (filtro of statusFilters; track filtro.value) {
+              <option [value]="filtro.value">{{ filtro.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      @if (filteredAlertas$ | async; as alertas) {
+        @if (alertas.length === 0) {
+          <gp-empty-state
+            icon="lucideBellOff"
+            title="Nenhum alerta encontrado"
+            [description]="
+              searchControl.value || tipoControl.value || gravidadeControl.value || statusControl.value
+                ? 'Nenhum alerta corresponde aos filtros aplicados.'
+                : 'Nenhum alerta registrado.'
+            "
+          />
+        } @else {
+          <div class="list-page__table-wrapper">
+            <table z-table zType="striped" class="list-page__table">
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Gravidade</th>
+                  <th>Status</th>
+                  <th>Mensagem</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (alerta of alertas; track alerta.id) {
+                  <tr [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
+                    <td>
+                      <span class="list-page__tipo">
+                        <ng-icon [name]="tipoIcon(alerta.tipo)" />
+                        {{ tipoLabel(alerta.tipo) }}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        class="list-page__gravidade"
+                        [class]="'list-page__gravidade--' + alerta.gravidade"
+                      >
+                        {{ gravidadeLabel(alerta.gravidade) }}
+                      </span>
+                    </td>
+                    <td>
+                      <gp-status-badge [status]="alerta.status" />
+                    </td>
+                    <td class="list-page__mensagem-cell">
+                      {{ alerta.mensagem || '—' }}
+                    </td>
+                    <td>{{ formatarData(alerta.createdAt) }}</td>
+                    <td class="list-page__actions">
                         <button
                           z-button
                           zType="ghost"
                           zSize="icon"
                           (click)="verDetalhes(alerta)"
-                          [matTooltip]="'Ver detalhes'"
+                          title="Ver detalhes"
                           aria-label="Ver detalhes do alerta"
                         >
                           <ng-icon name="lucideEye" />
@@ -134,7 +146,7 @@
                             zType="ghost"
                             zSize="icon"
                             (click)="confirmarReconhecer(alerta)"
-                            matTooltip="Reconhecer alerta"
+                            title="Reconhecer alerta"
                             aria-label="Reconhecer alerta"
                           >
                             <ng-icon name="lucideCheckCircle" />
@@ -145,7 +157,7 @@
                             zSize="icon"
                             class="text-destructive"
                             (click)="confirmarEncerrar(alerta)"
-                            matTooltip="Encerrar alerta"
+                            title="Encerrar alerta"
                             aria-label="Encerrar alerta"
                           >
                             <ng-icon name="lucideX" />
@@ -157,63 +169,62 @@
                             zSize="icon"
                             class="text-destructive"
                             (click)="confirmarEncerrar(alerta)"
-                            matTooltip="Encerrar alerta"
+                            title="Encerrar alerta"
                             aria-label="Encerrar alerta"
                           >
                             <ng-icon name="lucideX" />
                           </button>
-                        } @else {
-                          <span class="list-page__acoes-empty">—</span>
-                        }
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          }
+                      } @else {
+                        <span class="list-page__acoes-empty">—</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
       }
-    </mat-tab>
+    }
+  }
 
-    <mat-tab label="Estatísticas">
-      <div class="list-page__stats">
-        @if (statsLoading()) {
-          <div class="list-page__loading">
-            <gp-loading-spinner message="Carregando estatísticas..." />
-          </div>
-        } @else {
-          <div class="list-page__stats-grid">
-            <div class="list-page__chart-card">
-              <h3 class="list-page__chart-title">Alertas por Tipo</h3>
-              <div class="list-page__chart-container">
-                <canvas #porTipoCanvas></canvas>
-              </div>
-            </div>
-
-            <div class="list-page__chart-card">
-              <h3 class="list-page__chart-title">Alertas por Gravidade</h3>
-              <div class="list-page__chart-container">
-                <canvas #porGravidadeCanvas></canvas>
-              </div>
-            </div>
-
-            <div class="list-page__chart-card">
-              <h3 class="list-page__chart-title">Alertas por Status</h3>
-              <div class="list-page__chart-container">
-                <canvas #porStatusCanvas></canvas>
-              </div>
-            </div>
-
-            <div class="list-page__chart-card list-page__chart-card--wide">
-              <h3 class="list-page__chart-title">Alertas por Hora (24h)</h3>
-              <div class="list-page__chart-container">
-                <canvas #porDiaCanvas></canvas>
-              </div>
+  @if (activeTab() === 1) {
+    <div class="list-page__stats">
+      @if (statsLoading()) {
+        <div class="list-page__loading">
+          <gp-loading-spinner message="Carregando estatísticas..." />
+        </div>
+      } @else {
+        <div class="list-page__stats-grid">
+          <div class="list-page__chart-card">
+            <h3 class="list-page__chart-title">Alertas por Tipo</h3>
+            <div class="list-page__chart-container">
+              <canvas #porTipoCanvas></canvas>
             </div>
           </div>
-        }
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+
+          <div class="list-page__chart-card">
+            <h3 class="list-page__chart-title">Alertas por Gravidade</h3>
+            <div class="list-page__chart-container">
+              <canvas #porGravidadeCanvas></canvas>
+            </div>
+          </div>
+
+          <div class="list-page__chart-card">
+            <h3 class="list-page__chart-title">Alertas por Status</h3>
+            <div class="list-page__chart-container">
+              <canvas #porStatusCanvas></canvas>
+            </div>
+          </div>
+
+          <div class="list-page__chart-card list-page__chart-card--wide">
+            <h3 class="list-page__chart-title">Alertas por Hora (24h)</h3>
+            <div class="list-page__chart-container">
+              <canvas #porDiaCanvas></canvas>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

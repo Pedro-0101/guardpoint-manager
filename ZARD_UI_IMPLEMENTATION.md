@@ -14,11 +14,18 @@
 | **Loader** | ✅ Implementado | `gp-loading-spinner` (delegate interno) | 1 ✅ |
 | **Empty** | ✅ Implementado | `gp-empty-state` (delegate interno) | 1 ✅ |
 | **Alert** | ✅ Implementado | Banners do login → `<z-alert>` | 1 ✅ |
-| **Button** | ✅ Componente criado | `mat-button`/`mat-flat-button`/etc | 3 ✅ |
-| **Dialog** | ✅ Componente + Service criados | `MatDialog` + `gp-confirm-dialog` | 3 ✅ |
-| Input / Select / Form | ❌ | `mat-form-field` + `matInput` + `mat-select` | 3 |
-| Tabs / Calendar / Switch / Checkbox / Pagination / Avatar / Tooltip / Breadcrumb | ❌ | Material components pontuais | 4 |
-| Dropdown/Menu / Sheet / Skeleton / Card / etc | ❌ | Oportunidades futuras | 5 |
+| **Button** | ✅ Implementado e em uso | `mat-button`/`mat-flat-button`/etc | 3 ✅ |
+| **Dialog** | ✅ Implementado e em uso | `MatDialog` + `gp-confirm-dialog` | 3 ✅ |
+| **Card** | ✅ Implementado | `mat-card` | 3 ✅ |
+| **Input** | ✅ Implementado (`z-input` directive) | `mat-form-field` + `matInput` | 3 ✅ |
+| **Select** | ✅ Implementado (`z-select`) | `mat-select` | 3 ✅ |
+| **Checkbox** | ✅ Implementado (`z-checkbox`) | `mat-checkbox` | 3 ✅ |
+| **Switch** | ✅ Implementado (`z-switch`) | `mat-slide-toggle` | 4 ✅ |
+| **Pagination** | ✅ Implementado (`z-pagination`) | Paginação manual | 4 ✅ |
+| **Tooltip** | ✅ Implementado (`z-tooltip` directive) | `matTooltip` | 4 ✅ |
+| **Progress** | ✅ Implementado (`z-progress`) | `mat-progress-bar` | 4 ✅ |
+| Tabs / Calendar / Avatar / Breadcrumb | ❌ | Material components pontuais | 4 |
+| Dropdown/Menu / Sheet / Skeleton | ❌ | Oportunidades futuras | 5 |
 
 ---
 
@@ -33,10 +40,39 @@ src/app/shared/components/
 ├── alert/         — z-alert (default|destructive, icon+title+description)
 ├── button/        — z-button (default|destructive|outline|secondary|ghost|link, sm|default|lg|icon)
 ├── dialog/        — z-dialog (service + component + ref, suporta conteúdo como componente)
-└── table/         — z-table (já existia, em uso em 6 list pages)
+├── table/         — z-table (já existia, em uso em 6 list pages)
+├── card/          — z-card (default|interactive)
+├── input/         — input[z-input], textarea[z-input], select[z-input]
+├── select/        — z-select + z-select-item
+├── checkbox/      — z-checkbox (ControlValueAccessor)
+├── switch/        — z-switch (ControlValueAccessor, default|sm)
+├── pagination/    — z-pagination (páginas visíveis, pageChange)
+├── tooltip/       — [z-tooltip] directive (top|bottom|left|right)
+├── progress/      — z-progress (0-100)
+├── status-badge/  — gp-status-badge (legacy, mantido)
+├── confirm-dialog/— gp-confirm-dialog (legado, mantido)
+├── loading-spinner/— gp-loading-spinner (legacy, mantido)
+└── empty-state/   — gp-empty-state (legacy, mantido)
 ```
 
-## 3. Para usar Zard Button (exemplos)
+## 3. Migração concluída
+
+### Features sem nenhum Material Angular
+
+| Feature | Status |
+|---|---|
+| **alertas** | ✅ 100% Zard (z-button, ZardDialog, z-table) |
+| **configuracoes** | ✅ 100% Zard (z-button) |
+| **dashboard** | ✅ 100% Zard (sem Material) |
+| **escalas** | ✅ 100% Zard (z-button, ZardDialog, z-table) |
+| **login** | ✅ 100% Zard (migrado em Jul/2026) |
+| **mapa** | ✅ 100% Zard (sem Material) |
+| **postos** | ✅ 100% Zard (z-button, ZardDialog, z-table) |
+| **relatorios** | ✅ 100% Zard (z-button) |
+| **turnos** | ✅ 100% Zard (z-button, ZardDialog, z-table) |
+| **usuarios** | ✅ 100% Zard (z-button, ZardDialog, z-table) |
+
+## 4. Para usar Zard Button (exemplos)
 
 ```html
 <!-- Substitui mat-flat-button color="primary" -->
@@ -54,7 +90,7 @@ src/app/shared/components/
 <button z-button zType="destructive">Excluir</button>
 ```
 
-## 4. Para usar Zard Dialog
+## 5. Para usar Zard Dialog
 
 ```typescript
 // Injetar o serviço
@@ -71,9 +107,9 @@ this.dialog.create({
 });
 ```
 
-## 5. Migração pendente (próximos passos)
+## 6. Próximos passos
 
-1. **Feature por feature**: migrar `mat-button` → `z-button` nos templates (prioridade: postos-list)
-2. **Feature por feature**: migrar `MatDialog.open()` → `ZardDialogService.create()` 
-3. **Input + Select**: criar componentes + migrar `mat-form-field`
-4. **Componentes pontuais**: Tabs, Calendar, Switch, Checkbox, Pagination, Avatar, Tooltip
+1. **Remover dependência @angular/material** — verificar se ainda há imports residuais
+2. **Migrar gp-confirm-dialog** para usar ZardDialogService internamente
+3. **Componentes pendentes**: Tabs, Calendar, Avatar, Breadcrumb (quando necessário)
+4. **Remover componentes legacy**: status-badge, loading-spinner, empty-state (substituídos pelos Zard equivalentes)

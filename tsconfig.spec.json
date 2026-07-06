@@ -5,6 +5,10 @@
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
     "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/app/*"]
+    },
     "types": [
       "vitest/globals"
     ]

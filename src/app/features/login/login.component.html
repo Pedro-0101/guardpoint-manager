@@ -1,7 +1,7 @@
 <div class="login">
   <div class="login__container">
-    <mat-card class="login__card">
-      <mat-card-header class="login__header">
+    <div z-card class="login__card">
+      <div class="login__header">
         <div class="login__logo">
           <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
             <rect width="32" height="32" rx="8" fill="var(--color-primary)" />
@@ -9,11 +9,11 @@
             <circle cx="16" cy="19" r="4" fill="white" />
           </svg>
         </div>
-        <mat-card-title>GuardPoint</mat-card-title>
-        <mat-card-subtitle>Painel Gerencial</mat-card-subtitle>
-      </mat-card-header>
+        <h1 class="login__title">GuardPoint</h1>
+        <p class="login__subtitle">Painel Gerencial</p>
+      </div>
 
-      <mat-card-content>
+      <div class="login__content">
         @if (expiredSession()) {
           <z-alert zType="destructive" zTitle="Sua sessão expirou. Faça login novamente." class="mb-4" />
         }
@@ -23,53 +23,81 @@
         }
 
         <form [formGroup]="form" (ngSubmit)="submit()" class="login__form" novalidate>
-          <mat-form-field appearance="outline" class="login__field">
-            <mat-label>Email</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="seu@email.com" autocomplete="email" />
-            <ng-icon name="lucideMail" matPrefix />
+          <div class="login__field">
+            <label class="login__label" for="email">Email</label>
+            <div class="login__input-wrapper">
+              <ng-icon name="lucideMail" class="login__input-icon" />
+              <input
+                id="email"
+                z-input
+                type="email"
+                formControlName="email"
+                placeholder="seu@email.com"
+                autocomplete="email"
+                [class.login__input--error]="emailControl.invalid && emailControl.touched"
+              />
+            </div>
             @if (emailControl.invalid && emailControl.touched) {
-              <mat-error>
+              <p class="login__error">
                 @if (emailControl.errors?.['required']) {
                   Email é obrigatório.
                 } @else if (emailControl.errors?.['email']) {
                   Email inválido.
                 }
-              </mat-error>
+              </p>
             }
-          </mat-form-field>
+          </div>
 
-          <mat-form-field appearance="outline" class="login__field">
-            <mat-label>Senha</mat-label>
-            <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="senha" placeholder="Sua senha" autocomplete="current-password" />
-            <ng-icon name="lucideLock" matPrefix />
-            <button type="button" mat-icon-button matSuffix class="login__visibility-btn" (click)="hidePassword.set(!hidePassword())" [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'">
-              <ng-icon [name]="hidePassword() ? 'lucideEyeOff' : 'lucideEye'" />
-            </button>
+          <div class="login__field">
+            <label class="login__label" for="senha">Senha</label>
+            <div class="login__input-wrapper">
+              <ng-icon name="lucideLock" class="login__input-icon" />
+              <input
+                id="senha"
+                z-input
+                [type]="hidePassword() ? 'password' : 'text'"
+                formControlName="senha"
+                placeholder="Sua senha"
+                autocomplete="current-password"
+                [class.login__input--error]="senhaControl.invalid && senhaControl.touched"
+              />
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                zSize="icon"
+                class="login__visibility-btn"
+                (click)="hidePassword.set(!hidePassword())"
+                [attr.aria-label]="hidePassword() ? 'Mostrar senha' : 'Ocultar senha'"
+              >
+                <ng-icon [name]="hidePassword() ? 'lucideEyeOff' : 'lucideEye'" />
+              </button>
+            </div>
             @if (senhaControl.invalid && senhaControl.touched) {
-              <mat-error>
+              <p class="login__error">
                 @if (senhaControl.errors?.['required']) {
                   Senha é obrigatória.
                 } @else if (senhaControl.errors?.['minlength']) {
                   Mínimo de 6 caracteres.
                 }
-              </mat-error>
+              </p>
             }
-          </mat-form-field>
+          </div>
 
-          <mat-checkbox formControlName="rememberMe" class="login__remember">
+          <z-checkbox formControlName="rememberMe" class="login__remember">
             Lembrar-me
-          </mat-checkbox>
+          </z-checkbox>
 
-          <button type="submit" mat-flat-button color="primary" class="login__submit" [disabled]="loading()">
+          <button type="submit" z-button class="login__submit" [zDisabled]="loading()">
             @if (loading()) {
-              <mat-spinner diameter="20" />
+              <span class="login__spinner"></span>
               <span class="login__submit-text">Entrando...</span>
             } @else {
               <span class="login__submit-text">Entrar</span>
             }
           </button>
         </form>
-      </mat-card-content>
-    </mat-card>
+      </div>
+    </div>
   </div>
 </div>

@@ -11,9 +11,6 @@ import {
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, forkJoin } from 'rxjs';
 import { takeUntil, catchError, finalize, filter, take } from 'rxjs/operators';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
@@ -25,6 +22,7 @@ import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { Turno } from '../../core/models/turno.model';
@@ -57,9 +55,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardButtonComponent,
     ZardInputDirective,
     NgIcon,
-    MatPaginatorModule,
-    MatProgressBarModule,
-    MatTooltipModule,
+    ZardPaginationComponent,
     LoadingSpinner,
     EmptyState,
     StatusBadge,
@@ -175,9 +171,8 @@ export class RelatoriosComponent implements OnInit, OnDestroy, AfterViewInit {
     this.buscar();
   }
 
-  onPageChange(event: PageEvent): void {
-    this.pageIndex.set(event.pageIndex);
-    this.pageSize.set(event.pageSize);
+  onPageChange(page: number): void {
+    this.pageIndex.set(page - 1);
     this.buscar();
   }
 
