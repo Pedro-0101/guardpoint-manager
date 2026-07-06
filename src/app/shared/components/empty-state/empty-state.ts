@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { ZardEmptyComponent } from '../empty/empty.component';
 
 @Component({
@@ -6,6 +6,7 @@ import { ZardEmptyComponent } from '../empty/empty.component';
   imports: [ZardEmptyComponent],
   templateUrl: './empty-state.html',
   styleUrl: './empty-state.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EmptyState {
   icon = input('inbox');

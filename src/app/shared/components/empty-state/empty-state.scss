@@ -24,6 +24,14 @@
 .empty__description {
   font-size: 0.875rem;
   color: var(--text-secondary);
-  margin: 0;
+  margin: 0 0 24px;
   max-width: 360px;
+}
+
+.empty__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
 }

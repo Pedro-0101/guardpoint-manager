@@ -215,10 +215,12 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.map = L.map(container.nativeElement, {
       center: [-14.235, -51.9253],
       zoom: 4,
-      zoomControl: true,
+      zoomControl: false,
       attributionControl: true,
       scrollWheelZoom: true,
     });
+
+    L.control.zoom({ position: 'topright' }).addTo(this.map);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution:
