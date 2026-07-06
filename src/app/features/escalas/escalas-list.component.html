@@ -24,7 +24,7 @@
     <div class="list-page__toolbar">
       <mat-form-field appearance="outline" class="list-page__search">
         <mat-label>Buscar escala</mat-label>
-        <input matInput [formControl]="searchControl" placeholder="Nome, posto ou vigia..." />
+        <input matInput [formControl]="searchControl" placeholder="Nome, posto ou usuário..." />
         <mat-icon matPrefix>search</mat-icon>
       </mat-form-field>
     </div>
@@ -49,9 +49,9 @@
               <td mat-cell *matCellDef="let escala">{{ escala.postoNome }}</td>
             </ng-container>
 
-            <ng-container matColumnDef="vigia">
-              <th mat-header-cell *matHeaderCellDef>Vigia</th>
-              <td mat-cell *matCellDef="let escala">{{ escala.vigiaNome }}</td>
+            <ng-container matColumnDef="usuario">
+              <th mat-header-cell *matHeaderCellDef>Usuário</th>
+              <td mat-cell *matCellDef="let escala">{{ escala.usuarioNome }}</td>
             </ng-container>
 
             <ng-container matColumnDef="dias">
@@ -59,9 +59,19 @@
               <td mat-cell *matCellDef="let escala">{{ formatarDias(escala.diasSemana) }}</td>
             </ng-container>
 
+            <ng-container matColumnDef="vigencia">
+              <th mat-header-cell *matHeaderCellDef>Vigência</th>
+              <td mat-cell *matCellDef="let escala">{{ formatarVigencia(escala.dataInicio, escala.dataFim) }}</td>
+            </ng-container>
+
             <ng-container matColumnDef="horario">
               <th mat-header-cell *matHeaderCellDef>Horário</th>
               <td mat-cell *matCellDef="let escala">{{ formatarHorario(escala.horaInicio, escala.horaFim) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="tolerancia">
+              <th mat-header-cell *matHeaderCellDef>Tolerância</th>
+              <td mat-cell *matCellDef="let escala">{{ escala.toleranciaMin }} min</td>
             </ng-container>
 
             <ng-container matColumnDef="ativo">
@@ -77,7 +87,7 @@
                 <button mat-icon-button color="primary" (click)="abrirFormulario(escala)" aria-label="Editar escala">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button color="warn" (click)="confirmarExclusao(escala)" aria-label="Excluir escala">
+                <button mat-icon-button color="warn" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
                   <mat-icon>delete</mat-icon>
                 </button>
               </td>

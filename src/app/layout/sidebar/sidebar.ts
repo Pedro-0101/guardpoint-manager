@@ -1,6 +1,5 @@
 import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { environment } from '../../../environments/environment';
 
 interface NavItem {
   label: string;
@@ -30,10 +29,5 @@ export class Sidebar {
     { label: 'Configurações', icon: 'settings', route: '/configuracoes' },
   ];
 
-  navItems = this.allItems.filter((item) => {
-    if (item.route === '/escalas' && !environment.featureEscalas) {
-      return false; // TODO(F8): reabilitar quando /api/escalas existir
-    }
-    return true;
-  });
+  navItems = this.allItems;
 }

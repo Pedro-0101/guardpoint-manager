@@ -1,31 +1,59 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
-import { Escala } from '../../core/models/escala.model';
-
-export type EscalaPayload = Omit<Escala, 'id' | 'empresaId' | 'createdAt' | 'updatedAt' | 'postoNome' | 'vigiaNome'>;
+import { Escala, EscalaDto, CreateEscalaPayload, UpdateEscalaPayload } from '../../core/models/escala.model';
 
 @Injectable({ providedIn: 'root' })
 export class EscalasService {
   private readonly api = inject(ApiService);
 
-  listar(): Observable<Escala[]> {
-    return this.api.get<Escala[]>('/escalas');
+  listar(params?: {
+    usuario_id?: string;
+    posto_id?: string;
+    ativos?: string;
+    data?: string;
+    limit?: number;
+    offset?: number;
+  }): Observable<Escala[]> {
+    return this.api
+      .get<EscalaDto[]>('/escalas', params as Record<string, string | number | boolean>)
+      .pipe(map((dtos) => dtos.map(mapEscalaFromDto)));
   }
 
   obter(id: string): Observable<Escala> {
-    return this.api.get<Escala>(`/escalas/${id}`);
+    return this.api.get<EscalaDto>(`/escalas/${id}`).pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
-  criar(data: EscalaPayload): Observable<Escala> {
-    return this.api.post<Escala>('/escalas', data);
+  criar(data: CreateEscalaPayload): Observable<Escala> {
+    return this.api.post<EscalaDto>('/escalas', data).pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
-  atualizar(id: string, data: EscalaPayload): Observable<Escala> {
-    return this.api.put<Escala>(`/escalas/${id}`, data);
+  atualizar(id: string, data: UpdateEscalaPayload): Observable<Escala> {
+    return this.api.put<EscalaDto>(`/escalas/${id}`, data).pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
   excluir(id: string): Observable<void> {
     return this.api.delete<void>(`/escalas/${id}`);
   }
+}
+
+function mapEscalaFromDto(dto: EscalaDto): Escala {
+  return {
+    id: dto.id,
+    nome: dto.nome,
+    postoId: dto.posto_id,
+    postoNome: dto.posto_nome,
+    usuarioId: dto.usuario_id,
+    usuarioNome: dto.usuario_nome,
+    diasSemana: dto.dias_semana,
+    horaInicio: dto.hora_inicio,
+    horaFim: dto.hora_fim,
+    dataInicio: dto.data_inicio,
+    dataFim: dto.data_fim,
+    toleranciaMin: dto.tolerancia_min,
+    ativo: dto.ativo,
+    empresaId: dto.empresa_id,
+    createdAt: dto.created_at,
+    updatedAt: dto.updated_at,
+  };
 }

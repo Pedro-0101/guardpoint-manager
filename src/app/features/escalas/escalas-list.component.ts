@@ -75,12 +75,12 @@ export class EscalasListComponent implements OnInit, OnDestroy {
         (e) =>
           e.nome.toLowerCase().includes(lower) ||
           e.postoNome.toLowerCase().includes(lower) ||
-          e.vigiaNome.toLowerCase().includes(lower)
+          e.usuarioNome.toLowerCase().includes(lower)
       );
     })
   );
 
-  readonly displayedColumns: string[] = ['nome', 'posto', 'vigia', 'dias', 'horario', 'ativo', 'acoes'];
+  readonly displayedColumns: string[] = ['nome', 'posto', 'usuario', 'dias', 'vigencia', 'horario', 'tolerancia', 'ativo', 'acoes'];
 
   ngOnInit(): void {
     this.carregarEscalas();
@@ -130,9 +130,9 @@ export class EscalasListComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(ConfirmDialog, {
       width: '420px',
       data: {
-        title: 'Excluir escala',
-        message: `Tem certeza que deseja excluir a escala "${escala.nome}"?`,
-        confirmLabel: 'Excluir',
+        title: 'Desativar escala',
+        message: `Tem certeza que deseja desativar a escala "${escala.nome}"?`,
+        confirmLabel: 'Desativar',
         cancelLabel: 'Cancelar',
       },
     });
@@ -144,12 +144,12 @@ export class EscalasListComponent implements OnInit, OnDestroy {
         if (confirmed) {
           this.escalasService.excluir(escala.id).subscribe({
             next: () => {
-              this.notification.success(`Escala "${escala.nome}" excluída com sucesso.`);
+              this.notification.success(`Escala "${escala.nome}" desativada com sucesso.`);
               this.carregarEscalas();
             },
             error: (err) => {
               this.notification.error(
-                err.message ?? 'Erro ao excluir escala.'
+                err.message ?? 'Erro ao desativar escala.'
               );
             },
           });
@@ -164,4 +164,15 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   formatarHorario(inicio: string, fim: string): string {
     return `${inicio} - ${fim}`;
   }
+
+  formatarData(data: string): string {
+    if (!data) return '';
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  formatarVigencia(inicio: string, fim: string): string {
+    return `${this.formatarData(inicio)} até ${this.formatarData(fim)}`;
+  }
 }
+

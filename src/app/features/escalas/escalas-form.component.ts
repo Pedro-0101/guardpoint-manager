@@ -8,6 +8,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { forkJoin } from 'rxjs';
 import { EscalasService } from './escalas.service';
 import { PostosService } from '../postos/postos.service';
@@ -29,6 +31,8 @@ import { Usuario } from '../../core/models/usuario.model';
     MatProgressSpinnerModule,
     MatDialogModule,
     MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
   templateUrl: './escalas-form.component.html',
   styleUrl: './escalas-form.component.scss',
@@ -47,7 +51,7 @@ export class EscalasFormComponent implements OnInit {
   readonly isEdit = signal(false);
 
   readonly postos = signal<Posto[]>([]);
-  readonly vigias = signal<Usuario[]>([]);
+  readonly usuarios = signal<Usuario[]>([]);
 
   readonly diasSemana = [
     { value: 1, label: 'Seg' },
@@ -62,10 +66,13 @@ export class EscalasFormComponent implements OnInit {
   form = this.fb.nonNullable.group({
     nome: ['', [Validators.required, Validators.minLength(3)]],
     postoId: ['', [Validators.required]],
-    vigiaId: ['', [Validators.required]],
+    usuarioId: ['', [Validators.required]],
     diasSemana: [[] as number[], [Validators.required, Validators.minLength(1)]],
     horaInicio: ['08:00', [Validators.required, Validators.pattern(/^\d{2}:\d{2}$/)]],
     horaFim: ['18:00', [Validators.required, Validators.pattern(/^\d{2}:\d{2}$/)]],
+    dataInicio: [new Date(), [Validators.required]],
+    dataFim: [new Date(), [Validators.required]],
+    toleranciaMin: [0, [Validators.required, Validators.min(0), Validators.max(120)]],
     ativo: [true],
   });
 
@@ -77,10 +84,13 @@ export class EscalasFormComponent implements OnInit {
       this.form.patchValue({
         nome: this.data.nome,
         postoId: this.data.postoId,
-        vigiaId: this.data.vigiaId,
+        usuarioId: this.data.usuarioId,
         diasSemana: this.data.diasSemana,
         horaInicio: this.data.horaInicio,
         horaFim: this.data.horaFim,
+        dataInicio: new Date(this.data.dataInicio + 'T00:00:00'),
+        dataFim: new Date(this.data.dataFim + 'T00:00:00'),
+        toleranciaMin: this.data.toleranciaMin,
         ativo: this.data.ativo,
       });
     }
@@ -94,7 +104,7 @@ export class EscalasFormComponent implements OnInit {
     }).subscribe({
       next: ({ postos, usuarios }) => {
         this.postos.set(postos.filter((p) => p.ativo));
-        this.vigias.set(usuarios.filter((u) => u.ativo));
+        this.usuarios.set(usuarios.filter((u) => u.ativo));
         this.loadingDeps.set(false);
       },
       error: (err) => {
@@ -119,6 +129,13 @@ export class EscalasFormComponent implements OnInit {
     return this.form.controls.diasSemana.value.includes(dia);
   }
 
+  private toDateString(date: Date): string {
+    const ano = date.getFullYear();
+    const mes = String(date.getMonth() + 1).padStart(2, '0');
+    const dia = String(date.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -126,11 +143,24 @@ export class EscalasFormComponent implements OnInit {
     }
 
     this.loading.set(true);
-    const data = this.form.getRawValue();
+    const raw = this.form.getRawValue();
+
+    const payload = {
+      nome: raw.nome,
+      posto_id: raw.postoId,
+      usuario_id: raw.usuarioId,
+      dias_semana: raw.diasSemana,
+      hora_inicio: raw.horaInicio,
+      hora_fim: raw.horaFim,
+      data_inicio: this.toDateString(raw.dataInicio),
+      data_fim: this.toDateString(raw.dataFim),
+      tolerancia_min: raw.toleranciaMin,
+      ativo: raw.ativo,
+    };
 
     const request$ = this.isEdit()
-      ? this.escalasService.atualizar(this.data!.id, data)
-      : this.escalasService.criar(data);
+      ? this.escalasService.atualizar(this.data!.id, payload)
+      : this.escalasService.criar(payload);
 
     request$.subscribe({
       next: () => {
@@ -142,9 +172,7 @@ export class EscalasFormComponent implements OnInit {
       },
       error: (err) => {
         this.loading.set(false);
-        this.notification.error(
-          err.message ?? 'Erro ao salvar escala.'
-        );
+        this.notification.error(err.message ?? 'Erro ao salvar escala.');
       },
     });
   }

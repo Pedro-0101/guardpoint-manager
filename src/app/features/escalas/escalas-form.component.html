@@ -35,14 +35,14 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="form__field">
-        <mat-label>Vigia</mat-label>
-        <mat-select formControlName="vigiaId">
-          @for (vigia of vigias(); track vigia.id) {
-            <mat-option [value]="vigia.id">{{ vigia.nome }}</mat-option>
+        <mat-label>Usuário</mat-label>
+        <mat-select formControlName="usuarioId">
+          @for (usuario of usuarios(); track usuario.id) {
+            <mat-option [value]="usuario.id">{{ usuario.nome }}</mat-option>
           }
         </mat-select>
-        @if (form.controls.vigiaId.invalid && form.controls.vigiaId.touched) {
-          <mat-error>Vigia é obrigatório.</mat-error>
+        @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
+          <mat-error>Usuário é obrigatório.</mat-error>
         }
       </mat-form-field>
 
@@ -58,6 +58,28 @@
         @if (form.controls.diasSemana.invalid && form.controls.diasSemana.touched) {
           <span class="form__error">Selecione pelo menos um dia.</span>
         }
+      </div>
+
+      <div class="form__row">
+        <mat-form-field appearance="outline" class="form__field">
+          <mat-label>Data início</mat-label>
+          <input matInput [matDatepicker]="pickerInicio" formControlName="dataInicio" />
+          <mat-datepicker-toggle matIconSuffix [for]="pickerInicio" />
+          <mat-datepicker #pickerInicio />
+          @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
+            <mat-error>Data início é obrigatória.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form__field">
+          <mat-label>Data fim</mat-label>
+          <input matInput [matDatepicker]="pickerFim" formControlName="dataFim" />
+          <mat-datepicker-toggle matIconSuffix [for]="pickerFim" />
+          <mat-datepicker #pickerFim />
+          @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
+            <mat-error>Data fim é obrigatória.</mat-error>
+          }
+        </mat-form-field>
       </div>
 
       <div class="form__row">
@@ -89,6 +111,14 @@
           }
         </mat-form-field>
       </div>
+
+      <mat-form-field appearance="outline" class="form__field">
+        <mat-label>Tolerância (minutos)</mat-label>
+        <input matInput type="number" formControlName="toleranciaMin" min="0" max="120" />
+        @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
+          <mat-error>Valor entre 0 e 120 minutos.</mat-error>
+        }
+      </mat-form-field>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">

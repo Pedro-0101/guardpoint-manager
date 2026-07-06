@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
-import { featureEscalasGuard } from './core/auth/feature.guard';
+
 
 export const routes: Routes = [
   {
@@ -86,7 +86,7 @@ export const routes: Routes = [
       },
       {
         path: 'escalas',
-        canActivate: [featureEscalasGuard], // TODO(F8): remover guard quando /api/escalas existir
+        canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/escalas/escalas-list.component').then(
             (m) => m.EscalasListComponent
