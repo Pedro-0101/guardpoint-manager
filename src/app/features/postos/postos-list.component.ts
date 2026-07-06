@@ -100,7 +100,8 @@ export class PostosListComponent implements OnInit, OnDestroy {
 
   abrirFormulario(posto?: Posto): void {
     const dialogRef = this.dialog.open(PostosFormComponent, {
-      width: '560px',
+      width: '640px',
+      maxWidth: '95vw',
       data: posto ?? null,
     });
 
