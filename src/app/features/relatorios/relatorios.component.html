@@ -71,17 +71,54 @@
       <button class="relatorios__retry-btn" (click)="buscar()">Tentar novamente</button>
     </div>
   } @else {
-    @if (dataSource().length === 0) {
-      <gp-empty-state
-        icon="lucideBarChart3"
-        title="Nenhum turno encontrado"
-        [description]="
-          dataInicioControl.value || dataFimControl.value || postoControl.value || usuarioControl.value || statusControl.value
-            ? 'Nenhum turno corresponde aos filtros aplicados.'
-            : 'Utilize os filtros acima para buscar o histórico de turnos.'
-        "
-      />
-    } @else {
+    <div class="relatorios__table-wrapper">
+      <table z-table class="relatorios__table">
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Vigia</th>
+            <th z-table-head>Posto</th>
+            <th z-table-head>Status</th>
+            <th z-table-head>Início Previsto</th>
+            <th z-table-head>Fim Previsto</th>
+            <th z-table-head>Início Real</th>
+            <th z-table-head>Fim Real</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @if (dataSource().length === 0) {
+            <tr>
+              <td z-table-cell [attr.colspan]="7">
+                <gp-empty-state
+                  icon="lucideBarChart3"
+                  title="Nenhum turno encontrado"
+                  [description]="
+                    dataInicioControl.value || dataFimControl.value || postoControl.value || usuarioControl.value || statusControl.value
+                      ? 'Nenhum turno corresponde aos filtros aplicados.'
+                      : 'Utilize os filtros acima para buscar o histórico de turnos.'
+                  "
+                />
+              </td>
+            </tr>
+          } @else {
+            @for (turno of dataSource(); track turno.id) {
+              <tr z-table-row>
+                <td z-table-cell>{{ turno.usuarioNome }}</td>
+                <td z-table-cell>{{ turno.postoNome }}</td>
+                <td z-table-cell>
+                  <gp-status-badge [status]="turno.status" />
+                </td>
+                <td z-table-cell>{{ formatarData(turno.inicioPrevisto) }}</td>
+                <td z-table-cell>{{ formatarData(turno.fimPrevisto) }}</td>
+                <td z-table-cell>{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
+                <td z-table-cell>{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (dataSource().length > 0) {
       <div class="relatorios__table-section">
         <div class="relatorios__table-toolbar">
           <span class="relatorios__table-count">
@@ -104,37 +141,6 @@
             <div class="relatorios__export-progress-bar"></div>
           </div>
         }
-
-        <div class="relatorios__table-wrapper">
-          <table z-table class="relatorios__table">
-            <thead z-table-header>
-              <tr z-table-row>
-                <th z-table-head>Vigia</th>
-                <th z-table-head>Posto</th>
-                <th z-table-head>Status</th>
-                <th z-table-head>Início Previsto</th>
-                <th z-table-head>Fim Previsto</th>
-                <th z-table-head>Início Real</th>
-                <th z-table-head>Fim Real</th>
-              </tr>
-            </thead>
-            <tbody z-table-body>
-              @for (turno of dataSource(); track turno.id) {
-                <tr z-table-row>
-                  <td z-table-cell>{{ turno.usuarioNome }}</td>
-                  <td z-table-cell>{{ turno.postoNome }}</td>
-                  <td z-table-cell>
-                    <gp-status-badge [status]="turno.status" />
-                  </td>
-                  <td z-table-cell>{{ formatarData(turno.inicioPrevisto) }}</td>
-                  <td z-table-cell>{{ formatarData(turno.fimPrevisto) }}</td>
-                  <td z-table-cell>{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
-                  <td z-table-cell>{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
 
         <z-pagination
           [totalItems]="total()"

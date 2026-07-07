@@ -34,25 +34,29 @@
     </z-card>
 
     @if (filteredUsuarios$ | async; as usuarios) {
-      @if (usuarios.length === 0) {
-        <gp-empty-state
-          icon="lucideUserX"
-          title="Nenhum usuário encontrado"
-          [description]="searchControl.value ? 'Nenhum usuário corresponde à busca.' : 'Nenhum usuário cadastrado.'"
-        />
-      } @else {
-        <div class="list-page__table-wrapper">
-          <table z-table class="list-page__table">
-            <thead z-table-header>
-              <tr z-table-row>
-                <th z-table-head>Nome</th>
-                <th z-table-head>Email</th>
-                <th z-table-head>Cargo</th>
-                <th z-table-head>Status</th>
-                <th z-table-head>Ações</th>
+      <div class="list-page__table-wrapper">
+        <table z-table class="list-page__table">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Nome</th>
+              <th z-table-head>Email</th>
+              <th z-table-head>Cargo</th>
+              <th z-table-head>Status</th>
+              <th z-table-head>Ações</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @if (usuarios.length === 0) {
+              <tr>
+                <td z-table-cell [attr.colspan]="5">
+                  <gp-empty-state
+                    icon="lucideUserX"
+                    title="Nenhum usuário encontrado"
+                    [description]="searchControl.value ? 'Nenhum usuário corresponde à busca.' : 'Nenhum usuário cadastrado.'"
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody z-table-body>
+            } @else {
               @for (usuario of usuarios; track usuario.id) {
                 <tr z-table-row>
                   <td z-table-cell>{{ usuario.nome }}</td>
@@ -73,10 +77,10 @@
                   </td>
                 </tr>
               }
-            </tbody>
-          </table>
-        </div>
-      }
+            }
+          </tbody>
+        </table>
+      </div>
     }
   }
 </div>

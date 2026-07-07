@@ -34,29 +34,33 @@
     </z-card>
 
     @if (filteredEscalas$ | async; as escalas) {
-      @if (escalas.length === 0) {
-        <gp-empty-state
-          icon="lucideCalendarOff"
-          title="Nenhuma escala encontrada"
-          [description]="searchControl.value ? 'Nenhuma escala corresponde à busca.' : 'Nenhuma escala cadastrada.'"
-        />
-      } @else {
-        <div class="list-page__table-wrapper">
-          <table z-table class="list-page__table">
-            <thead z-table-header>
-              <tr z-table-row>
-                <th z-table-head>Nome</th>
-                <th z-table-head>Posto</th>
-                <th z-table-head>Usuário</th>
-                <th z-table-head>Dias</th>
-                <th z-table-head>Vigência</th>
-                <th z-table-head>Horário</th>
-                <th z-table-head>Tolerância</th>
-                <th z-table-head>Status</th>
-                <th z-table-head>Ações</th>
+      <div class="list-page__table-wrapper">
+        <table z-table class="list-page__table">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Nome</th>
+              <th z-table-head>Posto</th>
+              <th z-table-head>Usuário</th>
+              <th z-table-head>Dias</th>
+              <th z-table-head>Vigência</th>
+              <th z-table-head>Horário</th>
+              <th z-table-head>Tolerância</th>
+              <th z-table-head>Status</th>
+              <th z-table-head>Ações</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @if (escalas.length === 0) {
+              <tr>
+                <td z-table-cell [attr.colspan]="9">
+                  <gp-empty-state
+                    icon="lucideCalendarOff"
+                    title="Nenhuma escala encontrada"
+                    [description]="searchControl.value ? 'Nenhuma escala corresponde à busca.' : 'Nenhuma escala cadastrada.'"
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody z-table-body>
+            } @else {
               @for (escala of escalas; track escala.id) {
                 <tr z-table-row>
                   <td z-table-cell>{{ escala.nome }}</td>
@@ -79,10 +83,10 @@
                   </td>
                 </tr>
               }
-            </tbody>
-          </table>
-        </div>
-      }
+            }
+          </tbody>
+        </table>
+      </div>
     }
   }
 </div>

@@ -84,30 +84,34 @@
       </z-card>
 
       @if (filteredAlertas$ | async; as alertas) {
-        @if (alertas.length === 0) {
-          <gp-empty-state
-            icon="lucideBellOff"
-            title="Nenhum alerta encontrado"
-            [description]="
-              searchControl.value || tipoControl.value || gravidadeControl.value || statusControl.value
-                ? 'Nenhum alerta corresponde aos filtros aplicados.'
-                : 'Nenhum alerta registrado.'
-            "
-          />
-        } @else {
-          <div class="list-page__table-wrapper">
-            <table z-table class="list-page__table">
-              <thead z-table-header>
-                <tr z-table-row>
-                  <th z-table-head>Tipo</th>
-                  <th z-table-head>Gravidade</th>
-                  <th z-table-head>Status</th>
-                  <th z-table-head>Mensagem</th>
-                  <th z-table-head>Data</th>
-                  <th z-table-head>Ações</th>
+        <div class="list-page__table-wrapper">
+          <table z-table class="list-page__table">
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Tipo</th>
+                <th z-table-head>Gravidade</th>
+                <th z-table-head>Status</th>
+                <th z-table-head>Mensagem</th>
+                <th z-table-head>Data</th>
+                <th z-table-head>Ações</th>
+              </tr>
+            </thead>
+            <tbody z-table-body>
+              @if (alertas.length === 0) {
+                <tr>
+                  <td z-table-cell [attr.colspan]="6">
+                    <gp-empty-state
+                      icon="lucideBellOff"
+                      title="Nenhum alerta encontrado"
+                      [description]="
+                        searchControl.value || tipoControl.value || gravidadeControl.value || statusControl.value
+                          ? 'Nenhum alerta corresponde aos filtros aplicados.'
+                          : 'Nenhum alerta registrado.'
+                      "
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody z-table-body>
+              } @else {
                 @for (alerta of alertas; track alerta.id) {
                   <tr z-table-row [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
                     <td z-table-cell>
@@ -182,10 +186,10 @@
                     </td>
                   </tr>
                 }
-              </tbody>
-            </table>
-          </div>
-        }
+              }
+            </tbody>
+          </table>
+        </div>
       }
     }
   }

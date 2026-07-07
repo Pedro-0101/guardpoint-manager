@@ -43,25 +43,29 @@
     </z-card>
 
     @if (filteredTurnos$ | async; as turnos) {
-      @if (turnos.length === 0) {
-        <gp-empty-state
-          icon="lucideClock"
-          title="Nenhum turno encontrado"
-          [description]="searchControl.value || statusControl.value ? 'Nenhum turno corresponde aos filtros aplicados.' : 'Nenhum turno registrado.'"
-        />
-      } @else {
-        <div class="list-page__table-wrapper">
-          <table z-table class="list-page__table">
-            <thead z-table-header>
-              <tr z-table-row>
-                <th z-table-head>Vigia</th>
-                <th z-table-head>Posto</th>
-                <th z-table-head>Status</th>
-                <th z-table-head>Início</th>
-                <th z-table-head>Ações</th>
+      <div class="list-page__table-wrapper">
+        <table z-table class="list-page__table">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Vigia</th>
+              <th z-table-head>Posto</th>
+              <th z-table-head>Status</th>
+              <th z-table-head>Início</th>
+              <th z-table-head>Ações</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @if (turnos.length === 0) {
+              <tr>
+                <td z-table-cell [attr.colspan]="5">
+                  <gp-empty-state
+                    icon="lucideClock"
+                    title="Nenhum turno encontrado"
+                    [description]="searchControl.value || statusControl.value ? 'Nenhum turno corresponde aos filtros aplicados.' : 'Nenhum turno registrado.'"
+                  />
+                </td>
               </tr>
-            </thead>
-            <tbody z-table-body>
+            } @else {
               @for (turno of turnos; track turno.id) {
                 <tr z-table-row class="list-page__row">
                   <td z-table-cell>{{ turno.usuarioNome }}</td>
@@ -83,10 +87,10 @@
                   </td>
                 </tr>
               }
-            </tbody>
-          </table>
-        </div>
-      }
+            }
+          </tbody>
+        </table>
+      </div>
     }
   }
 </div>
