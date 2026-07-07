@@ -3,7 +3,7 @@
 :host {
   display: block;
   height: calc(100vh - var(--header-height));
-  margin: 0;
+  margin: -24px;
 }
 
 .mapa-page {
@@ -156,7 +156,7 @@
     justify-content: center;
     align-items: center;
     gap: 16px;
-    background: color-mix(in oklch, var(--bg-content), transparent 5%);
+    background: color-mix(in oklch, var(--bg-content), transparent 20%);
     backdrop-filter: blur(4px);
   }
 
