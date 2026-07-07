@@ -5,7 +5,7 @@
         <h1 class="list-page__title">Escalas</h1>
         <p class="list-page__subtitle">Gerencie as escalas de trabalho</p>
       </div>
-      <button z-button (click)="abrirFormulario()">
+      <button z-button (click)="abrirFormularioNova()">
         <ng-icon name="lucidePlus" />
         Nova escala
       </button>
@@ -40,6 +40,52 @@
               />
             </div>
           </div>
+
+          <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-[260px]">
+            <label class="form-label" for="filtro-postos-select">Postos</label>
+            <z-select
+              id="filtro-postos-select"
+              [zMultiple]="true"
+              [formControl]="postosControl"
+              [zPlaceholder]="'Todos os postos'"
+            >
+              @for (posto of postos(); track posto.id) {
+                <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
+              }
+            </z-select>
+          </div>
+
+          <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-[260px]">
+            <label class="form-label" for="filtro-vigias-select">Vigias</label>
+            <z-select
+              id="filtro-vigias-select"
+              [zMultiple]="true"
+              [formControl]="vigiasControl"
+              [zPlaceholder]="'Todos os vigias'"
+            >
+              @for (vigia of vigias(); track vigia.id) {
+                <z-select-item [zValue]="vigia.id">{{ vigia.nome }}</z-select-item>
+              }
+            </z-select>
+          </div>
+
+          <div class="flex items-center gap-3 min-w-fit">
+            <div class="flex items-center gap-2">
+              <z-checkbox [formControl]="ativosOnlyControl" />
+              <span class="text-sm text-muted-foreground whitespace-nowrap">Somente ativas</span>
+            </div>
+
+            <button
+              z-button
+              zType="ghost"
+              zSize="sm"
+              class="text-muted-foreground"
+              (click)="limparTodosFiltros()"
+            >
+              <ng-icon name="lucideX" class="size-3.5" />
+              Limpar filtros
+            </button>
+          </div>
         </div>
       </z-card>
 
@@ -47,13 +93,13 @@
         <table z-table class="list-page__table">
           <thead z-table-header>
             <tr z-table-row>
-              <th z-table-head>Vigia</th>
               <th z-table-head>Posto</th>
-              <th z-table-head>Dia(s)</th>
-              <th z-table-head>Horario</th>
-              <th z-table-head>Tolerancia</th>
+              <th z-table-head>Vigia</th>
+              <th z-table-head class="text-center">Qtde. Escalas</th>
+              <th z-table-head class="text-center">Horas Totais</th>
+              <th z-table-head class="text-center">Tolerância</th>
               <th z-table-head>Status</th>
-              <th z-table-head>Acoes</th>
+              <th z-table-head>Ações</th>
             </tr>
           </thead>
           <tbody z-table-body>
@@ -61,16 +107,16 @@
               @for (row of [1, 2, 3, 4, 5]; track row) {
                 <tr z-table-row>
                   <td z-table-cell>
-                    <z-skeleton class="h-[14px] w-[120px] rounded" />
-                  </td>
-                  <td z-table-cell>
                     <z-skeleton class="h-[14px] w-[100px] rounded" />
                   </td>
                   <td z-table-cell>
-                    <z-skeleton class="h-[14px] w-[80px] rounded" />
+                    <z-skeleton class="h-[14px] w-[120px] rounded" />
                   </td>
                   <td z-table-cell>
-                    <z-skeleton class="h-[14px] w-[90px] rounded" />
+                    <z-skeleton class="h-[14px] w-[40px] rounded" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="h-[14px] w-[50px] rounded" />
                   </td>
                   <td z-table-cell>
                     <z-skeleton class="h-[14px] w-[60px] rounded" />
@@ -84,76 +130,128 @@
                 </tr>
               }
             } @else {
-              @if (filteredEscalas$ | async; as escalas) {
-                @if (escalas.length === 0) {
+              @if (filteredGroups$ | async; as groups) {
+                @if (groups.length === 0) {
                   <tr>
                     <td z-table-cell [attr.colspan]="7">
                       <gp-empty-state
                         icon="lucideCalendarOff"
                         title="Nenhuma escala encontrada"
                         [description]="
-                          searchControl.value
-                            ? 'Nenhuma escala corresponde a busca.'
+                          searchControl.value || postosControl.value.length || vigiasControl.value.length || !ativosOnlyControl.value
+                            ? 'Nenhuma escala corresponde aos filtros.'
                             : 'Nenhuma escala cadastrada.'
                         "
                       />
                     </td>
                   </tr>
                 } @else {
-                  @for (escala of escalas; track escala.id) {
-                    <tr z-table-row>
-                      <td z-table-cell>{{ escala.usuarioNome }}</td>
-                      <td z-table-cell>{{ escala.postoNome }}</td>
+                  @for (grupo of groups; track grupo.key) {
+                    <tr
+                      z-table-row
+                      class="group-row"
+                      [class.group-row--expanded]="isExpanded(grupo.key)"
+                      (click)="toggleExpand(grupo.key)"
+                    >
+                      <td z-table-cell>{{ grupo.postoNome }}</td>
                       <td z-table-cell>
-                        {{
-                          formatarDias(
-                            escala.diaSemanaInicio,
-                            escala.diaSemanaFim
-                          )
-                        }}
+                        <span class="group-row__vigia">{{ grupo.usuarioNome }}</span>
                       </td>
-                      <td z-table-cell>
-                        {{
-                          formatarHorario(
-                            escala.horaInicio,
-                            escala.horaFim
-                          )
-                        }}
+                      <td z-table-cell class="text-center">
+                        <span class="group-row__count">{{ grupo.qtdEscalasAtivas }}</span>
                       </td>
-                      <td z-table-cell>
-                        {{ escala.toleranciaMin }} min
+                      <td z-table-cell class="text-center">
+                        <span class="group-row__hours">{{ grupo.totalHoras }}h</span>
+                      </td>
+                      <td z-table-cell class="text-center">
+                        {{ grupo.toleranciaMin }} min
                       </td>
                       <td z-table-cell>
                         <gp-status-badge
-                          [status]="escala.ativo ? 'ativo' : 'cancelado'"
+                          [status]="grupo.ativo ? 'ativo' : 'cancelado'"
                         />
                       </td>
                       <td z-table-cell class="list-page__actions">
-                        @if (escala.ativo) {
+                        <button
+                          z-button
+                          zType="ghost"
+                          zSize="icon"
+                          [zTooltip]="isExpanded(grupo.key) ? 'Recolher detalhes' : 'Ver detalhes'"
+                          (click)="toggleExpand(grupo.key); $event.stopPropagation()"
+                          aria-label="Ver detalhes"
+                        >
+                          <ng-icon
+                            [name]="isExpanded(grupo.key) ? 'lucideChevronUp' : 'lucideChevronDown'"
+                          />
+                        </button>
+                        @if (grupo.ativo) {
                           <button
                             z-button
                             zType="ghost"
                             zSize="icon"
                             zTooltip="Editar escala"
-                            (click)="abrirFormulario(escala)"
+                            (click)="abrirFormulario(grupo); $event.stopPropagation()"
                             aria-label="Editar escala"
                           >
                             <ng-icon name="lucidePencil" />
                           </button>
-                          <button
-                            z-button
-                            zType="ghost"
-                            zSize="icon"
-                            class="text-destructive"
-                            zTooltip="Desativar escala"
-                            (click)="confirmarExclusao(escala)"
-                            aria-label="Desativar escala"
-                          >
-                            <ng-icon name="lucideTrash2" />
-                          </button>
                         }
                       </td>
                     </tr>
+                    @if (isExpanded(grupo.key)) {
+                      <tr z-table-row class="detail-row">
+                        <td z-table-cell [attr.colspan]="7">
+                          <div class="detail-panel">
+                            <table class="detail-table">
+                              <thead>
+                                <tr>
+                                  <th class="detail-th">Dia(s)</th>
+                                  <th class="detail-th">Horário</th>
+                                  <th class="detail-th text-center">Tolerância</th>
+                                  <th class="detail-th">Status</th>
+                                  <th class="detail-th">Ações</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                @for (escala of grupo.escalas; track escala.id) {
+                                  <tr class="detail-tr">
+                                    <td class="detail-td">
+                                      {{ formatarDias(escala.diaSemanaInicio, escala.diaSemanaFim) }}
+                                    </td>
+                                    <td class="detail-td">
+                                      {{ formatarHorario(escala.horaInicio, escala.horaFim) }}
+                                    </td>
+                                    <td class="detail-td text-center">
+                                      {{ escala.toleranciaMin }} min
+                                    </td>
+                                    <td class="detail-td">
+                                      <gp-status-badge
+                                        [status]="escala.ativo ? 'ativo' : 'cancelado'"
+                                      />
+                                    </td>
+                                    <td class="detail-td detail-actions">
+                                      @if (escala.ativo) {
+                                        <button
+                                          z-button
+                                          zType="ghost"
+                                          zSize="icon"
+                                          class="text-destructive"
+                                          zTooltip="Desativar"
+                                          (click)="confirmarExclusaoIndividual(escala); $event.stopPropagation()"
+                                          aria-label="Desativar escala"
+                                        >
+                                          <ng-icon name="lucideTrash2" />
+                                        </button>
+                                      }
+                                    </td>
+                                  </tr>
+                                }
+                              </tbody>
+                            </table>
+                          </div>
+                        </td>
+                      </tr>
+                    }
                   }
                 }
               }
