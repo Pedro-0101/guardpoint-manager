@@ -58,9 +58,22 @@
   </div>
 
   <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
+
+  <div class="form-field">
+    <label class="form-label" for="posto-coordenadas-input">Colar coordenadas do Google Maps</label>
+    <input
+      z-input
+      id="posto-coordenadas-input"
+      placeholder="Ex: 23°12'05.6&quot;S 47°35'56.3&quot;W"
+      (paste)="onColarCoordenadas($event)"
+      (keydown)="$event.preventDefault()"
+      readonly
+    />
+  </div>
+
   <p class="form__mapa-hint">
     Clique no mapa ou arraste o marcador para posicionar o posto. Você também pode colar
-    coordenadas do Google Maps (ex.: 23°12'05.6"S 47°35'56.3"W) nos campos acima.
+    coordenadas do Google Maps (ex.: 23°12'05.6"S 47°35'56.3"W) no campo acima.
   </p>
 
   <div class="form-field">
