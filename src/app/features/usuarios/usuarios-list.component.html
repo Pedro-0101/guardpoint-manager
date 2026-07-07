@@ -21,10 +21,10 @@
     <z-card class="p-4 mb-6">
       <div class="flex flex-wrap gap-4 items-end">
         <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
-          <label class="form-label">Buscar usuário</label>
+          <label class="form-label" for="usuario-search-input">Buscar usuário</label>
           <div class="relative flex items-center">
             <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-            <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome ou email..." />
+            <input z-input id="usuario-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome ou email..." />
           </div>
         </div>
       </div>

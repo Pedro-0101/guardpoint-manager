@@ -87,7 +87,9 @@ export class ZardRadioComponent implements ControlValueAccessor, OnInit, OnDestr
   protected readonly checked = computed(() => this.groupValue() === this.value());
   protected readonly classes = computed(() => mergeClasses(radioVariants(), this.class()));
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: string) => void = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onTouched: () => void = () => {};
 
   ngOnInit(): void {

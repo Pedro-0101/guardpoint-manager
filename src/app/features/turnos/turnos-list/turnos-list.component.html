@@ -21,16 +21,16 @@
     <z-card class="p-4 mb-6">
       <div class="flex flex-wrap gap-4 items-end">
         <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-sm">
-          <label class="form-label">Buscar turno</label>
+          <label class="form-label" for="search-input">Buscar turno</label>
           <div class="relative flex items-center">
             <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-            <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
+            <input z-input id="search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
           </div>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-[160px]">
-          <label class="form-label">Status</label>
-          <z-select [formControl]="statusControl">
+          <label class="form-label" for="status-select">Status</label>
+          <z-select id="status-select" [formControl]="statusControl">
             @for (filtro of statusFilters; track filtro.value) {
               <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
             }

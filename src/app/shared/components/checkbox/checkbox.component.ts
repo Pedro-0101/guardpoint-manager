@@ -39,7 +39,9 @@ export class ZardCheckboxComponent implements ControlValueAccessor {
   protected readonly disabled = signal(false);
   protected readonly classes = computed(() => mergeClasses(checkboxVariants(), this.class()));
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: boolean) => void = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onTouched: () => void = () => {};
 
   toggle(): void {

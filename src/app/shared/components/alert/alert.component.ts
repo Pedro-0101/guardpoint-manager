@@ -15,7 +15,6 @@ import {
 } from './alert.variants';
 
 @Component({
-  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'z-alert, [z-alert]',
   imports: [NgIcon, ZardStringTemplateOutletDirective],
   template: `

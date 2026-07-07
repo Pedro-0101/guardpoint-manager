@@ -52,7 +52,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
 
   private closeTimeout: ReturnType<typeof setTimeout> | null = null;
   private openTimeout: ReturnType<typeof setTimeout> | null = null;
-  private readonly cleanupFunctions: Array<() => void> = [];
+  private readonly cleanupFunctions: (() => void)[] = [];
 
   readonly zMenuTriggerFor = input.required<TemplateRef<void>>();
   readonly zDisabled = input<boolean, BooleanInput>(false, { transform: booleanAttribute });

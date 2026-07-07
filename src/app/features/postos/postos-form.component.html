@@ -1,7 +1,7 @@
 <form [formGroup]="form" novalidate>
   <div class="form-field">
-    <label class="form-label">Nome</label>
-    <input z-input formControlName="nome" placeholder="Ex: Portaria Principal" />
+    <label class="form-label" for="posto-nome-input">Nome</label>
+    <input z-input id="posto-nome-input" formControlName="nome" placeholder="Ex: Portaria Principal" />
     @if (form.controls.nome.invalid && form.controls.nome.touched) {
       <p class="form-field__error">
         @if (form.controls.nome.errors?.['required']) {
@@ -15,9 +15,10 @@
 
   <div class="form__row">
     <div class="form-field flex-1">
-      <label class="form-label">Latitude</label>
+      <label class="form-label" for="posto-latitude-input">Latitude</label>
       <input
         z-input
+        id="posto-latitude-input"
         type="number"
         formControlName="latitude"
         step="any"
@@ -35,9 +36,10 @@
     </div>
 
     <div class="form-field flex-1">
-      <label class="form-label">Longitude</label>
+      <label class="form-label" for="posto-longitude-input">Longitude</label>
       <input
         z-input
+        id="posto-longitude-input"
         type="number"
         formControlName="longitude"
         step="any"
@@ -62,8 +64,8 @@
   </p>
 
   <div class="form-field">
-    <label class="form-label">Raio de tolerância (metros)</label>
-    <input z-input type="number" formControlName="raioM" min="10" max="5000" />
+    <label class="form-label" for="posto-raio-input">Raio de tolerância (metros)</label>
+    <input z-input id="posto-raio-input" type="number" formControlName="raioM" min="10" max="5000" />
     @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
       <p class="form-field__error">
         @if (form.controls.raioM.errors?.['required']) {

@@ -23,13 +23,15 @@ import { ZardSelectItemComponent } from './select-item.component';
 @Component({
   selector: 'z-select',
   template: `
-    @if (zLabel(); as label) {
-      <label class="block text-sm font-medium mb-1 text-foreground">{{ label }}</label>
-    }
+     @if (zLabel(); as label) {
+       <label class="block text-sm font-medium mb-1 text-foreground" for="zselect-trigger">{{ label }}</label>
+     }
 
-    <button
-      type="button"
-      role="combobox"
+     <button
+       id="zselect-trigger"
+       type="button"
+       role="combobox"
+       [attr.aria-controls]="isOpen() ? 'zselect-listbox' : undefined"
       [class]="triggerClasses()"
       [disabled]="disabled() || zDisabled()"
       [attr.aria-expanded]="isOpen()"
@@ -87,6 +89,7 @@ import { ZardSelectItemComponent } from './select-item.component';
       <div
         class="absolute z-50 mt-1 left-0 w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md"
         role="listbox"
+        id="zselect-listbox"
         [attr.aria-multiselectable]="zMultiple() || null"
       >
         <ng-content />
@@ -149,7 +152,9 @@ export class ZardSelectComponent implements ControlValueAccessor {
     mergeClasses(selectVariants({ zError: this.zError() }), this.class()),
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: string | string[]) => void = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onTouched: () => void = () => {};
 
   getItemLabel(value: string): string {

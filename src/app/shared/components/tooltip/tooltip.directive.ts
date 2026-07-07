@@ -1,16 +1,17 @@
-import { Directive, ElementRef, HostListener, input, OnDestroy, Renderer2 } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, input, OnDestroy, Renderer2 } from '@angular/core';
 
 @Directive({
   selector: '[zTooltip]',
   exportAs: 'zTooltip',
 })
 export class ZardTooltipDirective implements OnDestroy {
+  private readonly el = inject(ElementRef<HTMLElement>);
+  private readonly renderer = inject(Renderer2);
+
   readonly zTooltip = input.required<string>();
   readonly zTooltipPosition = input<'top' | 'bottom' | 'left' | 'right'>('top');
 
   private tooltipElement: HTMLElement | null = null;
-
-  constructor(private el: ElementRef<HTMLElement>, private renderer: Renderer2) {}
 
   @HostListener('mouseenter') onMouseEnter(): void {
     if (this.tooltipElement) return;

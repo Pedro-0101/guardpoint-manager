@@ -186,6 +186,7 @@ export class AuthService {
       this.PROACTIVE_REFRESH_MIN_DELAY_SECONDS,
     );
     this.refreshTimerId = setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       this.refreshToken().subscribe({ error: () => {} });
     }, delaySeconds * 1000);
   }

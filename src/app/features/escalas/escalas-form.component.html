@@ -6,8 +6,8 @@
 } @else {
   <form [formGroup]="form" novalidate>
     <div class="form-field">
-      <label class="form-label">Nome</label>
-      <input z-input formControlName="nome" placeholder="Ex: Escala diurna" />
+      <label class="form-label" for="escala-nome-input">Nome</label>
+      <input z-input id="escala-nome-input" formControlName="nome" placeholder="Ex: Escala diurna" />
       @if (form.controls.nome.invalid && form.controls.nome.touched) {
         <p class="form-field__error">
           @if (form.controls.nome.errors?.['required']) {
@@ -20,8 +20,8 @@
     </div>
 
     <div class="form-field">
-      <label class="form-label">Posto</label>
-      <z-select class="w-full" formControlName="postoId">
+      <label class="form-label" for="escala-posto-select">Posto</label>
+      <z-select id="escala-posto-select" class="w-full" formControlName="postoId">
         @for (posto of postos(); track posto.id) {
           <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
@@ -32,8 +32,8 @@
     </div>
 
     <div class="form-field">
-      <label class="form-label">Usuário</label>
-      <z-select class="w-full" formControlName="usuarioId">
+      <label class="form-label" for="escala-usuario-select">Usuário</label>
+      <z-select id="escala-usuario-select" class="w-full" formControlName="usuarioId">
         @for (usuario of usuarios(); track usuario.id) {
           <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
         }
@@ -59,16 +59,16 @@
 
     <div class="form__row">
       <div class="form-field flex-1">
-        <label class="form-label">Data início</label>
-        <input z-input type="date" formControlName="dataInicio" />
+        <label class="form-label" for="escala-data-inicio-input">Data início</label>
+        <input z-input id="escala-data-inicio-input" type="date" formControlName="dataInicio" />
         @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
           <p class="form-field__error">Data início é obrigatória.</p>
         }
       </div>
 
       <div class="form-field flex-1">
-        <label class="form-label">Data fim</label>
-        <input z-input type="date" formControlName="dataFim" />
+        <label class="form-label" for="escala-data-fim-input">Data fim</label>
+        <input z-input id="escala-data-fim-input" type="date" formControlName="dataFim" />
         @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
           <p class="form-field__error">Data fim é obrigatória.</p>
         }
@@ -77,8 +77,8 @@
 
     <div class="form__row">
       <div class="form-field flex-1">
-        <label class="form-label">Hora início</label>
-        <input z-input type="time" formControlName="horaInicio" />
+        <label class="form-label" for="escala-hora-inicio-input">Hora início</label>
+        <input z-input id="escala-hora-inicio-input" type="time" formControlName="horaInicio" />
         @if (form.controls.horaInicio.invalid && form.controls.horaInicio.touched) {
           <p class="form-field__error">
             @if (form.controls.horaInicio.errors?.['required']) {
@@ -91,8 +91,8 @@
       </div>
 
       <div class="form-field flex-1">
-        <label class="form-label">Hora fim</label>
-        <input z-input type="time" formControlName="horaFim" />
+        <label class="form-label" for="escala-hora-fim-input">Hora fim</label>
+        <input z-input id="escala-hora-fim-input" type="time" formControlName="horaFim" />
         @if (form.controls.horaFim.invalid && form.controls.horaFim.touched) {
           <p class="form-field__error">
             @if (form.controls.horaFim.errors?.['required']) {
@@ -106,8 +106,8 @@
     </div>
 
     <div class="form-field">
-      <label class="form-label">Tolerância (minutos)</label>
-      <input z-input type="number" formControlName="toleranciaMin" min="0" max="120" />
+      <label class="form-label" for="escala-tolerancia-input">Tolerância (minutos)</label>
+      <input z-input id="escala-tolerancia-input" type="number" formControlName="toleranciaMin" min="0" max="120" />
       @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
         <p class="form-field__error">Valor entre 0 e 120 minutos.</p>
       }

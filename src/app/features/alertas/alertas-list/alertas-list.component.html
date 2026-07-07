@@ -41,16 +41,16 @@
       <z-card class="p-4 mb-6">
         <div class="flex flex-wrap gap-4 items-end">
           <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-sm">
-            <label class="form-label">Buscar alerta</label>
+            <label class="form-label" for="alerta-search-input">Buscar alerta</label>
             <div class="relative flex items-center">
               <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-              <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
+              <input z-input id="alerta-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
             </div>
           </div>
 
           <div class="flex flex-col gap-1.5 min-w-[150px]">
-            <label class="form-label">Tipo</label>
-            <z-select [formControl]="tipoControl">
+            <label class="form-label" for="alerta-tipo-select">Tipo</label>
+            <z-select id="alerta-tipo-select" [formControl]="tipoControl">
               @for (filtro of tipoFilters; track filtro.value) {
                 <z-select-item [zValue]="filtro.value">
                   <ng-icon [name]="filtro.icon" class="list-page__filter-icon" />
@@ -61,8 +61,8 @@
           </div>
 
           <div class="flex flex-col gap-1.5 min-w-[150px]">
-            <label class="form-label">Gravidade</label>
-            <z-select [formControl]="gravidadeControl">
+            <label class="form-label" for="alerta-gravidade-select">Gravidade</label>
+            <z-select id="alerta-gravidade-select" [formControl]="gravidadeControl">
               @for (filtro of gravidadeFilters; track filtro.value) {
                 <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
               }
@@ -70,8 +70,8 @@
           </div>
 
           <div class="flex flex-col gap-1.5 min-w-[150px]">
-            <label class="form-label">Status</label>
-            <z-select [formControl]="statusControl">
+            <label class="form-label" for="alerta-status-select">Status</label>
+            <z-select id="alerta-status-select" [formControl]="statusControl">
               @for (filtro of statusFilters; track filtro.value) {
                 <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
               }

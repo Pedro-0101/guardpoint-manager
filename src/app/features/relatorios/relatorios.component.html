@@ -10,18 +10,18 @@
   <z-card class="p-4 mb-6">
     <div class="flex flex-wrap gap-4 items-end">
       <div class="flex flex-col gap-1.5 min-w-[160px]">
-        <label class="form-label">Data Início</label>
-        <input z-input type="date" [formControl]="dataInicioControl" />
+        <label class="form-label" for="relatorio-data-inicio-input">Data Início</label>
+        <input z-input id="relatorio-data-inicio-input" type="date" [formControl]="dataInicioControl" />
       </div>
 
       <div class="flex flex-col gap-1.5 min-w-[160px]">
-        <label class="form-label">Data Fim</label>
-        <input z-input type="date" [formControl]="dataFimControl" />
+        <label class="form-label" for="relatorio-data-fim-input">Data Fim</label>
+        <input z-input id="relatorio-data-fim-input" type="date" [formControl]="dataFimControl" />
       </div>
 
       <div class="flex flex-col gap-1.5 min-w-[160px]">
-        <label class="form-label">Posto</label>
-        <z-select [formControl]="postoControl">
+        <label class="form-label" for="relatorio-posto-select">Posto</label>
+        <z-select id="relatorio-posto-select" [formControl]="postoControl">
           <z-select-item zValue="">Todos</z-select-item>
           @for (posto of postos(); track posto.id) {
             <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
@@ -30,8 +30,8 @@
       </div>
 
       <div class="flex flex-col gap-1.5 min-w-[160px]">
-        <label class="form-label">Vigia</label>
-        <z-select [formControl]="usuarioControl">
+        <label class="form-label" for="relatorio-vigia-select">Vigia</label>
+        <z-select id="relatorio-vigia-select" [formControl]="usuarioControl">
           <z-select-item zValue="">Todos</z-select-item>
           @for (usuario of usuarios(); track usuario.id) {
             <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
@@ -40,8 +40,8 @@
       </div>
 
       <div class="flex flex-col gap-1.5 min-w-[160px]">
-        <label class="form-label">Status</label>
-        <z-select [formControl]="statusControl">
+        <label class="form-label" for="relatorio-status-select">Status</label>
+        <z-select id="relatorio-status-select" [formControl]="statusControl">
           @for (filtro of statusFilters; track filtro.value) {
             <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
           }

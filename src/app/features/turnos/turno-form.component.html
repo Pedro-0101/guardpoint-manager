@@ -6,16 +6,16 @@
     </div>
   } @else {
     <div class="form-field">
-      <label class="form-label">Device ID</label>
-      <input z-input formControlName="device_id" placeholder="ID do dispositivo do vigia" />
+      <label class="form-label" for="turno-device-input">Device ID</label>
+      <input z-input id="turno-device-input" formControlName="device_id" placeholder="ID do dispositivo do vigia" />
       @if (form.controls.device_id.invalid && form.controls.device_id.touched) {
         <p class="form-field__error">Device ID é obrigatório.</p>
       }
     </div>
 
     <div class="form-field">
-      <label class="form-label">Posto</label>
-      <z-select class="w-full" formControlName="posto_id">
+      <label class="form-label" for="posto-select">Posto</label>
+      <z-select id="posto-select" class="w-full" formControlName="posto_id">
         @for (posto of postos(); track posto.id) {
           <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
@@ -26,8 +26,8 @@
     </div>
 
     <div class="form-field">
-      <label class="form-label">Intervalo de check-in (minutos)</label>
-      <input z-input type="number" formControlName="intervalo_min" min="1" max="120" placeholder="Opcional" />
+      <label class="form-label" for="intervalo-input">Intervalo de check-in (minutos)</label>
+      <input z-input id="intervalo-input" type="number" formControlName="intervalo_min" min="1" max="120" placeholder="Opcional" />
       @if (form.controls.intervalo_min.invalid && form.controls.intervalo_min.touched) {
         <p class="form-field__error">Valor deve estar entre 1 e 120 minutos.</p>
       }

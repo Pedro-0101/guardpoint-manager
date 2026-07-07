@@ -34,8 +34,8 @@
           @for (nivel of niveisArray.controls; track $index) {
             <div class="niveis__row" [formGroup]="nivel">
               <div class="form-field niveis__field niveis__field--small">
-                <label class="form-label">Nível</label>
-                <input z-input type="number" formControlName="nivel" min="1" max="5" />
+                <label class="form-label" for="nivel-input-{{ $index }}">Nível</label>
+                <input z-input id="nivel-input-{{ $index }}" type="number" formControlName="nivel" min="1" max="5" />
                 @if (nivelDuplicado($index)) {
                   <p class="form-field__hint">Nível repetido em outra linha.</p>
                 }
@@ -51,8 +51,8 @@
               </div>
 
               <div class="form-field niveis__field">
-                <label class="form-label">Atraso (minutos)</label>
-                <input z-input type="number" formControlName="atrasoMinutos" min="1" max="1440" />
+                <label class="form-label" for="atraso-input-{{ $index }}">Atraso (minutos)</label>
+                <input z-input id="atraso-input-{{ $index }}" type="number" formControlName="atrasoMinutos" min="1" max="1440" />
                 @if (nivel.controls.atrasoMinutos.invalid && nivel.controls.atrasoMinutos.touched) {
                   <p class="form-field__error">
                     @if (nivel.controls.atrasoMinutos.errors?.['required']) {
@@ -65,9 +65,10 @@
               </div>
 
               <div class="form-field niveis__field">
-                <label class="form-label">WhatsApp</label>
+                <label class="form-label" for="whatsapp-input-{{ $index }}">WhatsApp</label>
                 <input
                   z-input
+                  id="whatsapp-input-{{ $index }}"
                   formControlName="whatsappPara"
                   placeholder="Ex: 5511999999999"
                 />
@@ -85,8 +86,8 @@
               </div>
 
               <div class="form-field niveis__field">
-                <label class="form-label">Cargo alvo</label>
-                <input z-input formControlName="cargoAlvo" placeholder="Ex: Supervisor" />
+                <label class="form-label" for="cargo-input-{{ $index }}">Cargo alvo</label>
+                <input z-input id="cargo-input-{{ $index }}" formControlName="cargoAlvo" placeholder="Ex: Supervisor" />
                 @if (nivel.controls.cargoAlvo.invalid && nivel.controls.cargoAlvo.touched) {
                   <p class="form-field__error">Máximo de 50 caracteres.</p>
                 }

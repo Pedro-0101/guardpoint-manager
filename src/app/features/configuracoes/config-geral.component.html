@@ -22,8 +22,8 @@
   } @else {
     <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="settings-form">
       <div class="form-field settings-form__field">
-        <label class="form-label">Nome da empresa</label>
-        <input z-input formControlName="nome" placeholder="Razão social ou nome fantasia" />
+        <label class="form-label" for="nome-empresa-input">Nome da empresa</label>
+        <input z-input id="nome-empresa-input" formControlName="nome" placeholder="Razão social ou nome fantasia" />
         @if (form.controls.nome.invalid && form.controls.nome.touched) {
           <p class="form-field__error">
             @if (form.controls.nome.errors?.['required']) {
@@ -47,6 +47,7 @@
         </div>
       </div>
 
+      <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
       <label class="settings-form__toggle">
         <z-switch formControlName="alertaSonoro" />
         Tocar som de alerta em coação

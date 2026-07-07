@@ -20,7 +20,7 @@ module.exports = defineConfig([
         {
           type: 'attribute',
           prefix: ['gp', 'z'],
-          style: 'camelCase',
+          style: 'kebab-case',
         },
       ],
       '@angular-eslint/component-selector': [
@@ -43,9 +43,20 @@ module.exports = defineConfig([
     files: [
       'src/app/shared/components/toast/**/*.ts',
       'src/app/shared/components/alert/**/*.ts',
+      'src/app/shared/components/button/**/*.ts',
+      'src/app/shared/components/radio/**/*.ts',
     ],
     rules: {
       '@angular-eslint/component-selector': 'off',
+    },
+  },
+  {
+    files: [
+      'src/app/shared/components/tooltip/**/*.ts',
+      'src/app/shared/core/directives/string-template-outlet/**/*.ts',
+    ],
+    rules: {
+      '@angular-eslint/directive-selector': 'off',
     },
   },
   {

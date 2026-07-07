@@ -20,7 +20,6 @@ import {
   distinctUntilChanged,
   startWith,
   map,
-  filter,
 } from 'rxjs/operators';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { AlertasService, AlertasEstatisticas } from '../alertas.service';

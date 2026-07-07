@@ -82,11 +82,13 @@
         </button>
         <ng-template #configMenu>
           <div z-menu-content class="w-56">
-            <a routerLink="/configuracoes" routerLinkActive="navbar__menu-item--active" z-menu-item>
+            <a routerLink="/configuracoes" routerLinkActive="navbar__menu-item--active"
+               [routerLinkActiveOptions]="{ exact: true }" z-menu-item>
               <ng-icon name="lucideSettings" class="mr-2" />
               Geral
             </a>
-            <a routerLink="/configuracoes/escalonamento" routerLinkActive="navbar__menu-item--active" z-menu-item>
+            <a routerLink="/configuracoes/escalonamento" routerLinkActive="navbar__menu-item--active"
+               [routerLinkActiveOptions]="{ exact: true }" z-menu-item>
               <ng-icon name="lucideCalendarDays" class="mr-2" />
               Escalonamento
             </a>

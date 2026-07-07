@@ -35,7 +35,9 @@ export class ZardSwitchComponent implements ControlValueAccessor {
   protected readonly switchClasses = computed(() => mergeClasses(switchVariants({ zSize: this.zSize() }), this.class()));
   protected readonly thumbClasses = computed(() => switchThumbVariants({ zSize: this.zSize() }));
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onChange: (value: boolean) => void = () => {};
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private _onTouched: () => void = () => {};
 
   toggle(): void {
