@@ -1,7 +1,7 @@
 import { Directive, ElementRef, HostListener, input, OnDestroy, Renderer2 } from '@angular/core';
 
 @Directive({
-  selector: '[z-tooltip]',
+  selector: '[zTooltip]',
   exportAs: 'zTooltip',
 })
 export class ZardTooltipDirective implements OnDestroy {

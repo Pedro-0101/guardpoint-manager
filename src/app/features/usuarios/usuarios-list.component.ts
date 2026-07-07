@@ -10,6 +10,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -36,6 +37,7 @@ const CARGO_LABELS: Record<string, string> = {
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
+    ...ZardTooltipImports,
   ],
   templateUrl: './usuarios-list.component.html',
   styleUrl: './usuarios-list.component.scss',

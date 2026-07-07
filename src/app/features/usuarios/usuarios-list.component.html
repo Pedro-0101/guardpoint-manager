@@ -73,11 +73,11 @@
                       <gp-status-badge [status]="usuario.ativo ? 'ativo' : 'cancelado'" />
                     </td>
                     <td z-table-cell class="list-page__actions">
-                      <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
+                      <button z-button zType="ghost" zSize="icon" zTooltip="Editar usuário" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
                         <ng-icon name="lucidePencil" />
                       </button>
                       @if (usuario.ativo) {
-                        <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
+                        <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Inativar usuário" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
                           <ng-icon name="lucideBan" />
                         </button>
                       }
