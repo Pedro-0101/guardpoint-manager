@@ -132,6 +132,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     this.dialog.create({
       zTitle: 'Inativar usuário',
       zDescription: `Tem certeza que deseja inativar o usuário "${usuario.nome}"?`,
+      zWidth: '28rem',
       zOkText: 'Inativar',
       zCancelText: 'Cancelar',
       zOkDestructive: true,

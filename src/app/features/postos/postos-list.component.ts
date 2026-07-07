@@ -125,6 +125,7 @@ export class PostosListComponent implements OnInit, OnDestroy {
     this.dialog.create({
       zTitle: 'Inativar posto',
       zDescription: `Tem certeza que deseja inativar o posto "${posto.nome}"?`,
+      zWidth: '28rem',
       zOkText: 'Inativar',
       zCancelText: 'Cancelar',
       zOkDestructive: true,
