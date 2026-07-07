@@ -53,7 +53,7 @@ export class ZardSelectItemComponent {
 
   protected readonly classes = computed(() =>
     mergeClasses(
-      'relative flex w-full cursor-default select-none items-center gap-2 rounded-md py-1.5 px-3 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-pointer select-none items-center gap-2 rounded-md py-1.5 px-3 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       this.active() ? 'bg-accent text-accent-foreground' : 'text-popover-foreground',
       this.class(),
     ),
