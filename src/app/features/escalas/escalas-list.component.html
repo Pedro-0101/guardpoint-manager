@@ -1,108 +1,166 @@
 <gp-page-layout>
-<div class="list-page">
-  <header class="list-page__header">
-    <div>
-      <h1 class="list-page__title">Escalas</h1>
-      <p class="list-page__subtitle">Gerencie as escalas de trabalho</p>
-    </div>
-    <button z-button (click)="abrirFormulario()">
-      <ng-icon name="lucidePlus" />
-      Nova escala
-    </button>
-  </header>
+  <div class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h1 class="list-page__title">Escalas</h1>
+        <p class="list-page__subtitle">Gerencie as escalas de trabalho</p>
+      </div>
+      <button z-button (click)="abrirFormulario()">
+        <ng-icon name="lucidePlus" />
+        Nova escala
+      </button>
+    </header>
 
-  @if (error(); as errorMsg) {
-    <div class="list-page__error">
-      <ng-icon name="lucideAlertCircle" />
-      <p>{{ errorMsg }}</p>
-      <button class="list-page__retry-btn" (click)="carregarEscalas()">Tentar novamente</button>
-    </div>
-  } @else {
-    <z-card class="p-4 mb-6">
-      <div class="flex flex-wrap gap-4 items-end">
-        <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
-          <label class="form-label" for="escala-search-input">Buscar escala</label>
-          <div class="relative flex items-center">
-            <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-            <input z-input id="escala-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome, posto ou usuário..." />
+    @if (error(); as errorMsg) {
+      <div class="list-page__error">
+        <ng-icon name="lucideAlertCircle" />
+        <p>{{ errorMsg }}</p>
+        <button class="list-page__retry-btn" (click)="carregarEscalas()">
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <z-card class="p-4 mb-6">
+        <div class="flex flex-wrap gap-4 items-end">
+          <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
+            <label class="form-label" for="escala-search-input">
+              Buscar escala
+            </label>
+            <div class="relative flex items-center">
+              <ng-icon
+                name="lucideSearch"
+                class="text-muted-foreground pointer-events-none absolute left-3 size-4"
+              />
+              <input
+                z-input
+                id="escala-search-input"
+                class="w-full pl-9"
+                [formControl]="searchControl"
+                placeholder="Posto ou vigia..."
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </z-card>
+      </z-card>
 
-    <div class="list-page__table-wrapper">
-      <table z-table class="list-page__table">
-        <thead z-table-header>
-          <tr z-table-row>
-            <th z-table-head>Nome</th>
-            <th z-table-head>Posto</th>
-            <th z-table-head>Usuário</th>
-            <th z-table-head>Dias</th>
-            <th z-table-head>Vigência</th>
-            <th z-table-head>Horário</th>
-            <th z-table-head>Tolerância</th>
-            <th z-table-head>Status</th>
-            <th z-table-head>Ações</th>
-          </tr>
-        </thead>
-        <tbody z-table-body>
-          @if (loading()) {
-            @for (row of [1,2,3,4,5]; track row) {
-              <tr z-table-row>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[120px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[100px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[120px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[100px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[160px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[100px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-[14px] w-[60px] rounded" /></td>
-                <td z-table-cell><z-skeleton class="h-6 w-[70px] rounded-full" /></td>
-                <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
-              </tr>
-            }
-          } @else {
-            @if ((filteredEscalas$ | async); as escalas) {
-              @if (escalas.length === 0) {
-                <tr>
-                  <td z-table-cell [attr.colspan]="9">
-                    <gp-empty-state
-                      icon="lucideCalendarOff"
-                      title="Nenhuma escala encontrada"
-                      [description]="searchControl.value ? 'Nenhuma escala corresponde à busca.' : 'Nenhuma escala cadastrada.'"
-                    />
+      <div class="list-page__table-wrapper">
+        <table z-table class="list-page__table">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Vigia</th>
+              <th z-table-head>Posto</th>
+              <th z-table-head>Dia(s)</th>
+              <th z-table-head>Horario</th>
+              <th z-table-head>Tolerancia</th>
+              <th z-table-head>Status</th>
+              <th z-table-head>Acoes</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @if (loading()) {
+              @for (row of [1, 2, 3, 4, 5]; track row) {
+                <tr z-table-row>
+                  <td z-table-cell>
+                    <z-skeleton class="h-[14px] w-[120px] rounded" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="h-[14px] w-[100px] rounded" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="h-[14px] w-[80px] rounded" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="h-[14px] w-[90px] rounded" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="h-[14px] w-[60px] rounded" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="h-6 w-[70px] rounded-full" />
+                  </td>
+                  <td z-table-cell>
+                    <z-skeleton class="size-8 rounded-md" />
                   </td>
                 </tr>
-              } @else {
-                @for (escala of escalas; track escala.id) {
-                  <tr z-table-row>
-                    <td z-table-cell>{{ escala.nome }}</td>
-                    <td z-table-cell>{{ escala.postoNome }}</td>
-                    <td z-table-cell>{{ escala.usuarioNome }}</td>
-                    <td z-table-cell>{{ formatarDias(escala.diasSemana) }}</td>
-                    <td z-table-cell>{{ formatarVigencia(escala.dataInicio, escala.dataFim) }}</td>
-                    <td z-table-cell>{{ formatarHorario(escala.horaInicio, escala.horaFim) }}</td>
-                    <td z-table-cell>{{ escala.toleranciaMin }} min</td>
-                    <td z-table-cell>
-                      <gp-status-badge [status]="escala.ativo ? 'ativo' : 'cancelado'" />
-                    </td>
-                    <td z-table-cell class="list-page__actions">
-                      @if (escala.ativo) {
-                        <button z-button zType="ghost" zSize="icon" zTooltip="Editar escala" (click)="abrirFormulario(escala)" aria-label="Editar escala">
-                          <ng-icon name="lucidePencil" />
-                        </button>
-                        <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Desativar escala" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
-                          <ng-icon name="lucideTrash2" />
-                        </button>
-                      }
+              }
+            } @else {
+              @if (filteredEscalas$ | async; as escalas) {
+                @if (escalas.length === 0) {
+                  <tr>
+                    <td z-table-cell [attr.colspan]="7">
+                      <gp-empty-state
+                        icon="lucideCalendarOff"
+                        title="Nenhuma escala encontrada"
+                        [description]="
+                          searchControl.value
+                            ? 'Nenhuma escala corresponde a busca.'
+                            : 'Nenhuma escala cadastrada.'
+                        "
+                      />
                     </td>
                   </tr>
+                } @else {
+                  @for (escala of escalas; track escala.id) {
+                    <tr z-table-row>
+                      <td z-table-cell>{{ escala.usuarioNome }}</td>
+                      <td z-table-cell>{{ escala.postoNome }}</td>
+                      <td z-table-cell>
+                        {{
+                          formatarDias(
+                            escala.diaSemanaInicio,
+                            escala.diaSemanaFim
+                          )
+                        }}
+                      </td>
+                      <td z-table-cell>
+                        {{
+                          formatarHorario(
+                            escala.horaInicio,
+                            escala.horaFim
+                          )
+                        }}
+                      </td>
+                      <td z-table-cell>
+                        {{ escala.toleranciaMin }} min
+                      </td>
+                      <td z-table-cell>
+                        <gp-status-badge
+                          [status]="escala.ativo ? 'ativo' : 'cancelado'"
+                        />
+                      </td>
+                      <td z-table-cell class="list-page__actions">
+                        @if (escala.ativo) {
+                          <button
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
+                            zTooltip="Editar escala"
+                            (click)="abrirFormulario(escala)"
+                            aria-label="Editar escala"
+                          >
+                            <ng-icon name="lucidePencil" />
+                          </button>
+                          <button
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
+                            class="text-destructive"
+                            zTooltip="Desativar escala"
+                            (click)="confirmarExclusao(escala)"
+                            aria-label="Desativar escala"
+                          >
+                            <ng-icon name="lucideTrash2" />
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
                 }
               }
             }
-          }
-        </tbody>
-      </table>
-    </div>
-  }
-</div>
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
 </gp-page-layout>

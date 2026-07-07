@@ -4,112 +4,86 @@
     <span>Carregando...</span>
   </div>
 } @else {
-  <form [formGroup]="form" novalidate>
-    <div class="form-field">
-      <label class="form-label" for="escala-nome-input">Nome</label>
-      <input z-input id="escala-nome-input" formControlName="nome" placeholder="Ex: Escala diurna" />
-      @if (form.controls.nome.invalid && form.controls.nome.touched) {
-        <p class="form-field__error">
-          @if (form.controls.nome.errors?.['required']) {
-            Nome é obrigatório.
-          } @else if (form.controls.nome.errors?.['minlength']) {
-            Mínimo de 3 caracteres.
-          }
-        </p>
-      }
-    </div>
-
-    <div class="form-field">
-      <label class="form-label" for="escala-posto-select">Posto</label>
-      <z-select id="escala-posto-select" class="w-full" formControlName="postoId">
-        @for (posto of postos(); track posto.id) {
-          <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
-        }
-      </z-select>
-      @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
-        <p class="form-field__error">Posto é obrigatório.</p>
-      }
-    </div>
-
-    <div class="form-field">
-      <label class="form-label" for="escala-usuario-select">Usuário</label>
-      <z-select id="escala-usuario-select" class="w-full" formControlName="usuarioId">
-        @for (usuario of usuarios(); track usuario.id) {
-          <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
-        }
-      </z-select>
-      @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
-        <p class="form-field__error">Usuário é obrigatório.</p>
-      }
-    </div>
-
-    <div class="form-field">
-      <span class="form__label">Dias da semana</span>
-      <div class="form__dias">
-        @for (dia of diasSemana; track dia.value) {
-          <button type="button" class="form__dia" [class.form__dia--active]="isDiaSelecionado(dia.value)" (click)="toggleDia(dia.value)">
-            {{ dia.label }}
-          </button>
-        }
-      </div>
-      @if (form.controls.diasSemana.invalid && form.controls.diasSemana.touched) {
-        <span class="form__error">Selecione pelo menos um dia.</span>
-      }
-    </div>
-
+  <form [formGroup]="form" class="form" novalidate>
     <div class="form__row">
-      <div class="form-field flex-1">
-        <label class="form-label" for="escala-data-inicio-input">Data início</label>
-        <input z-input id="escala-data-inicio-input" type="date" formControlName="dataInicio" />
-        @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
-          <p class="form-field__error">Data início é obrigatória.</p>
+      <div class="form-field">
+        <label class="form-label" for="escala-vigia-select">Vigia</label>
+        <z-combobox
+          id="escala-vigia-select"
+          class="w-full"
+          zWidth="full"
+          [zOptions]="vigiaOptions()"
+          zPlaceholder="Selecione o vigia..."
+          zSearchPlaceholder="Buscar vigia..."
+          zEmptyText="Nenhum vigia encontrado."
+          formControlName="usuarioId"
+        />
+        <p class="form-field__desc">Selecione o vigia responsavel pela escala.</p>
+        @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
+          <p class="form-field__error">Vigia e obrigatorio.</p>
         }
       </div>
 
-      <div class="form-field flex-1">
-        <label class="form-label" for="escala-data-fim-input">Data fim</label>
-        <input z-input id="escala-data-fim-input" type="date" formControlName="dataFim" />
-        @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
-          <p class="form-field__error">Data fim é obrigatória.</p>
+      <div class="form-field">
+        <label class="form-label" for="escala-posto-select">Posto</label>
+        <z-combobox
+          id="escala-posto-select"
+          class="w-full"
+          zWidth="full"
+          [zOptions]="postoOptions()"
+          zPlaceholder="Selecione o posto..."
+          zSearchPlaceholder="Buscar posto..."
+          zEmptyText="Nenhum posto encontrado."
+          formControlName="postoId"
+        />
+        <p class="form-field__desc">Selecione o posto onde o vigia atuara.</p>
+        @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
+          <p class="form-field__error">Posto e obrigatorio.</p>
+        }
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="escala-tolerancia-input">
+          Tolerancia (min)
+        </label>
+        <input
+          z-input
+          id="escala-tolerancia-input"
+          class="w-full"
+          type="number"
+          formControlName="toleranciaMin"
+          min="0"
+          max="120"
+          step="5"
+        />
+        <p class="form-field__desc">Margem de tolerancia em minutos (0 a 120).</p>
+        @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
+          <p class="form-field__error">Valor entre 0 e 120 minutos.</p>
         }
       </div>
     </div>
 
-    <div class="form__row">
-      <div class="form-field flex-1">
-        <label class="form-label" for="escala-hora-inicio-input">Hora início</label>
-        <input z-input id="escala-hora-inicio-input" type="time" formControlName="horaInicio" />
-        @if (form.controls.horaInicio.invalid && form.controls.horaInicio.touched) {
-          <p class="form-field__error">
-            @if (form.controls.horaInicio.errors?.['required']) {
-              Hora início é obrigatória.
-            } @else {
-              Formato inválido (HH:mm).
-            }
-          </p>
-        }
+    <div class="form-field form__grid-wrapper">
+      <div class="form-field__header">
+        <span class="form-label">Horarios da semana</span>
+        <span class="form-field__badge">{{ entries().length }} periodo(s) &middot; {{ totalHoras() }}h</span>
       </div>
-
-      <div class="form-field flex-1">
-        <label class="form-label" for="escala-hora-fim-input">Hora fim</label>
-        <input z-input id="escala-hora-fim-input" type="time" formControlName="horaFim" />
-        @if (form.controls.horaFim.invalid && form.controls.horaFim.touched) {
-          <p class="form-field__error">
-            @if (form.controls.horaFim.errors?.['required']) {
-              Hora fim é obrigatória.
-            } @else {
-              Formato inválido (HH:mm).
-            }
-          </p>
-        }
-      </div>
-    </div>
-
-    <div class="form-field">
-      <label class="form-label" for="escala-tolerancia-input">Tolerância (minutos)</label>
-      <input z-input id="escala-tolerancia-input" type="number" formControlName="toleranciaMin" min="0" max="120" />
-      @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
-        <p class="form-field__error">Valor entre 0 e 120 minutos.</p>
+      <p class="form-field__hint">
+        Clique e arraste nas celulas para definir os horarios. Clique em um
+        bloco colorido para remove-lo. Para turnos que cruzam a meia-noite,
+        crie um bloco ate o final do primeiro dia e outro a partir do inicio
+        do dia seguinte — o sistema os une automaticamente.
+      </p>
+      @if (loadingEscalas()) {
+        <div class="form__loading">
+          <gp-loading-spinner size="sm" />
+          <span>Carregando escala existente...</span>
+        </div>
+      } @else {
+        <gp-weekly-grid
+          [entries]="entries()"
+          (entriesChange)="onEntriesChange($event)"
+        />
       }
     </div>
   </form>

@@ -1,7 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
-import { Escala, EscalaDto, CreateEscalaPayload, UpdateEscalaPayload } from '../../core/models/escala.model';
+import {
+  Escala,
+  EscalaDto,
+  CreateEscalaPayload,
+  CreateEscalaLotePayload,
+  UpdateEscalaPayload,
+} from '../../core/models/escala.model';
 
 @Injectable({ providedIn: 'root' })
 export class EscalasService {
@@ -11,7 +17,6 @@ export class EscalasService {
     usuario_id?: string;
     posto_id?: string;
     ativos?: string;
-    data?: string;
     limit?: number;
     offset?: number;
   }): Observable<Escala[]> {
@@ -24,15 +29,30 @@ export class EscalasService {
   }
 
   obter(id: string): Observable<Escala> {
-    return this.api.get<EscalaDto>(`/escalas/${id}`).pipe(map((dto) => mapEscalaFromDto(dto)));
+    return this.api
+      .get<EscalaDto>(`/escalas/${id}`)
+      .pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
   criar(data: CreateEscalaPayload): Observable<Escala> {
-    return this.api.post<EscalaDto>('/escalas', data).pipe(map((dto) => mapEscalaFromDto(dto)));
+    return this.api
+      .post<EscalaDto>('/escalas', data)
+      .pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
-  atualizar(id: string, data: UpdateEscalaPayload): Observable<Escala> {
-    return this.api.put<EscalaDto>(`/escalas/${id}`, data).pipe(map((dto) => mapEscalaFromDto(dto)));
+  criarLote(data: CreateEscalaLotePayload): Observable<Escala[]> {
+    return this.api
+      .post<EscalaDto[]>('/escalas/lote', data)
+      .pipe(map((dtos) => dtos.map(mapEscalaFromDto)));
+  }
+
+  atualizar(
+    id: string,
+    data: UpdateEscalaPayload
+  ): Observable<Escala> {
+    return this.api
+      .put<EscalaDto>(`/escalas/${id}`, data)
+      .pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
   excluir(id: string): Observable<void> {
@@ -43,16 +63,14 @@ export class EscalasService {
 function mapEscalaFromDto(dto: EscalaDto): Escala {
   return {
     id: dto.id,
-    nome: dto.nome,
     postoId: dto.posto_id,
     postoNome: dto.posto_nome,
     usuarioId: dto.usuario_id,
     usuarioNome: dto.usuario_nome,
-    diasSemana: dto.dias_semana,
+    diaSemanaInicio: dto.dia_semana_inicio,
+    diaSemanaFim: dto.dia_semana_fim,
     horaInicio: dto.hora_inicio,
     horaFim: dto.hora_fim,
-    dataInicio: dto.data_inicio,
-    dataFim: dto.data_fim,
     toleranciaMin: dto.tolerancia_min,
     ativo: dto.ativo,
     empresaId: dto.empresa_id,

@@ -1,15 +1,13 @@
 export interface Escala {
   id: string;
-  nome: string;
   postoId: string;
   postoNome: string;
   usuarioId: string;
   usuarioNome: string;
-  diasSemana: number[];
+  diaSemanaInicio: number;
+  diaSemanaFim: number;
   horaInicio: string;
   horaFim: string;
-  dataInicio: string;
-  dataFim: string;
   toleranciaMin: number;
   ativo: boolean;
   empresaId: string;
@@ -19,16 +17,14 @@ export interface Escala {
 
 export interface EscalaDto {
   id: string;
-  nome: string;
   posto_id: string;
   posto_nome: string;
   usuario_id: string;
   usuario_nome: string;
-  dias_semana: number[];
+  dia_semana_inicio: number;
+  dia_semana_fim: number;
   hora_inicio: string;
   hora_fim: string;
-  data_inicio: string;
-  data_fim: string;
   tolerancia_min: number;
   ativo: boolean;
   empresa_id: string;
@@ -36,13 +32,25 @@ export interface EscalaDto {
   updated_at: string;
 }
 
+export interface DiaEscalaEntry {
+  dia_semana_inicio: number;
+  dia_semana_fim: number;
+  hora_inicio: string;
+  hora_fim: string;
+}
+
 export interface CreateEscalaPayload {
-  data_fim: string;
-  data_inicio: string;
-  dias_semana: number[];
+  dia_semana_fim: number;
+  dia_semana_inicio: number;
   hora_fim: string;
   hora_inicio: string;
-  nome?: string;
+  posto_id: string;
+  tolerancia_min?: number;
+  usuario_id: string;
+}
+
+export interface CreateEscalaLotePayload {
+  dias: DiaEscalaEntry[];
   posto_id: string;
   tolerancia_min?: number;
   usuario_id: string;
@@ -50,12 +58,10 @@ export interface CreateEscalaPayload {
 
 export interface UpdateEscalaPayload {
   ativo?: boolean;
-  data_fim?: string;
-  data_inicio?: string;
-  dias_semana?: number[];
+  dia_semana_fim?: number;
+  dia_semana_inicio?: number;
   hora_fim?: string;
   hora_inicio?: string;
-  nome?: string;
   posto_id?: string;
   tolerancia_min?: number;
   usuario_id?: string;

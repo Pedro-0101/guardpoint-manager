@@ -1,9 +1,21 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  OnInit,
+  OnDestroy,
+} from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
-import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
+import {
+  takeUntil,
+  debounceTime,
+  distinctUntilChanged,
+  startWith,
+  map,
+} from 'rxjs/operators';
 import { EscalasService } from './escalas.service';
 import { EscalasFormComponent } from './escalas-form.component';
 import { ZardDialogService } from '@/shared/components/dialog';
@@ -26,7 +38,7 @@ const DIA_LABELS: Record<number, string> = {
   3: 'Qua',
   4: 'Qui',
   5: 'Sex',
-  6: 'Sáb',
+  6: 'Sab',
 };
 
 @Component({
@@ -75,7 +87,6 @@ export class EscalasListComponent implements OnInit, OnDestroy {
       const lower = term.toLowerCase().trim();
       return escalas.filter(
         (e) =>
-          e.nome.toLowerCase().includes(lower) ||
           e.postoNome.toLowerCase().includes(lower) ||
           e.usuarioNome.toLowerCase().includes(lower)
       );
@@ -104,27 +115,31 @@ export class EscalasListComponent implements OnInit, OnDestroy {
           this.loading.set(false);
         },
         error: (err) => {
-          this.error.set(err.message ?? 'Erro ao carregar escalas.');
+          this.error.set(
+            err.message ?? 'Erro ao carregar escalas.'
+          );
           this.loading.set(false);
         },
       });
   }
 
   abrirFormulario(escala?: Escala): void {
+    const title = escala ? 'Editar escala' : 'Nova escala';
     const dialogRef = this.dialog.create({
-      zTitle: escala ? 'Editar escala' : 'Nova escala',
+      zTitle: title,
       zContent: EscalasFormComponent,
-      zWidth: '640px',
-      zData: escala ?? null,
-      zOkText: escala ? 'Salvar' : 'Criar',
+      zWidth: '960px',
+      zData: escala
+        ? { usuarioId: escala.usuarioId, postoId: escala.postoId }
+        : null,
+      zOkText: 'Salvar',
       zOnOk: (instance) => {
         instance.submit();
         return false;
       },
     });
 
-    dialogRef
-      .afterClosed
+    dialogRef.afterClosed
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
@@ -134,16 +149,20 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   }
 
   confirmarExclusao(escala: Escala): void {
+    const label = `${escala.usuarioNome} - ${escala.postoNome}`;
     this.dialog.create({
       zTitle: 'Desativar escala',
-      zDescription: `Tem certeza que deseja desativar a escala "${escala.nome}"?`,
+      zDescription: `Tem certeza que deseja desativar a escala de "${label}"?`,
+      zWidth: '28rem',
       zOkText: 'Desativar',
       zCancelText: 'Cancelar',
       zOkDestructive: true,
       zOnOk: () => {
         this.escalasService.excluir(escala.id).subscribe({
           next: () => {
-            this.notification.success(`Escala "${escala.nome}" desativada com sucesso.`);
+            this.notification.success(
+              `Escala de "${label}" desativada com sucesso.`
+            );
             this.carregarEscalas();
           },
           error: (err) => {
@@ -156,22 +175,14 @@ export class EscalasListComponent implements OnInit, OnDestroy {
     });
   }
 
-  formatarDias(dias: number[]): string {
-    return dias.map((d) => DIA_LABELS[d] ?? '').join(', ');
+  formatarDias(inicio: number, fim: number): string {
+    if (inicio === fim) {
+      return DIA_LABELS[inicio] ?? '';
+    }
+    return `${DIA_LABELS[inicio] ?? ''} - ${DIA_LABELS[fim] ?? ''}`;
   }
 
   formatarHorario(inicio: string, fim: string): string {
     return `${inicio} - ${fim}`;
   }
-
-  formatarData(data: string): string {
-    if (!data) return '';
-    const [ano, mes, dia] = data.split('-');
-    return `${dia}/${mes}/${ano}`;
-  }
-
-  formatarVigencia(inicio: string, fim: string): string {
-    return `${this.formatarData(inicio)} até ${this.formatarData(fim)}`;
-  }
 }
-

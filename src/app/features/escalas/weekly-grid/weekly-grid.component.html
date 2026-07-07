@@ -1,0 +1,81 @@
+<div class="weekly-grid" (mouseleave)="onGridLeave()">
+  <div class="grid-scroll" #gridScroll>
+    <div class="grid-inner">
+      <table class="grid-table">
+        <colgroup>
+          <col class="col-spacer" />
+          @for (slot of slots; track slot.value) {
+            <col class="col-slot" />
+          }
+        </colgroup>
+        <thead>
+          <tr class="time-header-row">
+            <th class="corner-spacer"></th>
+            @for (hour of hours; track hour.label) {
+              <th class="time-header" colspan="2">
+                <span class="time-header__label">{{ hour.label }}</span>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (day of days; track day.apiValue) {
+            <tr class="day-row">
+              <td class="day-label">{{ day.label }}</td>
+              @for (slot of slots; track slot.value) {
+                <td
+                  class="cell"
+                  [attr.data-day]="day.apiValue"
+                  [attr.data-slot]="slot.value"
+                  [class.cell--selected]="isSelected(day.apiValue, slot.value)"
+                  [class.cell--preview]="isPreview(day.apiValue, slot.value)"
+                  (mousedown)="onMouseDown(day.apiValue, slot.value, $event)"
+                  (mouseenter)="onMouseEnter(day.apiValue, slot.value)"
+                ></td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <div class="blocks-overlay">
+        @for (day of days; track day.apiValue) {
+          @for (block of getBlocksForDay(day.apiValue); track $index) {
+            <div
+              class="time-block"
+              [style.top.px]="rowTop(day.apiValue)"
+              [style.left.px]="blockLeft(block)"
+              [style.width.px]="blockWidth(block)"
+              (click)="removeBlock(block)"
+              (keydown.enter)="removeBlock(block)"
+              (keydown.space)="removeBlock(block); $event.preventDefault()"
+              [attr.title]="formatBlockLabel(block) + ' (clique para remover)'"
+              tabindex="0"
+              role="button"
+            >
+              <span
+                class="time-block__handle time-block__handle--left"
+                (mousedown)="onResizeStart(block, 'left', $event)"
+              ></span>
+              <span class="time-block__label">{{ formatBlockLabel(block) }}</span>
+              <span
+                class="time-block__handle time-block__handle--right"
+                (mousedown)="onResizeStart(block, 'right', $event)"
+              ></span>
+            </div>
+          }
+          @if (previewBlock && previewBlock.day === day.apiValue) {
+            <div
+              class="time-block time-block--preview"
+              [style.top.px]="rowTop(day.apiValue)"
+              [style.left.px]="blockLeft(previewBlock)"
+              [style.width.px]="blockWidth(previewBlock)"
+            >
+              <span class="time-block__label">{{ formatBlockLabel(previewBlock) }}</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>
