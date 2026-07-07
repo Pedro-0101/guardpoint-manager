@@ -175,6 +175,7 @@ export class ZardSelectComponent implements ControlValueAccessor {
   }
 
   protected close(): void {
+    if (!this.isOpen()) return;
     this.isOpen.set(false);
     this._onTouched();
   }
