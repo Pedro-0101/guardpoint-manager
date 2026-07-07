@@ -1,19 +1,11 @@
-<div class="layout" [class.sidebar-collapsed]="sidebarCollapsed">
-  <gp-sidebar
-    class="layout__sidebar"
-    [collapsed]="sidebarCollapsed"
-    (toggleSidebar)="onToggleSidebar()"
+<div class="layout">
+  <gp-navbar
+    [userName]="userName()"
+    [userRole]="userRole()"
+    [notificationCount]="alertasAbertosCount()"
+    (logout)="authService.logout()"
   />
-  <div class="layout__main">
-    <gp-header
-      (toggleSidebar)="onToggleSidebar()"
-      [userName]="userName()"
-      [userRole]="userRole()"
-      [notificationCount]="alertasAbertosCount()"
-      (logout)="authService.logout()"
-    />
-    <div class="layout__content">
-      <router-outlet />
-    </div>
+  <div class="layout__content">
+    <router-outlet />
   </div>
 </div>
