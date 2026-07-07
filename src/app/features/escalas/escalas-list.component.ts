@@ -10,6 +10,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -42,6 +43,7 @@ const DIA_LABELS: Record<number, string> = {
     StatusBadge,
     EmptyState,
     PageLayoutComponent,
+    ...ZardTooltipImports,
   ],
   templateUrl: './escalas-list.component.html',
   styleUrl: './escalas-list.component.scss',

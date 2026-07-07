@@ -11,6 +11,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSelectImports } from '@/shared/components/select';
 import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
@@ -48,6 +49,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     StatusBadge,
     EmptyState,
     PageLayoutComponent,
+    ...ZardTooltipImports,
   ],
   templateUrl: './turnos-list.component.html',
   styleUrl: './turnos-list.component.scss',

@@ -74,11 +74,11 @@
                       <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
                     </td>
                     <td z-table-cell class="list-page__actions">
-                      <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(posto)" aria-label="Editar posto">
-                        <ng-icon name="lucidePencil" />
-                      </button>
                       @if (posto.ativo) {
-                        <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
+                        <button z-button zType="ghost" zSize="icon" zTooltip="Editar posto" (click)="abrirFormulario(posto)" aria-label="Editar posto">
+                          <ng-icon name="lucidePencil" />
+                        </button>
+                        <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Inativar posto" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
                           <ng-icon name="lucideBan" />
                         </button>
                       }

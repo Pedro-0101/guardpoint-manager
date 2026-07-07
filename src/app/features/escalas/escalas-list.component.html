@@ -86,12 +86,14 @@
                       <gp-status-badge [status]="escala.ativo ? 'ativo' : 'cancelado'" />
                     </td>
                     <td z-table-cell class="list-page__actions">
-                      <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(escala)" aria-label="Editar escala">
-                        <ng-icon name="lucidePencil" />
-                      </button>
-                      <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
-                        <ng-icon name="lucideTrash2" />
-                      </button>
+                      @if (escala.ativo) {
+                        <button z-button zType="ghost" zSize="icon" zTooltip="Editar escala" (click)="abrirFormulario(escala)" aria-label="Editar escala">
+                          <ng-icon name="lucidePencil" />
+                        </button>
+                        <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Desativar escala" (click)="confirmarExclusao(escala)" aria-label="Desativar escala">
+                          <ng-icon name="lucideTrash2" />
+                        </button>
+                      }
                     </td>
                   </tr>
                 }

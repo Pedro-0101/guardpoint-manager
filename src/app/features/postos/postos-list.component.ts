@@ -10,6 +10,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -32,6 +33,7 @@ import { Posto } from '../../core/models/posto.model';
     StatusBadge,
     EmptyState,
     PageLayoutComponent,
+    ...ZardTooltipImports,
   ],
   templateUrl: './postos-list.component.html',
   styleUrl: './postos-list.component.scss',
