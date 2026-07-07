@@ -10,9 +10,14 @@
   height: 100%;
 }
 
+.layout__breadcrumb {
+  padding: 12px 24px 0;
+  background: var(--bg-content);
+}
+
 .layout__content {
   flex: 1;
   overflow-y: auto;
   background: var(--bg-content);
-  padding: 24px;
+  padding: 12px 24px 24px;
 }

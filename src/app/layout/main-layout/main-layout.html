@@ -5,6 +5,20 @@
     [notificationCount]="alertasAbertosCount()"
     (logout)="authService.logout()"
   />
+  <div class="layout__breadcrumb">
+    <z-breadcrumb zSize="sm">
+      <z-breadcrumb-item [routerLink]="['/dashboard']">
+        <ng-icon name="lucideHouse" />
+        Home
+      </z-breadcrumb-item>
+      @for (item of breadcrumbs(); track item.label; let last = $last) {
+        <z-breadcrumb-separator />
+        <z-breadcrumb-item [routerLink]="!last ? [item.url] : undefined">
+          {{ item.label }}
+        </z-breadcrumb-item>
+      }
+    </z-breadcrumb>
+  </div>
   <div class="layout__content">
     <router-outlet />
   </div>

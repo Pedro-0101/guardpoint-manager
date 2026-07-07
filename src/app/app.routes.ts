@@ -3,7 +3,6 @@ import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard } from './core/auth/auth.guard';
 import { roleGuard } from './core/auth/role.guard';
 
-
 export const routes: Routes = [
   {
     path: 'login',
@@ -25,6 +24,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
+        data: { breadcrumb: 'Dashboard' },
         loadComponent: () =>
           import('./features/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent
@@ -32,6 +32,7 @@ export const routes: Routes = [
       },
       {
         path: 'mapa',
+        data: { breadcrumb: 'Mapa' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/mapa/mapa.component').then(
@@ -40,6 +41,7 @@ export const routes: Routes = [
       },
       {
         path: 'turnos',
+        data: { breadcrumb: 'Turnos' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/turnos/turnos-list/turnos-list.component').then(
@@ -48,6 +50,7 @@ export const routes: Routes = [
       },
       {
         path: 'turnos/:id',
+        data: { breadcrumb: 'Detalhe' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/turnos/turno-detail/turno-detail').then(
@@ -56,6 +59,7 @@ export const routes: Routes = [
       },
       {
         path: 'postos',
+        data: { breadcrumb: 'Postos' },
         loadComponent: () =>
           import('./features/postos/postos-list.component').then(
             (m) => m.PostosListComponent
@@ -63,6 +67,7 @@ export const routes: Routes = [
       },
       {
         path: 'usuarios',
+        data: { breadcrumb: 'Usuários' },
         loadComponent: () =>
           import('./features/usuarios/usuarios-list.component').then(
             (m) => m.UsuariosListComponent
@@ -70,6 +75,7 @@ export const routes: Routes = [
       },
       {
         path: 'alertas',
+        data: { breadcrumb: 'Alertas' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/alertas/alertas-list/alertas-list.component').then(
@@ -78,6 +84,7 @@ export const routes: Routes = [
       },
       {
         path: 'alertas/:id',
+        data: { breadcrumb: 'Detalhe' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/alertas/alerta-detail/alerta-detail').then(
@@ -86,6 +93,7 @@ export const routes: Routes = [
       },
       {
         path: 'escalas',
+        data: { breadcrumb: 'Escalas' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/escalas/escalas-list.component').then(
@@ -94,6 +102,7 @@ export const routes: Routes = [
       },
       {
         path: 'relatorios',
+        data: { breadcrumb: 'Relatórios' },
         canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/relatorios/relatorios.component').then(
@@ -102,6 +111,7 @@ export const routes: Routes = [
       },
       {
         path: 'configuracoes',
+        data: { breadcrumb: 'Configurações' },
         canActivate: [roleGuard(['admin'])],
         loadComponent: () =>
           import('./features/configuracoes/config-geral.component').then(
@@ -110,6 +120,7 @@ export const routes: Routes = [
       },
       {
         path: 'configuracoes/escalonamento',
+        data: { breadcrumb: 'Escalonamento' },
         canActivate: [roleGuard(['admin'])],
         loadComponent: () =>
           import('./features/configuracoes/config-escalonamento.component').then(
