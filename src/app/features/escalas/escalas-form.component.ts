@@ -6,6 +6,7 @@ import { PostosService } from '../postos/postos.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardSelectImports } from '@/shared/components/select';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
@@ -18,6 +19,7 @@ import { Usuario } from '../../core/models/usuario.model';
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
+    ZardSelectImports,
     LoadingSpinner,
   ],
   templateUrl: './escalas-form.component.html',

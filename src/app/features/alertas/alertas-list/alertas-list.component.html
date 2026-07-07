@@ -44,40 +44,40 @@
       <div class="list-page__toolbar">
         <div class="list-page__search-wrapper">
           <label class="form-label">Buscar alerta</label>
-          <div class="flex items-center gap-2">
-            <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
-            <input z-input class="flex-1" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
+          <div class="relative flex items-center">
+            <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+            <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Mensagem ou tipo..." />
           </div>
         </div>
 
         <div class="list-page__filter-wrapper">
           <label class="form-label">Tipo</label>
-          <select z-input [formControl]="tipoControl">
+          <z-select [formControl]="tipoControl">
             @for (filtro of tipoFilters; track filtro.value) {
-              <option [value]="filtro.value">
+              <z-select-item [zValue]="filtro.value">
                 <ng-icon [name]="filtro.icon" class="list-page__filter-icon" />
                 {{ filtro.label }}
-              </option>
+              </z-select-item>
             }
-          </select>
+          </z-select>
         </div>
 
         <div class="list-page__filter-wrapper">
           <label class="form-label">Gravidade</label>
-          <select z-input [formControl]="gravidadeControl">
+          <z-select [formControl]="gravidadeControl">
             @for (filtro of gravidadeFilters; track filtro.value) {
-              <option [value]="filtro.value">{{ filtro.label }}</option>
+              <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
             }
-          </select>
+          </z-select>
         </div>
 
         <div class="list-page__filter-wrapper">
           <label class="form-label">Status</label>
-          <select z-input [formControl]="statusControl">
+          <z-select [formControl]="statusControl">
             @for (filtro of statusFilters; track filtro.value) {
-              <option [value]="filtro.value">{{ filtro.label }}</option>
+              <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
             }
-          </select>
+          </z-select>
         </div>
       </div>
 
@@ -95,26 +95,26 @@
         } @else {
           <div class="list-page__table-wrapper">
             <table z-table class="list-page__table">
-              <thead>
-                <tr>
-                  <th>Tipo</th>
-                  <th>Gravidade</th>
-                  <th>Status</th>
-                  <th>Mensagem</th>
-                  <th>Data</th>
-                  <th>Ações</th>
+              <thead z-table-header>
+                <tr z-table-row>
+                  <th z-table-head>Tipo</th>
+                  <th z-table-head>Gravidade</th>
+                  <th z-table-head>Status</th>
+                  <th z-table-head>Mensagem</th>
+                  <th z-table-head>Data</th>
+                  <th z-table-head>Ações</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody z-table-body>
                 @for (alerta of alertas; track alerta.id) {
-                  <tr [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
-                    <td>
+                  <tr z-table-row [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
+                    <td z-table-cell>
                       <span class="list-page__tipo">
                         <ng-icon [name]="tipoIcon(alerta.tipo)" />
                         {{ tipoLabel(alerta.tipo) }}
                       </span>
                     </td>
-                    <td>
+                    <td z-table-cell>
                       <span
                         class="list-page__gravidade"
                         [class]="'list-page__gravidade--' + alerta.gravidade"
@@ -122,14 +122,14 @@
                         {{ gravidadeLabel(alerta.gravidade) }}
                       </span>
                     </td>
-                    <td>
+                    <td z-table-cell>
                       <gp-status-badge [status]="alerta.status" />
                     </td>
-                    <td class="list-page__mensagem-cell">
+                    <td z-table-cell class="list-page__mensagem-cell">
                       {{ alerta.mensagem || '—' }}
                     </td>
-                    <td>{{ formatarData(alerta.createdAt) }}</td>
-                    <td class="list-page__actions">
+                    <td z-table-cell>{{ formatarData(alerta.createdAt) }}</td>
+                    <td z-table-cell class="list-page__actions">
                         <button
                           z-button
                           zType="ghost"

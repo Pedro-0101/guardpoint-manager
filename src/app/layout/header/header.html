@@ -17,7 +17,12 @@
     <button class="header__icon-btn">
       <ng-icon name="lucideBell" />
       @if (notificationCount() > 0) {
-        <span class="header__badge">{{ notificationCount() }}</span>
+        <z-badge
+          zShape="pill"
+          class="absolute top-1 right-1 h-[18px] min-w-[18px] justify-center px-1 bg-[var(--color-warn)] text-[var(--color-warning-foreground)] text-[11px] font-semibold"
+        >
+          {{ notificationCount() }}
+        </z-badge>
       }
     </button>
 

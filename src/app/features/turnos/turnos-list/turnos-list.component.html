@@ -24,19 +24,19 @@
     <div class="list-page__toolbar">
       <div class="list-page__search-wrapper">
         <label class="form-label">Buscar turno</label>
-        <div class="flex items-center gap-2">
-          <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
-          <input z-input class="flex-1" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
+        <div class="relative flex items-center">
+          <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+          <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
         </div>
       </div>
 
       <div class="list-page__filter-wrapper">
         <label class="form-label">Status</label>
-        <select z-input [formControl]="statusControl">
+        <z-select [formControl]="statusControl">
           @for (filtro of statusFilters; track filtro.value) {
-            <option [value]="filtro.value">{{ filtro.label }}</option>
+            <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
           }
-        </select>
+        </z-select>
       </div>
     </div>
 
@@ -50,25 +50,25 @@
       } @else {
         <div class="list-page__table-wrapper">
           <table z-table class="list-page__table">
-            <thead>
-              <tr>
-                <th>Vigia</th>
-                <th>Posto</th>
-                <th>Status</th>
-                <th>Início</th>
-                <th>Ações</th>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Vigia</th>
+                <th z-table-head>Posto</th>
+                <th z-table-head>Status</th>
+                <th z-table-head>Início</th>
+                <th z-table-head>Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody z-table-body>
               @for (turno of turnos; track turno.id) {
-                <tr class="list-page__row">
-                  <td>{{ turno.usuarioNome }}</td>
-                  <td>{{ turno.postoNome }}</td>
-                  <td>
+                <tr z-table-row class="list-page__row">
+                  <td z-table-cell>{{ turno.usuarioNome }}</td>
+                  <td z-table-cell>{{ turno.postoNome }}</td>
+                  <td z-table-cell>
                     <gp-status-badge [status]="turno.status" />
                   </td>
-                  <td>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
-                  <td class="list-page__actions">
+                  <td z-table-cell>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
+                  <td z-table-cell class="list-page__actions">
                       <button
                         z-button
                         zType="ghost"

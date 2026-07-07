@@ -19,31 +19,31 @@
 
     <div class="form-field">
       <label class="form-label">Posto</label>
-      <select z-input [formControl]="postoControl">
-        <option value="">Todos</option>
+      <z-select [formControl]="postoControl">
+        <z-select-item zValue="">Todos</z-select-item>
         @for (posto of postos(); track posto.id) {
-          <option [value]="posto.id">{{ posto.nome }}</option>
+          <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
-      </select>
+      </z-select>
     </div>
 
     <div class="form-field">
       <label class="form-label">Vigia</label>
-      <select z-input [formControl]="usuarioControl">
-        <option value="">Todos</option>
+      <z-select [formControl]="usuarioControl">
+        <z-select-item zValue="">Todos</z-select-item>
         @for (usuario of usuarios(); track usuario.id) {
-          <option [value]="usuario.id">{{ usuario.nome }}</option>
+          <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
         }
-      </select>
+      </z-select>
     </div>
 
     <div class="form-field">
       <label class="form-label">Status</label>
-      <select z-input [formControl]="statusControl">
+      <z-select [formControl]="statusControl">
         @for (filtro of statusFilters; track filtro.value) {
-          <option [value]="filtro.value">{{ filtro.label }}</option>
+          <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
         }
-      </select>
+      </z-select>
     </div>
 
     <div class="relatorios__filter-actions">
@@ -105,29 +105,29 @@
 
         <div class="relatorios__table-wrapper">
           <table z-table class="relatorios__table">
-            <thead>
-              <tr>
-                <th>Vigia</th>
-                <th>Posto</th>
-                <th>Status</th>
-                <th>Início Previsto</th>
-                <th>Fim Previsto</th>
-                <th>Início Real</th>
-                <th>Fim Real</th>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Vigia</th>
+                <th z-table-head>Posto</th>
+                <th z-table-head>Status</th>
+                <th z-table-head>Início Previsto</th>
+                <th z-table-head>Fim Previsto</th>
+                <th z-table-head>Início Real</th>
+                <th z-table-head>Fim Real</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody z-table-body>
               @for (turno of dataSource(); track turno.id) {
-                <tr>
-                  <td>{{ turno.usuarioNome }}</td>
-                  <td>{{ turno.postoNome }}</td>
-                  <td>
+                <tr z-table-row>
+                  <td z-table-cell>{{ turno.usuarioNome }}</td>
+                  <td z-table-cell>{{ turno.postoNome }}</td>
+                  <td z-table-cell>
                     <gp-status-badge [status]="turno.status" />
                   </td>
-                  <td>{{ formatarData(turno.inicioPrevisto) }}</td>
-                  <td>{{ formatarData(turno.fimPrevisto) }}</td>
-                  <td>{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
-                  <td>{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
+                  <td z-table-cell>{{ formatarData(turno.inicioPrevisto) }}</td>
+                  <td z-table-cell>{{ formatarData(turno.fimPrevisto) }}</td>
+                  <td z-table-cell>{{ turno.inicioReal ? formatarData(turno.inicioReal) : '—' }}</td>
+                  <td z-table-cell>{{ turno.fimReal ? formatarData(turno.fimReal) : '—' }}</td>
                 </tr>
               }
             </tbody>

@@ -22,11 +22,11 @@
     </div>
   } @else {
     <div class="list-page__toolbar">
-      <div class="list-page__search-wrapper">
+      <div class="list-page__search-wrapper max-w-sm">
         <label class="form-label">Buscar posto</label>
-        <div class="flex items-center gap-2">
-          <ng-icon name="lucideSearch" class="text-muted-foreground shrink-0" />
-          <input z-input class="flex-1" [formControl]="searchControl" placeholder="Nome do posto..." />
+        <div class="relative flex items-center">
+          <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+          <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do posto..." />
         </div>
       </div>
     </div>
@@ -41,25 +41,25 @@
       } @else {
         <div class="list-page__table-wrapper">
           <table z-table class="list-page__table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>Coordenadas</th>
-                <th>Raio (m)</th>
-                <th>Status</th>
-                <th>Ações</th>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Nome</th>
+                <th z-table-head>Coordenadas</th>
+                <th z-table-head>Raio (m)</th>
+                <th z-table-head>Status</th>
+                <th z-table-head>Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody z-table-body>
               @for (posto of postos; track posto.id) {
-                <tr>
-                  <td>{{ posto.nome }}</td>
-                  <td>{{ posto.latitude }}, {{ posto.longitude }}</td>
-                  <td>{{ posto.raioM }}m</td>
-                  <td>
+                <tr z-table-row>
+                  <td z-table-cell>{{ posto.nome }}</td>
+                  <td z-table-cell>{{ posto.latitude }}, {{ posto.longitude }}</td>
+                  <td z-table-cell>{{ posto.raioM }}m</td>
+                  <td z-table-cell>
                     <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
                   </td>
-                  <td class="list-page__actions">
+                  <td z-table-cell class="list-page__actions">
                     <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(posto)" aria-label="Editar posto">
                       <ng-icon name="lucidePencil" />
                     </button>

@@ -56,11 +56,11 @@
 
   <div class="form-field">
     <label class="form-label">Cargo</label>
-    <select z-input formControlName="cargo">
+    <z-select formControlName="cargo">
       @for (cargo of cargos; track cargo.value) {
-        <option [value]="cargo.value">{{ cargo.label }}</option>
+        <z-select-item [zValue]="cargo.value">{{ cargo.label }}</z-select-item>
       }
-    </select>
+    </z-select>
     @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
       <p class="form-field__error">Cargo é obrigatório.</p>
     }

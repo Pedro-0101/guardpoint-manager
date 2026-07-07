@@ -40,7 +40,7 @@ src/app/shared/components/
 ├── alert/         — z-alert (default|destructive, icon+title+description)
 ├── button/        — z-button (default|destructive|outline|secondary|ghost|link, sm|default|lg|icon)
 ├── dialog/        — z-dialog (service + component + ref, suporta conteúdo como componente)
-├── table/         — z-table (já existia, em uso em 6 list pages)
+├── table/         — z-table (zType: default|striped|bordered; zSize: default|compact|comfortable) + sub-componentes opcionais z-table-header/-body/-row/-head/-cell/-caption
 ├── card/          — z-card (default|interactive)
 ├── input/         — input[z-input], textarea[z-input], select[z-input]
 ├── select/        — z-select + z-select-item
@@ -106,6 +106,74 @@ this.dialog.create({
   zOnOk: () => this.excluir(),
 });
 ```
+
+## 5.1 Para usar Zard Table
+
+`z-table` é uma diretiva que aceita todas as propriedades de uma `<table>` nativa. Ela estiliza automaticamente os elementos aninhados (`thead`, `tbody`, `tr`, `th`, `td`, `caption`) sem exigir diretivas adicionais.
+
+### Props (`table[z-table]`)
+
+| Propriedade | Descrição | Tipo | Default |
+|---|---|---|---|
+| `zType` | Tipo da tabela | `default \| striped \| bordered` | `default` |
+| `zSize` | Tamanho da tabela | `default \| compact \| comfortable` | `default` |
+
+### Uso básico
+
+```html
+<table z-table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>John Doe</td>
+      <td>john@example.com</td>
+      <td>Active</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+### Com data binding
+
+```html
+<table z-table zType="striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (person of people; track person.id) {
+      <tr>
+        <td>{{ person.name }}</td>
+        <td>{{ person.age }}</td>
+      </tr>
+    }
+  </tbody>
+</table>
+```
+
+### Sub-componentes opcionais
+
+Para controle mais granular, existem componentes/diretivas individuais (usados no exemplo `z-demo-table-payments`, que serve de referência de implementação com `z-badge` para status e `z-button` ghost para ações):
+
+| Diretiva | Elemento | Descrição |
+|---|---|---|
+| `z-table-header` | `thead` | Estiliza a seção de cabeçalho |
+| `z-table-body` | `tbody` | Estiliza a seção de corpo |
+| `z-table-row` | `tr` | Estiliza linhas |
+| `z-table-head` | `th` | Estiliza células de cabeçalho |
+| `z-table-cell` | `td` | Estiliza células de dados |
+| `z-table-caption` | `caption` | Estiliza a legenda da tabela |
+
+`zSize` definido em `table[z-table]` é propagado para `z-table-head`/`z-table-cell` via injeção do componente pai (`ZardTableComponent`), então basta declarar `zSize` uma vez na tabela.
 
 ## 6. Próximos passos
 

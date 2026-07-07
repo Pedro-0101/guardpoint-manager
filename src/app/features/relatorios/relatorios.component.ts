@@ -22,6 +22,7 @@ import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardSelectImports } from '@/shared/components/select';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -54,6 +55,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardTableImports,
     ZardButtonComponent,
     ZardInputDirective,
+    ZardSelectImports,
     NgIcon,
     ZardPaginationComponent,
     LoadingSpinner,

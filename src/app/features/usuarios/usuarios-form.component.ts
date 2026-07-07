@@ -4,6 +4,7 @@ import { NgIcon } from '@ng-icons/core';
 import { UsuariosService } from './usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardSelectImports } from '@/shared/components/select';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
@@ -14,6 +15,7 @@ import { Usuario } from '../../core/models/usuario.model';
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
+    ZardSelectImports,
     ZardButtonComponent,
     NgIcon,
   ],

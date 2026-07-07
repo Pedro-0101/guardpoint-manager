@@ -15,11 +15,11 @@
 
     <div class="form-field">
       <label class="form-label">Posto</label>
-      <select z-input formControlName="posto_id">
+      <z-select formControlName="posto_id">
         @for (posto of postos(); track posto.id) {
-          <option [value]="posto.id">{{ posto.nome }}</option>
+          <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
-      </select>
+      </z-select>
       @if (form.controls.posto_id.invalid && form.controls.posto_id.touched) {
         <p class="form-field__error">Posto é obrigatório.</p>
       }

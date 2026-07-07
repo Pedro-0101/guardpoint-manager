@@ -21,11 +21,11 @@
 
     <div class="form-field">
       <label class="form-label">Posto</label>
-      <select z-input formControlName="postoId">
+      <z-select formControlName="postoId">
         @for (posto of postos(); track posto.id) {
-          <option [value]="posto.id">{{ posto.nome }}</option>
+          <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
-      </select>
+      </z-select>
       @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
         <p class="form-field__error">Posto é obrigatório.</p>
       }
@@ -33,11 +33,11 @@
 
     <div class="form-field">
       <label class="form-label">Usuário</label>
-      <select z-input formControlName="usuarioId">
+      <z-select formControlName="usuarioId">
         @for (usuario of usuarios(); track usuario.id) {
-          <option [value]="usuario.id">{{ usuario.nome }}</option>
+          <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
         }
-      </select>
+      </z-select>
       @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
         <p class="form-field__error">Usuário é obrigatório.</p>
       }

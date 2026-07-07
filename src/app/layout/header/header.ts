@@ -1,10 +1,11 @@
 import { Component, input, output, inject } from '@angular/core';
 import { NgIcon } from '@ng-icons/core';
 import { ThemeService } from '../../core/services/theme.service';
+import { ZardBadgeComponent } from '../../shared/components/badge/badge.component';
 
 @Component({
   selector: 'gp-header',
-  imports: [NgIcon],
+  imports: [NgIcon, ZardBadgeComponent],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })

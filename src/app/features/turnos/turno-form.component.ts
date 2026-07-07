@@ -5,6 +5,7 @@ import { PostosService } from '../postos/postos.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardSelectImports } from '@/shared/components/select';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { Posto } from '../../core/models/posto.model';
 
@@ -13,6 +14,7 @@ import { Posto } from '../../core/models/posto.model';
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
+    ZardSelectImports,
     LoadingSpinner,
   ],
   templateUrl: './turno-form.component.html',
