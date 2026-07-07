@@ -3,6 +3,22 @@ import { Observable } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { Usuario } from '../../core/models/usuario.model';
 
+export interface CreateUsuarioPayload {
+  nome: string;
+  email: string;
+  cargo: Usuario['cargo'];
+  senha: string;
+  ativo?: boolean;
+}
+
+export interface UpdateUsuarioPayload {
+  nome?: string;
+  email?: string;
+  cargo?: Usuario['cargo'];
+  senha?: string;
+  ativo?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
   private readonly api = inject(ApiService);
@@ -15,11 +31,11 @@ export class UsuariosService {
     return this.api.get<Usuario>(`/usuarios/${id}`);
   }
 
-  criar(data: Omit<Usuario, 'id' | 'empresaId' | 'createdAt' | 'updatedAt'>): Observable<Usuario> {
+  criar(data: CreateUsuarioPayload): Observable<Usuario> {
     return this.api.post<Usuario>('/usuarios', data);
   }
 
-  atualizar(id: string, data: Partial<Usuario>): Observable<Usuario> {
+  atualizar(id: string, data: UpdateUsuarioPayload): Observable<Usuario> {
     return this.api.put<Usuario>(`/usuarios/${id}`, data);
   }
 

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, Subject, of, tap, map, catchError, throwError, finalize } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { AuthResponse, AuthUser, JwtPayload, LoginRequest, LogoutReason } from './auth.model';
+import { AuthResponse, AuthUser, JwtPayload, LoginRequest, RegisterRequest, LogoutReason } from './auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -48,6 +48,10 @@ export class AuthService {
       tap((response) => this.handleAuthResponse(response, rememberMe)),
       catchError((err) => throwError(() => err)),
     );
+  }
+
+  register(data: RegisterRequest): Observable<AuthUser> {
+    return this.http.post<AuthUser>(`${environment.apiUrl}/auth/register`, data);
   }
 
   logout(reason: LogoutReason = 'user'): void {

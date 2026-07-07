@@ -3,6 +3,14 @@ export interface LoginRequest {
   senha: string;
 }
 
+export interface RegisterRequest {
+  email: string;
+  nome: string;
+  role: 'admin' | 'supervisor' | 'vigia';
+  senha: string;
+  telefone?: string;
+}
+
 export type LogoutReason = 'user' | 'expired';
 
 export interface AuthResponse {

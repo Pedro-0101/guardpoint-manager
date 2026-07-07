@@ -59,6 +59,22 @@ export class ConfiguracoesService {
       .pipe(map((d) => this.mapEmpresaFromDto(d)));
   }
 
+  criarNivelEscalonamento(data: NivelEscalonamentoInput): Observable<NivelEscalonamento> {
+    return this.api
+      .post<NivelEscalonamentoDto>('/config/escalonamento', this.mapNivelToDto(data))
+      .pipe(map((d) => this.mapNivelFromDto(d)));
+  }
+
+  atualizarNivelEscalonamento(id: string, data: NivelEscalonamentoInput): Observable<NivelEscalonamento> {
+    return this.api
+      .put<NivelEscalonamentoDto>(`/config/escalonamento/${id}`, this.mapNivelToDto(data))
+      .pipe(map((d) => this.mapNivelFromDto(d)));
+  }
+
+  removerNivelEscalonamento(id: string): Observable<void> {
+    return this.api.delete<void>(`/config/escalonamento/${id}`);
+  }
+
   private mapNivelFromDto(dto: NivelEscalonamentoDto): NivelEscalonamento {
     return {
       id: dto.id,

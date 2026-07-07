@@ -1,11 +1,11 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
-import { UsuariosService } from './usuarios.service';
+import { UsuariosService, CreateUsuarioPayload, UpdateUsuarioPayload } from './usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
-import { ZardSelectImports } from '@/shared/components/select';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardRadioComponent } from '@/shared/components/radio';
 import {
   ZardFormFieldComponent,
   ZardFormLabelComponent,
@@ -20,8 +20,8 @@ import { Usuario } from '../../core/models/usuario.model';
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
-    ZardSelectImports,
     ZardButtonComponent,
+    ZardRadioComponent,
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
@@ -77,15 +77,23 @@ export class UsuariosFormComponent implements OnInit {
     }
 
     this.loading.set(true);
-    const { senha, ...rest } = this.form.getRawValue();
-    const data: Record<string, unknown> = { ...rest };
-    if (senha) {
-      data['senha'] = senha;
-    }
+    const { nome, email, cargo, ativo, senha } = this.form.getRawValue();
 
     const request$ = this.isEdit()
-      ? this.usuariosService.atualizar(this.data!.id, data)
-      : this.usuariosService.criar(data as Omit<Usuario, 'id' | 'empresaId' | 'createdAt' | 'updatedAt'>);
+      ? this.usuariosService.atualizar(this.data!.id, {
+          nome,
+          email,
+          cargo,
+          ativo,
+          ...(senha ? { senha } : {}),
+        } as UpdateUsuarioPayload)
+      : this.usuariosService.criar({
+          nome,
+          email,
+          cargo,
+          senha,
+          ativo,
+        } as CreateUsuarioPayload);
 
     request$.subscribe({
       next: () => {
