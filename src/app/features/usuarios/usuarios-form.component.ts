@@ -10,6 +10,7 @@ import {
   ZardFormFieldComponent,
   ZardFormLabelComponent,
   ZardFormControlComponent,
+  ZardFormMessageComponent,
 } from '@/shared/components/form';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
@@ -25,6 +26,7 @@ import { Usuario } from '../../core/models/usuario.model';
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
+    ZardFormMessageComponent,
     NgIcon,
   ],
   templateUrl: './usuarios-form.component.html',

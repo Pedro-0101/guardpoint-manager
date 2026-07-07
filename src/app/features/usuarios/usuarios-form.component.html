@@ -5,13 +5,15 @@
       <input z-input formControlName="nome" placeholder="Ex: João Silva" class="w-full" />
     </z-form-control>
     @if (form.controls.nome.invalid && form.controls.nome.touched) {
-      <p class="text-sm text-destructive">
+      <z-form-message [zError]="true">
         @if (form.controls.nome.errors?.['required']) {
           Nome é obrigatório.
         } @else if (form.controls.nome.errors?.['minlength']) {
           Mínimo de 3 caracteres.
         }
-      </p>
+      </z-form-message>
+    } @else {
+      <z-form-message>Como o usuário será identificado no sistema.</z-form-message>
     }
   </z-form-field>
 
@@ -21,13 +23,15 @@
       <input z-input type="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
     </z-form-control>
     @if (form.controls.email.invalid && form.controls.email.touched) {
-      <p class="text-sm text-destructive">
+      <z-form-message [zError]="true">
         @if (form.controls.email.errors?.['required']) {
           Email é obrigatório.
         } @else if (form.controls.email.errors?.['email']) {
           Email inválido.
         }
-      </p>
+      </z-form-message>
+    } @else {
+      <z-form-message>Usado para login e notificações do sistema.</z-form-message>
     }
   </z-form-field>
 
@@ -51,13 +55,17 @@
       </div>
     </z-form-control>
     @if (form.controls.senha.invalid && form.controls.senha.touched) {
-      <p class="text-sm text-destructive">
+      <z-form-message [zError]="true">
         @if (form.controls.senha.errors?.['required']) {
           Senha é obrigatória.
         } @else if (form.controls.senha.errors?.['minlength']) {
           Mínimo de 6 caracteres.
         }
-      </p>
+      </z-form-message>
+    } @else {
+      <z-form-message>
+        {{ isEdit() ? 'Deixe em branco para manter a senha atual.' : 'Use pelo menos 6 caracteres.' }}
+      </z-form-message>
     }
   </z-form-field>
 
@@ -71,7 +79,9 @@
       </div>
     </z-form-control>
     @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
-      <p class="text-sm text-destructive">Cargo é obrigatório.</p>
+      <z-form-message [zError]="true">Cargo é obrigatório.</z-form-message>
+    } @else {
+      <z-form-message>Define o nível de acesso do usuário no sistema.</z-form-message>
     }
   </z-form-field>
 </form>

@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
+
+import { mergeClasses } from '@/shared/utils/merge-classes';
 
 @Component({
   selector: 'z-form-field',
@@ -38,3 +40,21 @@ export class ZardFormLabelComponent {
   exportAs: 'zFormControl',
 })
 export class ZardFormControlComponent {}
+
+@Component({
+  selector: 'z-form-message',
+  template: `<ng-content />`,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  host: {
+    '[class]': 'classes()',
+  },
+  exportAs: 'zFormMessage',
+})
+export class ZardFormMessageComponent {
+  readonly zError = input(false);
+
+  protected readonly classes = computed(() =>
+    mergeClasses('block text-sm', this.zError() ? 'text-destructive' : 'text-muted-foreground'),
+  );
+}
