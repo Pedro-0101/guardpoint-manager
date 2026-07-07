@@ -30,7 +30,7 @@
   --color-text: var(--foreground);
   --color-text-secondary: var(--muted-foreground);
 
-  --bg-sidebar-hover: color-mix(in oklch, var(--sidebar), var(--sidebar-accent) 50%);
+  --bg-sidebar-hover: var(--sidebar-accent);
   --text-sidebar-muted: color-mix(in oklch, var(--sidebar-foreground) 60%, transparent);
 
   --bg-content: var(--background);

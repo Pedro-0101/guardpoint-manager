@@ -69,6 +69,10 @@
   &--active {
     background: var(--bg-sidebar-active);
     color: var(--text-sidebar-active);
+
+    &:hover {
+      background: color-mix(in oklch, var(--sidebar-primary), transparent 15%);
+    }
   }
 }
 
