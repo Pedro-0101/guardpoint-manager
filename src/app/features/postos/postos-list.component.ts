@@ -51,8 +51,8 @@ export class PostosListComponent implements OnInit, OnDestroy {
   readonly filteredPostos$ = combineLatest([
     this.postos$,
     this.searchControl.valueChanges.pipe(
-      startWith(''),
       debounceTime(300),
+      startWith(''),
       distinctUntilChanged()
     ),
   ]).pipe(

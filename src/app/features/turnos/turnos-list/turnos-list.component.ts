@@ -69,8 +69,8 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   readonly filteredTurnos$ = combineLatest([
     this.turnos$,
     this.searchControl.valueChanges.pipe(
-      startWith(''),
       debounceTime(300),
+      startWith(''),
       distinctUntilChanged(),
     ),
     this.statusControl.valueChanges.pipe(startWith('')),

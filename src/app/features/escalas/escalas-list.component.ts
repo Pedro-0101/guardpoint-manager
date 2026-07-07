@@ -61,8 +61,8 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   readonly filteredEscalas$ = combineLatest([
     this.escalas$,
     this.searchControl.valueChanges.pipe(
-      startWith(''),
       debounceTime(300),
+      startWith(''),
       distinctUntilChanged()
     ),
   ]).pipe(

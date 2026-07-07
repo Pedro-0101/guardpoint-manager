@@ -122,8 +122,8 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly filteredAlertas$ = combineLatest([
     this.alertas$,
     this.searchControl.valueChanges.pipe(
-      startWith(''),
       debounceTime(300),
+      startWith(''),
       distinctUntilChanged(),
     ),
     this.tipoControl.valueChanges.pipe(startWith('')),

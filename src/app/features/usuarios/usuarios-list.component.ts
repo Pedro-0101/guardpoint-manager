@@ -57,8 +57,8 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   readonly filteredUsuarios$ = combineLatest([
     this.usuarios$,
     this.searchControl.valueChanges.pipe(
-      startWith(''),
       debounceTime(300),
+      startWith(''),
       distinctUntilChanged()
     ),
   ]).pipe(
