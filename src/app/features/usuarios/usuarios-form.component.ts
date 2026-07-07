@@ -6,6 +6,11 @@ import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardSelectImports } from '@/shared/components/select';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import {
+  ZardFormFieldComponent,
+  ZardFormLabelComponent,
+  ZardFormControlComponent,
+} from '@/shared/components/form';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Usuario } from '../../core/models/usuario.model';
@@ -17,10 +22,12 @@ import { Usuario } from '../../core/models/usuario.model';
     ZardInputDirective,
     ZardSelectImports,
     ZardButtonComponent,
+    ZardFormFieldComponent,
+    ZardFormLabelComponent,
+    ZardFormControlComponent,
     NgIcon,
   ],
   templateUrl: './usuarios-form.component.html',
-  styleUrl: './usuarios-form.component.scss',
 })
 export class UsuariosFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
