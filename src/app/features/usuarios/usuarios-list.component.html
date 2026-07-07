@@ -10,11 +10,7 @@
     </button>
   </header>
 
-  @if (loading()) {
-    <div class="list-page__loading">
-      <gp-loading-spinner message="Carregando usuários..." />
-    </div>
-  } @else if (error(); as errorMsg) {
+  @if (error(); as errorMsg) {
     <div class="list-page__error">
       <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
@@ -33,54 +29,66 @@
       </div>
     </z-card>
 
-    @if (filteredUsuarios$ | async; as usuarios) {
-      <div class="list-page__table-wrapper">
-        <table z-table class="list-page__table">
-          <thead z-table-header>
-            <tr z-table-row>
-              <th z-table-head>Nome</th>
-              <th z-table-head>Email</th>
-              <th z-table-head>Cargo</th>
-              <th z-table-head>Status</th>
-              <th z-table-head>Ações</th>
-            </tr>
-          </thead>
-          <tbody z-table-body>
-            @if (usuarios.length === 0) {
-              <tr>
-                <td z-table-cell [attr.colspan]="5">
-                  <gp-empty-state
-                    icon="lucideUserX"
-                    title="Nenhum usuário encontrado"
-                    [description]="searchControl.value ? 'Nenhum usuário corresponde à busca.' : 'Nenhum usuário cadastrado.'"
-                  />
-                </td>
+    <div class="list-page__table-wrapper">
+      <table z-table class="list-page__table">
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Nome</th>
+            <th z-table-head>Email</th>
+            <th z-table-head>Cargo</th>
+            <th z-table-head>Status</th>
+            <th z-table-head>Ações</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @if (loading()) {
+            @for (row of [1,2,3,4,5]; track row) {
+              <tr z-table-row>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[140px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[180px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[80px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-6 w-[70px] rounded-full" /></td>
+                <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
               </tr>
-            } @else {
-              @for (usuario of usuarios; track usuario.id) {
-                <tr z-table-row>
-                  <td z-table-cell>{{ usuario.nome }}</td>
-                  <td z-table-cell>{{ usuario.email }}</td>
-                  <td z-table-cell>{{ cargoLabel(usuario.cargo) }}</td>
-                  <td z-table-cell>
-                    <gp-status-badge [status]="usuario.ativo ? 'ativo' : 'cancelado'" />
-                  </td>
-                  <td z-table-cell class="list-page__actions">
-                    <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
-                      <ng-icon name="lucidePencil" />
-                    </button>
-                    @if (usuario.ativo) {
-                      <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
-                        <ng-icon name="lucideBan" />
-                      </button>
-                    }
+            }
+          } @else {
+            @if ((filteredUsuarios$ | async); as usuarios) {
+              @if (usuarios.length === 0) {
+                <tr>
+                  <td z-table-cell [attr.colspan]="5">
+                    <gp-empty-state
+                      icon="lucideUserX"
+                      title="Nenhum usuário encontrado"
+                      [description]="searchControl.value ? 'Nenhum usuário corresponde à busca.' : 'Nenhum usuário cadastrado.'"
+                    />
                   </td>
                 </tr>
+              } @else {
+                @for (usuario of usuarios; track usuario.id) {
+                  <tr z-table-row>
+                    <td z-table-cell>{{ usuario.nome }}</td>
+                    <td z-table-cell>{{ usuario.email }}</td>
+                    <td z-table-cell>{{ cargoLabel(usuario.cargo) }}</td>
+                    <td z-table-cell>
+                      <gp-status-badge [status]="usuario.ativo ? 'ativo' : 'cancelado'" />
+                    </td>
+                    <td z-table-cell class="list-page__actions">
+                      <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
+                        <ng-icon name="lucidePencil" />
+                      </button>
+                      @if (usuario.ativo) {
+                        <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
+                          <ng-icon name="lucideBan" />
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
               }
             }
-          </tbody>
-        </table>
-      </div>
-    }
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>

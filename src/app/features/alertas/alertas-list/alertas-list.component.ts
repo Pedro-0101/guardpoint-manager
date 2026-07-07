@@ -30,7 +30,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSelectImports } from '@/shared/components/select';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
+import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -88,7 +88,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardCardComponent,
     ZardSelectImports,
     NgIcon,
-    LoadingSpinner,
+    ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
   ],
@@ -113,7 +113,7 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
 
   readonly alertas$ = this.alertasService.alertas$;
 
-  readonly loading = signal(false);
+  readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly statsLoading = signal(false);
 

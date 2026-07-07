@@ -10,11 +10,7 @@
     </button>
   </header>
 
-  @if (loading()) {
-    <div class="list-page__loading">
-      <gp-loading-spinner message="Carregando postos..." />
-    </div>
-  } @else if (error(); as errorMsg) {
+  @if (error(); as errorMsg) {
     <div class="list-page__error">
       <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
@@ -33,54 +29,66 @@
       </div>
     </z-card>
 
-    @if (filteredPostos$ | async; as postos) {
-      <div class="list-page__table-wrapper">
-        <table z-table class="list-page__table">
-          <thead z-table-header>
-            <tr z-table-row>
-              <th z-table-head>Nome</th>
-              <th z-table-head>Coordenadas</th>
-              <th z-table-head>Raio (m)</th>
-              <th z-table-head>Status</th>
-              <th z-table-head>Ações</th>
-            </tr>
-          </thead>
-          <tbody z-table-body>
-            @if (postos.length === 0) {
-              <tr>
-                <td z-table-cell [attr.colspan]="5">
-                  <gp-empty-state
-                    icon="lucideMapPinOff"
-                    title="Nenhum posto encontrado"
-                    [description]="searchControl.value ? 'Nenhum posto corresponde à busca.' : 'Nenhum posto cadastrado.'"
-                  />
-                </td>
+    <div class="list-page__table-wrapper">
+      <table z-table class="list-page__table">
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Nome</th>
+            <th z-table-head>Coordenadas</th>
+            <th z-table-head>Raio (m)</th>
+            <th z-table-head>Status</th>
+            <th z-table-head>Ações</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @if (loading()) {
+            @for (row of [1,2,3,4,5]; track row) {
+              <tr z-table-row>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[140px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[160px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[60px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-6 w-[70px] rounded-full" /></td>
+                <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
               </tr>
-            } @else {
-              @for (posto of postos; track posto.id) {
-                <tr z-table-row>
-                  <td z-table-cell>{{ posto.nome }}</td>
-                  <td z-table-cell>{{ posto.latitude }}, {{ posto.longitude }}</td>
-                  <td z-table-cell>{{ posto.raioM }}m</td>
-                  <td z-table-cell>
-                    <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
-                  </td>
-                  <td z-table-cell class="list-page__actions">
-                    <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(posto)" aria-label="Editar posto">
-                      <ng-icon name="lucidePencil" />
-                    </button>
-                    @if (posto.ativo) {
-                      <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
-                        <ng-icon name="lucideBan" />
-                      </button>
-                    }
+            }
+          } @else {
+            @if ((filteredPostos$ | async); as postos) {
+              @if (postos.length === 0) {
+                <tr>
+                  <td z-table-cell [attr.colspan]="5">
+                    <gp-empty-state
+                      icon="lucideMapPinOff"
+                      title="Nenhum posto encontrado"
+                      [description]="searchControl.value ? 'Nenhum posto corresponde à busca.' : 'Nenhum posto cadastrado.'"
+                    />
                   </td>
                 </tr>
+              } @else {
+                @for (posto of postos; track posto.id) {
+                  <tr z-table-row>
+                    <td z-table-cell>{{ posto.nome }}</td>
+                    <td z-table-cell>{{ posto.latitude }}, {{ posto.longitude }}</td>
+                    <td z-table-cell>{{ posto.raioM }}m</td>
+                    <td z-table-cell>
+                      <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
+                    </td>
+                    <td z-table-cell class="list-page__actions">
+                      <button z-button zType="ghost" zSize="icon" (click)="abrirFormulario(posto)" aria-label="Editar posto">
+                        <ng-icon name="lucidePencil" />
+                      </button>
+                      @if (posto.ativo) {
+                        <button z-button zType="ghost" zSize="icon" class="text-destructive" (click)="confirmarExclusao(posto)" aria-label="Inativar posto">
+                          <ng-icon name="lucideBan" />
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
               }
             }
-          </tbody>
-        </table>
-      </div>
-    }
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>

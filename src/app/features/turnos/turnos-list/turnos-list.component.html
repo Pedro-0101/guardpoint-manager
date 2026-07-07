@@ -10,11 +10,7 @@
     </button>
   </header>
 
-  @if (loading()) {
-    <div class="list-page__loading">
-      <gp-loading-spinner message="Carregando turnos..." />
-    </div>
-  } @else if (error(); as errorMsg) {
+  @if (error(); as errorMsg) {
     <div class="list-page__error">
       <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
@@ -42,55 +38,67 @@
       </div>
     </z-card>
 
-    @if (filteredTurnos$ | async; as turnos) {
-      <div class="list-page__table-wrapper">
-        <table z-table class="list-page__table">
-          <thead z-table-header>
-            <tr z-table-row>
-              <th z-table-head>Vigia</th>
-              <th z-table-head>Posto</th>
-              <th z-table-head>Status</th>
-              <th z-table-head>Início</th>
-              <th z-table-head>Ações</th>
-            </tr>
-          </thead>
-          <tbody z-table-body>
-            @if (turnos.length === 0) {
-              <tr>
-                <td z-table-cell [attr.colspan]="5">
-                  <gp-empty-state
-                    icon="lucideClock"
-                    title="Nenhum turno encontrado"
-                    [description]="searchControl.value || statusControl.value ? 'Nenhum turno corresponde aos filtros aplicados.' : 'Nenhum turno registrado.'"
-                  />
-                </td>
+    <div class="list-page__table-wrapper">
+      <table z-table class="list-page__table">
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Vigia</th>
+            <th z-table-head>Posto</th>
+            <th z-table-head>Status</th>
+            <th z-table-head>Início</th>
+            <th z-table-head>Ações</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @if (loading()) {
+            @for (row of [1,2,3,4,5]; track row) {
+              <tr z-table-row>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[140px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[120px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-6 w-[90px] rounded-full" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[150px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
               </tr>
-            } @else {
-              @for (turno of turnos; track turno.id) {
-                <tr z-table-row class="list-page__row">
-                  <td z-table-cell>{{ turno.usuarioNome }}</td>
-                  <td z-table-cell>{{ turno.postoNome }}</td>
-                  <td z-table-cell>
-                    <gp-status-badge [status]="turno.status" />
-                  </td>
-                  <td z-table-cell>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
-                  <td z-table-cell class="list-page__actions">
-                      <button
-                        z-button
-                        zType="ghost"
-                        zSize="icon"
-                        (click)="verDetalhe(turno)"
-                        aria-label="Ver detalhes do turno"
-                      >
-                        <ng-icon name="lucideEye" />
-                      </button>
+            }
+          } @else {
+            @if ((filteredTurnos$ | async); as turnos) {
+              @if (turnos.length === 0) {
+                <tr>
+                  <td z-table-cell [attr.colspan]="5">
+                    <gp-empty-state
+                      icon="lucideClock"
+                      title="Nenhum turno encontrado"
+                      [description]="searchControl.value || statusControl.value ? 'Nenhum turno corresponde aos filtros aplicados.' : 'Nenhum turno registrado.'"
+                    />
                   </td>
                 </tr>
+              } @else {
+                @for (turno of turnos; track turno.id) {
+                  <tr z-table-row class="list-page__row">
+                    <td z-table-cell>{{ turno.usuarioNome }}</td>
+                    <td z-table-cell>{{ turno.postoNome }}</td>
+                    <td z-table-cell>
+                      <gp-status-badge [status]="turno.status" />
+                    </td>
+                    <td z-table-cell>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
+                    <td z-table-cell class="list-page__actions">
+                        <button
+                          z-button
+                          zType="ghost"
+                          zSize="icon"
+                          (click)="verDetalhe(turno)"
+                          aria-label="Ver detalhes do turno"
+                        >
+                          <ng-icon name="lucideEye" />
+                        </button>
+                    </td>
+                  </tr>
+                }
               }
             }
-          </tbody>
-        </table>
-      </div>
-    }
+          }
+        </tbody>
+      </table>
+    </div>
   }
 </div>

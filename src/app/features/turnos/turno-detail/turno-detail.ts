@@ -18,7 +18,7 @@ import { TurnosService } from '../turnos.service';
 import { TurnoRevogarDialog } from '../turno-revogar-dialog/turno-revogar-dialog';
 import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
+import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -44,7 +44,7 @@ const TIPO_CHECKIN_MAP: Record<string, { icon: string; label: string; color: str
   imports: [
     NgIcon,
     ZardButtonComponent,
-    LoadingSpinner,
+    ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
   ],
@@ -61,7 +61,7 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
 
-  readonly loading = signal(false);
+  readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
   readonly turno = signal<TurnoDetalhe | null>(null);

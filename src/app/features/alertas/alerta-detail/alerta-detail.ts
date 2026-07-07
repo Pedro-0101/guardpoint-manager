@@ -7,7 +7,7 @@ import { takeUntil, catchError, finalize } from 'rxjs/operators';
 import { AlertasService } from '../alertas.service';
 import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
-import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
+import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Alerta } from '../../../core/models/alerta.model';
@@ -35,7 +35,7 @@ const GRAVIDADE_LABEL: Record<Alerta['gravidade'], string> = {
 
 @Component({
   selector: 'gp-alerta-detail',
-  imports: [RouterLink, NgIcon, ZardButtonComponent, LoadingSpinner, StatusBadge],
+  imports: [RouterLink, NgIcon, ZardButtonComponent, ZardSkeletonComponent, StatusBadge],
   templateUrl: './alerta-detail.html',
   styleUrl: './alerta-detail.scss',
 })
@@ -47,7 +47,7 @@ export class AlertaDetailComponent implements OnInit, OnDestroy {
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
 
-  readonly loading = signal(false);
+  readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly alerta = signal<Alerta | null>(null);
 

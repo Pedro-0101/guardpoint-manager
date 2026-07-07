@@ -7,11 +7,11 @@ import { DashboardService } from './dashboard.service';
 import { KpiCard } from './components/kpi-card/kpi-card';
 import { AlertasRecentes } from './components/alertas-recentes/alertas-recentes';
 import { TurnosResumo } from './components/turnos-resumo/turnos-resumo';
-import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
+import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 
 @Component({
   selector: 'gp-dashboard',
-  imports: [AsyncPipe, NgIcon, KpiCard, AlertasRecentes, TurnosResumo, LoadingSpinner],
+  imports: [AsyncPipe, NgIcon, KpiCard, AlertasRecentes, TurnosResumo, ZardSkeletonComponent],
   providers: [DashboardService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',

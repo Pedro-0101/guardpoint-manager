@@ -3,11 +3,7 @@
     <h1 class="dashboard__title">Dashboard</h1>
   </header>
 
-  @if (loading$ | async) {
-    <div class="dashboard__loading">
-      <gp-loading-spinner message="Carregando dashboard..." />
-    </div>
-  } @else if (error$ | async; as errorMsg) {
+  @if (error$ | async; as errorMsg) {
     <div class="dashboard__error">
       <ng-icon name="lucideAlertCircle" />
       <p>{{ errorMsg }}</p>
@@ -15,8 +11,18 @@
     </div>
   } @else {
     <!-- KPIs -->
-    @if (kpis$ | async; as kpis) {
-      <section class="dashboard__kpis">
+    <section class="dashboard__kpis">
+      @if (loading$ | async) {
+        @for (kpi of [1,2,3,4]; track kpi) {
+          <div class="kpi-card-skeleton">
+            <z-skeleton class="size-10 rounded-lg" />
+            <div class="flex flex-col gap-2 flex-1">
+              <z-skeleton class="h-6 w-[60px]" />
+              <z-skeleton class="h-4 w-[100px]" />
+            </div>
+          </div>
+        }
+      } @else if (kpis$ | async; as kpis) {
         <gp-kpi-card
           icon="lucideUsers"
           [value]="kpis.turnosAtivos"
@@ -41,16 +47,21 @@
           label="Desvios de rota"
           color="info"
         />
-      </section>
-    }
+      }
+    </section>
 
     <!-- Chart + Alertas -->
     <section class="dashboard__grid">
-      @if (turnosPorPosto$ | async; as turnosPorPosto) {
-        <gp-turnos-resumo [data]="turnosPorPosto" />
-      }
-      @if (alertas$ | async; as alertas) {
-        <gp-alertas-recentes [alertas]="alertas" />
+      @if (loading$ | async) {
+        <z-skeleton class="h-[300px] w-full rounded-xl" />
+        <z-skeleton class="h-[300px] w-full rounded-xl" />
+      } @else {
+        @if (turnosPorPosto$ | async; as turnosPorPosto) {
+          <gp-turnos-resumo [data]="turnosPorPosto" />
+        }
+        @if (alertas$ | async; as alertas) {
+          <gp-alertas-recentes [alertas]="alertas" />
+        }
       }
     </section>
   }

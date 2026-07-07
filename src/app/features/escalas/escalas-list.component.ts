@@ -11,7 +11,7 @@ import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
-import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
+import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { NotificationService } from '../../core/services/notification.service';
@@ -37,7 +37,7 @@ const DIA_LABELS: Record<number, string> = {
     ZardInputDirective,
     ZardCardComponent,
     NgIcon,
-    LoadingSpinner,
+    ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
   ],
@@ -55,7 +55,7 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   private readonly escalasSubject = new BehaviorSubject<Escala[]>([]);
   readonly escalas$ = this.escalasSubject.asObservable();
 
-  readonly loading = signal(false);
+  readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
   readonly filteredEscalas$ = combineLatest([
