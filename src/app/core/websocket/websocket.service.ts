@@ -36,6 +36,7 @@ export class WebSocketService implements OnDestroy {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private wasConnected = false;
   private manualDisconnect = false;
+  private isReconnecting = false;
 
   constructor() {
     const token = this.auth.getToken();
@@ -58,6 +59,7 @@ export class WebSocketService implements OnDestroy {
       openObserver: {
         next: () => {
           this.reconnectAttempts = 0;
+          this.isReconnecting = false;
           if (this.wasConnected) {
             this.notification.success('Reconectado ao servidor.');
           }
@@ -88,7 +90,10 @@ export class WebSocketService implements OnDestroy {
   private handleClose(): void {
     if (this.manualDisconnect) return;
     this.wasConnected = true;
-    this.notification.warning('Conexão perdida. Reconectando...');
+    if (!this.isReconnecting) {
+      this.isReconnecting = true;
+      this.notification.warning('Conexão perdida. Reconectando...');
+    }
     this.scheduleReconnect();
   }
 
