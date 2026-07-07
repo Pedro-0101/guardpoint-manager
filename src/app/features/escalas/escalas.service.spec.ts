@@ -63,7 +63,7 @@ describe('EscalasService', () => {
 
   it('deve listar escalas', async () => {
     const promise = firstValueFrom(service.listar());
-    httpMock.expectOne(`${baseUrl}/escalas`).flush([mockEscalaDto]);
+    httpMock.expectOne(`${baseUrl}/escalas`).flush({ data: [mockEscalaDto], total: 1 });
     expect(await promise).toEqual([mockEscala]);
   });
 

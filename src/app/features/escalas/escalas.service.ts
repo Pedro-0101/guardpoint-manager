@@ -16,8 +16,11 @@ export class EscalasService {
     offset?: number;
   }): Observable<Escala[]> {
     return this.api
-      .get<EscalaDto[]>('/escalas', params as Record<string, string | number | boolean>)
-      .pipe(map((dtos) => dtos.map(mapEscalaFromDto)));
+      .get<{ data: EscalaDto[]; total: number }>(
+        '/escalas',
+        params as Record<string, string | number | boolean>
+      )
+      .pipe(map((res) => res.data.map(mapEscalaFromDto)));
   }
 
   obter(id: string): Observable<Escala> {
