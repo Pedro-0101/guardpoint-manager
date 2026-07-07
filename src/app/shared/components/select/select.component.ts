@@ -85,7 +85,7 @@ import { ZardSelectItemComponent } from './select-item.component';
 
     @if (isOpen()) {
       <div
-        class="absolute z-50 mt-1 left-0 min-w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md"
+        class="absolute z-50 mt-1 left-0 w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md"
         role="listbox"
         [attr.aria-multiselectable]="zMultiple() || null"
       >
