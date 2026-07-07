@@ -21,15 +21,17 @@
       <button class="list-page__retry-btn" (click)="carregarEscalas()">Tentar novamente</button>
     </div>
   } @else {
-    <div class="list-page__toolbar">
-      <div class="list-page__search-wrapper max-w-sm">
-        <label class="form-label">Buscar escala</label>
-        <div class="relative flex items-center">
-          <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-          <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome, posto ou usuário..." />
+    <z-card class="p-4 mb-6">
+      <div class="flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
+          <label class="form-label">Buscar escala</label>
+          <div class="relative flex items-center">
+            <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+            <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome, posto ou usuário..." />
+          </div>
         </div>
       </div>
-    </div>
+    </z-card>
 
     @if (filteredEscalas$ | async; as escalas) {
       @if (escalas.length === 0) {

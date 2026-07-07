@@ -56,7 +56,7 @@
 
   <div class="form-field">
     <label class="form-label">Cargo</label>
-    <z-select formControlName="cargo">
+    <z-select class="w-full" formControlName="cargo">
       @for (cargo of cargos; track cargo.value) {
         <z-select-item [zValue]="cargo.value">{{ cargo.label }}</z-select-item>
       }

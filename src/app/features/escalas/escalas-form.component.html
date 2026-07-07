@@ -21,7 +21,7 @@
 
     <div class="form-field">
       <label class="form-label">Posto</label>
-      <z-select formControlName="postoId">
+      <z-select class="w-full" formControlName="postoId">
         @for (posto of postos(); track posto.id) {
           <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
@@ -33,7 +33,7 @@
 
     <div class="form-field">
       <label class="form-label">Usuário</label>
-      <z-select formControlName="usuarioId">
+      <z-select class="w-full" formControlName="usuarioId">
         @for (usuario of usuarios(); track usuario.id) {
           <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
         }

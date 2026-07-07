@@ -85,7 +85,7 @@ import { ZardSelectItemComponent } from './select-item.component';
 
     @if (isOpen()) {
       <div
-        class="absolute z-50 mt-1 left-0 right-0 overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md"
+        class="absolute z-50 mt-1 left-0 min-w-full overflow-hidden rounded-md border border-border bg-popover text-popover-foreground shadow-md"
         role="listbox"
         [attr.aria-multiselectable]="zMultiple() || null"
       >
@@ -93,11 +93,11 @@ import { ZardSelectItemComponent } from './select-item.component';
       </div>
     }
   `,
-  styles: `
-    :host { display: inline-block; position: relative; width: 100%; }
-  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
+  host: {
+    class: 'relative inline-block',
+  },
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -121,6 +121,7 @@ export class ZardSelectComponent implements ControlValueAccessor {
 
   protected readonly isOpen = signal(false);
   protected readonly disabled = signal(false);
+
 
   private readonly elementRef = inject(ElementRef);
 

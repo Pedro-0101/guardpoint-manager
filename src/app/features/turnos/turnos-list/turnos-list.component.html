@@ -21,24 +21,26 @@
       <button class="list-page__retry-btn" (click)="carregarTurnos()">Tentar novamente</button>
     </div>
   } @else {
-    <div class="list-page__toolbar">
-      <div class="list-page__search-wrapper">
-        <label class="form-label">Buscar turno</label>
-        <div class="relative flex items-center">
-          <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-          <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
+    <z-card class="p-4 mb-6">
+      <div class="flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-sm">
+          <label class="form-label">Buscar turno</label>
+          <div class="relative flex items-center">
+            <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+            <input z-input class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5 min-w-[160px]">
+          <label class="form-label">Status</label>
+          <z-select [formControl]="statusControl">
+            @for (filtro of statusFilters; track filtro.value) {
+              <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
+            }
+          </z-select>
         </div>
       </div>
-
-      <div class="list-page__filter-wrapper">
-        <label class="form-label">Status</label>
-        <z-select [formControl]="statusControl">
-          @for (filtro of statusFilters; track filtro.value) {
-            <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
-          }
-        </z-select>
-      </div>
-    </div>
+    </z-card>
 
     @if (filteredTurnos$ | async; as turnos) {
       @if (turnos.length === 0) {

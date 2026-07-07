@@ -6,57 +6,59 @@
     </div>
   </header>
 
-  <section class="relatorios__filters">
-    <div class="form-field">
-      <label class="form-label">Data Início</label>
-      <input z-input type="date" [formControl]="dataInicioControl" />
-    </div>
+  <z-card class="p-4 mb-6">
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex flex-col gap-1.5 min-w-[160px]">
+        <label class="form-label">Data Início</label>
+        <input z-input type="date" [formControl]="dataInicioControl" />
+      </div>
 
-    <div class="form-field">
-      <label class="form-label">Data Fim</label>
-      <input z-input type="date" [formControl]="dataFimControl" />
-    </div>
+      <div class="flex flex-col gap-1.5 min-w-[160px]">
+        <label class="form-label">Data Fim</label>
+        <input z-input type="date" [formControl]="dataFimControl" />
+      </div>
 
-    <div class="form-field">
-      <label class="form-label">Posto</label>
-      <z-select [formControl]="postoControl">
-        <z-select-item zValue="">Todos</z-select-item>
-        @for (posto of postos(); track posto.id) {
-          <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
-        }
-      </z-select>
-    </div>
+      <div class="flex flex-col gap-1.5 min-w-[160px]">
+        <label class="form-label">Posto</label>
+        <z-select [formControl]="postoControl">
+          <z-select-item zValue="">Todos</z-select-item>
+          @for (posto of postos(); track posto.id) {
+            <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
+          }
+        </z-select>
+      </div>
 
-    <div class="form-field">
-      <label class="form-label">Vigia</label>
-      <z-select [formControl]="usuarioControl">
-        <z-select-item zValue="">Todos</z-select-item>
-        @for (usuario of usuarios(); track usuario.id) {
-          <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
-        }
-      </z-select>
-    </div>
+      <div class="flex flex-col gap-1.5 min-w-[160px]">
+        <label class="form-label">Vigia</label>
+        <z-select [formControl]="usuarioControl">
+          <z-select-item zValue="">Todos</z-select-item>
+          @for (usuario of usuarios(); track usuario.id) {
+            <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
+          }
+        </z-select>
+      </div>
 
-    <div class="form-field">
-      <label class="form-label">Status</label>
-      <z-select [formControl]="statusControl">
-        @for (filtro of statusFilters; track filtro.value) {
-          <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
-        }
-      </z-select>
-    </div>
+      <div class="flex flex-col gap-1.5 min-w-[160px]">
+        <label class="form-label">Status</label>
+        <z-select [formControl]="statusControl">
+          @for (filtro of statusFilters; track filtro.value) {
+            <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
+          }
+        </z-select>
+      </div>
 
-    <div class="relatorios__filter-actions">
-      <button z-button (click)="buscar()" [zDisabled]="loading()">
-        <ng-icon name="lucideSearch" />
-        Buscar
-      </button>
-      <button z-button zType="outline" (click)="limparFiltros()">
-        <ng-icon name="lucideX" />
-        Limpar
-      </button>
+      <div class="flex gap-2 items-center pt-1">
+        <button z-button (click)="buscar()" [zDisabled]="loading()">
+          <ng-icon name="lucideSearch" />
+          Buscar
+        </button>
+        <button z-button zType="outline" (click)="limparFiltros()">
+          <ng-icon name="lucideX" />
+          Limpar
+        </button>
+      </div>
     </div>
-  </section>
+  </z-card>
 
   @if (loading()) {
     <div class="relatorios__loading">

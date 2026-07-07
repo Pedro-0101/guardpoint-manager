@@ -44,15 +44,6 @@
   }
 
   &__filters {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    background: var(--bg-card);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-sm);
-    padding: 20px;
-    margin-bottom: 24px;
   }
 
   &__filter-field {
@@ -190,21 +181,8 @@
     padding: 16px;
   }
 
-  .relatorios__filters {
-    flex-direction: column;
-  }
-
   .relatorios__filter-field {
     width: 100%;
-  }
-
-  .relatorios__filter-actions {
-    flex-direction: column;
-    width: 100%;
-
-    button {
-      width: 100%;
-    }
   }
 
   .relatorios__table-toolbar {

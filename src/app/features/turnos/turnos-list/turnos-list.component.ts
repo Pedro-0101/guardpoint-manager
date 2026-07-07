@@ -11,6 +11,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSelectImports } from '@/shared/components/select';
 import { LoadingSpinner } from '../../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
@@ -39,6 +40,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardTableImports,
     ZardButtonComponent,
     ZardInputDirective,
+    ZardCardComponent,
     ZardSelectImports,
     NgIcon,
     LoadingSpinner,

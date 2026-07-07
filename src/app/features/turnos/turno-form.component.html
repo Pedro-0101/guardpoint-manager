@@ -15,7 +15,7 @@
 
     <div class="form-field">
       <label class="form-label">Posto</label>
-      <z-select formControlName="posto_id">
+      <z-select class="w-full" formControlName="posto_id">
         @for (posto of postos(); track posto.id) {
           <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
         }
