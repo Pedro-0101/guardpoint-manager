@@ -14,6 +14,7 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../core/services/notification.service';
 import { Escala } from '../../core/models/escala.model';
 
@@ -40,6 +41,7 @@ const DIA_LABELS: Record<number, string> = {
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
+    PageLayoutComponent,
   ],
   templateUrl: './escalas-list.component.html',
   styleUrl: './escalas-list.component.scss',

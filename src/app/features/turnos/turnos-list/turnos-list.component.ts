@@ -16,6 +16,7 @@ import { ZardSelectImports } from '@/shared/components/select';
 import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
+import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout';
 import { Turno } from '../../../core/models/turno.model';
 
 interface StatusFilter {
@@ -46,6 +47,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
+    PageLayoutComponent,
   ],
   templateUrl: './turnos-list.component.html',
   styleUrl: './turnos-list.component.scss',

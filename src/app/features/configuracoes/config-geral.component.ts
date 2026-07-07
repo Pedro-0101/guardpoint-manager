@@ -8,6 +8,7 @@ import { ZardInputDirective } from '@/shared/components/input';
 import { ZardSwitchComponent } from '@/shared/components/switch/switch.component';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
+import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../core/services/notification.service';
 import { Empresa } from '../../core/models/empresa.model';
 
@@ -22,6 +23,7 @@ import { Empresa } from '../../core/models/empresa.model';
     NgIcon,
     LoadingSpinner,
     StatusBadge,
+    PageLayoutComponent,
   ],
   templateUrl: './config-geral.component.html',
   styleUrl: './config-geral.component.scss',

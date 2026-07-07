@@ -27,6 +27,7 @@ import { ZardSelectImports } from '@/shared/components/select';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
+import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { Turno } from '../../core/models/turno.model';
 import { Posto } from '../../core/models/posto.model';
 import { Usuario } from '../../core/models/usuario.model';
@@ -63,6 +64,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     LoadingSpinner,
     EmptyState,
     StatusBadge,
+    PageLayoutComponent,
   ],
   templateUrl: './relatorios.component.html',
   styleUrl: './relatorios.component.scss',

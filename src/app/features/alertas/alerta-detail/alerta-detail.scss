@@ -1,8 +1,5 @@
 :host {
   display: block;
-  padding: 32px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
 .detail-page {
@@ -147,9 +144,6 @@
 }
 
 @media (max-width: 640px) {
-  :host {
-    padding: 16px;
-  }
 
   .detail-page__info-grid {
     grid-template-columns: 1fr;

@@ -15,6 +15,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardInputDirective } from '@/shared/components/input';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../core/services/notification.service';
 import { NivelEscalonamento } from '../../core/models/config.model';
 
@@ -35,6 +36,7 @@ interface NivelGroup {
     ConfigNavComponent,
     LoadingSpinner,
     EmptyState,
+    PageLayoutComponent,
   ],
   templateUrl: './config-escalonamento.component.html',
   styleUrl: './config-escalonamento.component.scss',

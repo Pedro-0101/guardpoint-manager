@@ -15,6 +15,7 @@ import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../core/services/notification.service';
 import { Usuario } from '../../core/models/usuario.model';
 
@@ -37,6 +38,7 @@ const CARGO_LABELS: Record<string, string> = {
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
+    PageLayoutComponent,
     ...ZardTooltipImports,
   ],
   templateUrl: './usuarios-list.component.html',

@@ -1,11 +1,8 @@
 :host {
   display: block;
-  padding: 32px;
 }
 
 .list-page {
-  max-width: 1440px;
-  margin: 0 auto;
 
   &__header {
     display: flex;
@@ -109,9 +106,6 @@
 }
 
 @media (max-width: 640px) {
-  :host {
-    padding: 16px;
-  }
 
   .list-page__header {
     flex-direction: column;

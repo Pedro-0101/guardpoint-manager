@@ -9,6 +9,7 @@ import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
+import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Alerta } from '../../../core/models/alerta.model';
 
@@ -35,7 +36,7 @@ const GRAVIDADE_LABEL: Record<Alerta['gravidade'], string> = {
 
 @Component({
   selector: 'gp-alerta-detail',
-  imports: [RouterLink, NgIcon, ZardButtonComponent, ZardSkeletonComponent, StatusBadge],
+  imports: [RouterLink, NgIcon, ZardButtonComponent, ZardSkeletonComponent, StatusBadge, PageLayoutComponent],
   templateUrl: './alerta-detail.html',
   styleUrl: './alerta-detail.scss',
 })

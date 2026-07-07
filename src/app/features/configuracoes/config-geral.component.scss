@@ -1,11 +1,8 @@
 :host {
   display: block;
-  padding: 32px;
 }
 
 .settings-page {
-  max-width: 720px;
-  margin: 0 auto;
 
   &__header {
     margin-bottom: 24px;
@@ -109,9 +106,6 @@
 }
 
 @media (max-width: 640px) {
-  :host {
-    padding: 16px;
-  }
 
   .settings-form__row {
     flex-direction: column;

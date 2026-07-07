@@ -33,6 +33,7 @@ import { ZardSelectImports } from '@/shared/components/select';
 import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
+import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../../core/services/notification.service';
 import { Alerta } from '../../../core/models/alerta.model';
 
@@ -91,6 +92,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
+    PageLayoutComponent,
   ],
   templateUrl: './alertas-list.component.html',
   styleUrl: './alertas-list.component.scss',
