@@ -15,11 +15,41 @@ import * as L from 'leaflet';
 import { PostosService } from './postos.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
+import {
+  ZardFormFieldComponent,
+  ZardFormLabelComponent,
+  ZardFormControlComponent,
+  ZardFormMessageComponent,
+} from '@/shared/components/form';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Posto } from '../../core/models/posto.model';
 import { parseCoordenadas } from '../../shared/utils/coordenadas.util';
 
+/**
+ * Formulário de criação e edição de Postos.
+ *
+ * ## Padrão de formulário
+ *
+ * Este componente segue o padrão de formulário reativo do GuardPoint, alinhado ao
+ * `UsuariosFormComponent`. O template utiliza os componentes de form do Zard UI:
+ *
+ * - `<z-form-field>` — agrupa label, controle e mensagem com espaçamento consistente.
+ * - `<z-form-label [zRequired]="true">` — exibe o rótulo com indicador de obrigatoriedade.
+ * - `<z-form-control>` — wrapper semântico ao redor do `<input z-input class="w-full" />`.
+ * - `<z-form-message [zError]="true">` — mensagem de erro (exibida apenas quando o campo
+ *   está inválido **e** foi tocado).
+ * - `<z-form-message>` (sem `[zError]`) — texto descritivo exibido como ajuda enquanto o
+ *   campo está válido ou intocado, explicando a finalidade do campo ao usuário.
+ *
+ * O `<form>` raiz usa `class="space-y-6"` para espaçamento vertical uniforme entre os
+ * campos. Campos lado a lado (ex.: latitude/longitude) utilizam `grid grid-cols-2 gap-4`.
+ * Todos os inputs possuem `class="w-full"` para ocupar a largura total do container.
+ *
+ * O mapa Leaflet (`#mapContainer`) é injetado via `viewChild` e gerenciado manualmente
+ * no ciclo de vida (`AfterViewInit` / `OnDestroy`), ficando fora do fluxo dos componentes
+ * Zard por ser um elemento de terceiros.
+ */
 const CENTRO_BRASIL: L.LatLngExpression = [-14.235, -51.9253];
 
 @Component({
@@ -27,6 +57,10 @@ const CENTRO_BRASIL: L.LatLngExpression = [-14.235, -51.9253];
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
+    ZardFormFieldComponent,
+    ZardFormLabelComponent,
+    ZardFormControlComponent,
+    ZardFormMessageComponent,
   ],
   templateUrl: './postos-form.component.html',
   styleUrl: './postos-form.component.scss',

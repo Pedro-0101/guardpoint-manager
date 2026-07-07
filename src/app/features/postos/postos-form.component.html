@@ -1,92 +1,106 @@
-<form [formGroup]="form" novalidate>
-  <div class="form-field">
-    <label class="form-label" for="posto-nome-input">Nome</label>
-    <input z-input id="posto-nome-input" formControlName="nome" placeholder="Ex: Portaria Principal" />
+<form [formGroup]="form" novalidate class="space-y-6">
+  <z-form-field>
+    <z-form-label [zRequired]="true">Nome</z-form-label>
+    <z-form-control>
+      <input z-input formControlName="nome" placeholder="Ex: Portaria Principal" class="w-full" />
+    </z-form-control>
     @if (form.controls.nome.invalid && form.controls.nome.touched) {
-      <p class="form-field__error">
+      <z-form-message [zError]="true">
         @if (form.controls.nome.errors?.['required']) {
           Nome é obrigatório.
         } @else if (form.controls.nome.errors?.['minlength']) {
           Mínimo de 3 caracteres.
         }
-      </p>
+      </z-form-message>
+    } @else {
+      <z-form-message>Nome de identificação do posto de serviço.</z-form-message>
     }
-  </div>
+  </z-form-field>
 
-  <div class="form__row">
-    <div class="form-field flex-1">
-      <label class="form-label" for="posto-latitude-input">Latitude</label>
-      <input
-        z-input
-        id="posto-latitude-input"
-        type="number"
-        formControlName="latitude"
-        step="any"
-        (paste)="onColarCoordenadas($event)"
-      />
+  <div class="grid grid-cols-2 gap-4">
+    <z-form-field>
+      <z-form-label [zRequired]="true">Latitude</z-form-label>
+      <z-form-control>
+        <input
+          z-input
+          type="number"
+          formControlName="latitude"
+          step="any"
+          class="w-full"
+          (paste)="onColarCoordenadas($event)"
+        />
+      </z-form-control>
       @if (form.controls.latitude.invalid && form.controls.latitude.touched) {
-        <p class="form-field__error">
+        <z-form-message [zError]="true">
           @if (form.controls.latitude.errors?.['required']) {
             Latitude é obrigatória.
           } @else {
             Valor deve estar entre -90 e 90.
           }
-        </p>
+        </z-form-message>
+      } @else {
+        <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
       }
-    </div>
+    </z-form-field>
 
-    <div class="form-field flex-1">
-      <label class="form-label" for="posto-longitude-input">Longitude</label>
-      <input
-        z-input
-        id="posto-longitude-input"
-        type="number"
-        formControlName="longitude"
-        step="any"
-        (paste)="onColarCoordenadas($event)"
-      />
+    <z-form-field>
+      <z-form-label [zRequired]="true">Longitude</z-form-label>
+      <z-form-control>
+        <input
+          z-input
+          type="number"
+          formControlName="longitude"
+          step="any"
+          class="w-full"
+          (paste)="onColarCoordenadas($event)"
+        />
+      </z-form-control>
       @if (form.controls.longitude.invalid && form.controls.longitude.touched) {
-        <p class="form-field__error">
+        <z-form-message [zError]="true">
           @if (form.controls.longitude.errors?.['required']) {
             Longitude é obrigatória.
           } @else {
             Valor deve estar entre -180 e 180.
           }
-        </p>
+        </z-form-message>
+      } @else {
+        <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
       }
-    </div>
+    </z-form-field>
   </div>
 
   <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
 
-  <div class="form-field">
-    <label class="form-label" for="posto-coordenadas-input">Colar coordenadas do Google Maps</label>
-    <input
-      z-input
-      id="posto-coordenadas-input"
-      placeholder="Ex: 23°12'05.6&quot;S 47°35'56.3&quot;W"
-      (paste)="onColarCoordenadas($event)"
-      (keydown)="$event.preventDefault()"
-      readonly
-    />
-  </div>
+  <z-form-field>
+    <z-form-label>Colar coordenadas do Google Maps</z-form-label>
+    <z-form-control>
+      <input
+        z-input
+        placeholder="Ex: 23°12'05.6&quot;S 47°35'56.3&quot;W"
+        class="w-full"
+        (paste)="onColarCoordenadas($event)"
+        (keydown)="$event.preventDefault()"
+        readonly
+      />
+    </z-form-control>
+    <z-form-message>Clique no mapa, arraste o marcador ou cole coordenadas do Google Maps para posicionar o posto.</z-form-message>
+  </z-form-field>
 
-  <p class="form__mapa-hint">
-    Clique no mapa ou arraste o marcador para posicionar o posto. Você também pode colar
-    coordenadas do Google Maps (ex.: 23°12'05.6"S 47°35'56.3"W) no campo acima.
-  </p>
-
-  <div class="form-field">
-    <label class="form-label" for="posto-raio-input">Raio de tolerância (metros)</label>
-    <input z-input id="posto-raio-input" type="number" formControlName="raioM" min="10" max="5000" />
+  <z-form-field>
+    <z-form-label [zRequired]="true">Raio de tolerância (metros)</z-form-label>
+    <z-form-control>
+      <input z-input type="number" formControlName="raioM" min="10" max="5000" class="w-full" />
+    </z-form-control>
     @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
-      <p class="form-field__error">
+      <z-form-message [zError]="true">
         @if (form.controls.raioM.errors?.['required']) {
           Raio é obrigatório.
         } @else {
           Valor deve estar entre 10 e 5000 metros.
         }
-      </p>
+      </z-form-message>
+    } @else {
+      <z-form-message>Distância máxima permitida para registro de ponto pelo vigilante.</z-form-message>
     }
-  </div>
+  </z-form-field>
 </form>
