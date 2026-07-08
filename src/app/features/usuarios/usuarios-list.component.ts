@@ -6,6 +6,7 @@ import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosFormComponent } from './usuarios-form.component';
+import { VigiaSenhasFormComponent } from './vigia-senhas-form.component';
 import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
@@ -18,6 +19,7 @@ import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.com
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
+import { GpAvatarComponent } from '../../shared/components/avatar/gp-avatar';
 import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../core/services/notification.service';
 import { Usuario } from '../../core/models/usuario.model';
@@ -49,6 +51,7 @@ const CARGO_OPTIONS = Object.entries(CARGO_LABELS).map(([value, label]) => ({
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
+    GpAvatarComponent,
     PageLayoutComponent,
     ...ZardTooltipImports,
   ],
@@ -186,6 +189,17 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   cargoLabel(cargo: string): string {
     return CARGO_LABELS[cargo] ?? cargo;
+  }
+
+  abrirSenhas(usuario: Usuario): void {
+    this.dialog.create({
+      zTitle: `Senhas do Vigia: ${usuario.nome}`,
+      zContent: VigiaSenhasFormComponent,
+      zWidth: '640px',
+      zData: usuario,
+      zOkText: null,
+      zCancelText: 'Fechar',
+    });
   }
 
   limparFiltroCargo(value: string): void {

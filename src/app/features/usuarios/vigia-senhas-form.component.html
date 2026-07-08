@@ -1,0 +1,280 @@
+<div class="space-y-6 p-1">
+  @if (loading()) {
+    <div class="space-y-4">
+      <z-skeleton class="h-5 w-32 rounded" />
+      <z-skeleton class="h-20 w-full rounded-lg" />
+      <z-skeleton class="h-20 w-full rounded-lg" />
+      <z-skeleton class="h-5 w-40 rounded" />
+      <z-skeleton class="h-24 w-full rounded-lg" />
+    </div>
+  } @else {
+    <div class="rounded-lg border p-4">
+      <h4 class="font-medium text-sm">Senha OK</h4>
+      <p class="text-xs text-muted-foreground mt-0.5 mb-3">
+        @if (okSenha()) {
+          Código atual: <strong>{{ okSenha()?.codigo }}</strong>. Altere abaixo.
+        } @else {
+          Senha ainda não definida. Configure um código de 4 a 6 dígitos.
+        }
+      </p>
+      <div class="flex items-end gap-2">
+        <z-form-field class="flex-1">
+          <z-form-label>Código</z-form-label>
+          <z-form-control>
+            <input
+              z-input
+              [formControl]="okCodigo"
+              placeholder="4 a 6 dígitos"
+              class="w-full max-w-[180px]"
+              minlength="4"
+              maxlength="6"
+            />
+          </z-form-control>
+          @if (okCodigo.invalid && okCodigo.touched) {
+            <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+          }
+        </z-form-field>
+        <button
+          type="button"
+          z-button
+          zSize="sm"
+          (click)="salvarOk()"
+          [zDisabled]="savingOk() || okCodigo.invalid"
+        >
+          @if (savingOk()) {
+            Salvando...
+          } @else {
+            {{ okSenha() ? 'Salvar' : 'Criar' }}
+          }
+        </button>
+      </div>
+    </div>
+
+    <div class="rounded-lg border p-4">
+      <h4 class="font-medium text-sm">Senha de Emergência</h4>
+      <p class="text-xs text-muted-foreground mt-0.5 mb-3">
+        @if (emergenciaSenha()) {
+          Código atual: <strong>{{ emergenciaSenha()?.codigo }}</strong>. Altere abaixo.
+        } @else {
+          Senha ainda não definida. Configure um código de 4 a 6 dígitos.
+        }
+      </p>
+      <div class="flex items-end gap-2">
+        <z-form-field class="flex-1">
+          <z-form-label>Código</z-form-label>
+          <z-form-control>
+            <input
+              z-input
+              [formControl]="emergenciaCodigo"
+              placeholder="4 a 6 dígitos"
+              class="w-full max-w-[180px]"
+              minlength="4"
+              maxlength="6"
+            />
+          </z-form-control>
+          @if (emergenciaCodigo.invalid && emergenciaCodigo.touched) {
+            <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+          }
+        </z-form-field>
+        <button
+          type="button"
+          z-button
+          zSize="sm"
+          (click)="salvarEmergencia()"
+          [zDisabled]="savingEmergencia() || emergenciaCodigo.invalid"
+        >
+          @if (savingEmergencia()) {
+            Salvando...
+          } @else {
+            {{ emergenciaSenha() ? 'Salvar' : 'Criar' }}
+          }
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-3">
+        <div>
+          <h4 class="font-medium text-sm">Senhas Customizadas</h4>
+          <p class="text-xs text-muted-foreground mt-0.5">Senhas adicionais vinculadas a níveis de escalonamento.</p>
+        </div>
+        @if (!showingNewCustom()) {
+          <button type="button" z-button zSize="sm" zType="outline" (click)="showingNewCustom.set(true)">
+            <ng-icon name="lucidePlus" class="size-3.5" />
+            Nova
+          </button>
+        }
+      </div>
+
+      @if (showingNewCustom()) {
+        <div class="rounded-lg border border-dashed p-4 mb-3">
+          <h5 class="text-sm font-medium mb-3">Nova senha customizada</h5>
+          <form [formGroup]="novoCustomForm" novalidate class="space-y-3">
+            <div class="grid grid-cols-2 gap-3">
+              <z-form-field>
+                <z-form-label [zRequired]="true">Código</z-form-label>
+                <z-form-control>
+                  <input
+                    z-input
+                    formControlName="codigo"
+                    placeholder="4 a 6 dígitos"
+                    class="w-full"
+                    minlength="4"
+                    maxlength="6"
+                  />
+                </z-form-control>
+                @if (novoCustomForm.controls.codigo.invalid && novoCustomForm.controls.codigo.touched) {
+                  <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+                }
+              </z-form-field>
+
+              <z-form-field>
+                <z-form-label>Descrição</z-form-label>
+                <z-form-control>
+                  <input
+                    z-input
+                    formControlName="descricao"
+                    placeholder="Opcional"
+                    class="w-full"
+                  />
+                </z-form-control>
+              </z-form-field>
+            </div>
+
+            <z-form-field>
+              <z-form-label>Nível de escalonamento</z-form-label>
+              <z-form-control>
+                <z-select
+                  [formControl]="novoCustomForm.controls.nivelEscalonamentoId"
+                  [zPlaceholder]="'Nível máximo (dinâmico)'"
+                >
+                  <z-select-item [zValue]="''">Nível máximo (dinâmico)</z-select-item>
+                  @for (nivel of niveisEscalonamento(); track nivel.id) {
+                    <z-select-item [zValue]="nivel.id">
+                      Nível {{ nivel.nivel }} ({{ nivel.atrasoMinutos }}min)
+                    </z-select-item>
+                  }
+                </z-select>
+              </z-form-control>
+              <z-form-message>Define quando esta senha pode ser usada no escalonamento de alertas.</z-form-message>
+            </z-form-field>
+
+            <div class="flex items-center gap-2 justify-end">
+              <button type="button" z-button zType="ghost" zSize="sm" (click)="cancelarNovaCustom()">
+                Cancelar
+              </button>
+              <button
+                type="button"
+                z-button
+                zSize="sm"
+                (click)="criarCustom()"
+                [zDisabled]="savingNewCustom() || novoCustomForm.invalid"
+              >
+                @if (savingNewCustom()) {
+                  Criando...
+                } @else {
+                  Criar
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+
+      @if (customSenhas().length === 0 && !showingNewCustom()) {
+        <p class="text-sm text-muted-foreground text-center py-4">
+          Nenhuma senha customizada cadastrada.
+        </p>
+      } @else {
+        <div class="space-y-3">
+          @for (senha of customSenhas(); track senha.id) {
+            @let form = customForms[senha.id];
+            @if (form) {
+              <div class="rounded-lg border p-4">
+                <div class="grid grid-cols-2 gap-3 mb-3">
+                  <z-form-field>
+                    <z-form-label [zRequired]="true">Código</z-form-label>
+                    <z-form-control>
+                      <input
+                        z-input
+                        [formControl]="form.codigo"
+                        placeholder="4 a 6 dígitos"
+                        class="w-full"
+                        minlength="4"
+                        maxlength="6"
+                      />
+                    </z-form-control>
+                    @if (form.codigo.invalid && form.codigo.touched) {
+                      <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+                    }
+                  </z-form-field>
+
+                  <z-form-field>
+                    <z-form-label>Descrição</z-form-label>
+                    <z-form-control>
+                      <input
+                        z-input
+                        [formControl]="form.descricao"
+                        placeholder="Opcional"
+                        class="w-full"
+                      />
+                    </z-form-control>
+                  </z-form-field>
+                </div>
+
+                <z-form-field class="mb-3">
+                  <z-form-label>Nível de escalonamento</z-form-label>
+                  <z-form-control>
+                    <z-select
+                      [formControl]="form.nivelEscalonamentoId"
+                      [zPlaceholder]="'Nível máximo (dinâmico)'"
+                    >
+                      <z-select-item [zValue]="''">Nível máximo (dinâmico)</z-select-item>
+                      @for (nivel of niveisEscalonamento(); track nivel.id) {
+                        <z-select-item [zValue]="nivel.id">
+                          Nível {{ nivel.nivel }} ({{ nivel.atrasoMinutos }}min)
+                        </z-select-item>
+                      }
+                    </z-select>
+                  </z-form-control>
+                </z-form-field>
+
+                <div class="flex items-center gap-2 justify-end">
+                  <button
+                    type="button"
+                    z-button
+                    zType="ghost"
+                    zSize="sm"
+                    class="text-destructive"
+                    (click)="removerCustom(senha.id)"
+                    [zDisabled]="deletingSenhaId() === senha.id"
+                  >
+                    @if (deletingSenhaId() === senha.id) {
+                      Removendo...
+                    } @else {
+                      <ng-icon name="lucideTrash2" class="size-3.5" />
+                      Remover
+                    }
+                  </button>
+                  <button
+                    type="button"
+                    z-button
+                    zSize="sm"
+                    (click)="salvarCustom(senha.id)"
+                    [zDisabled]="savingCustomId() === senha.id || form.codigo.invalid"
+                  >
+                    @if (savingCustomId() === senha.id) {
+                      Salvando...
+                    } @else {
+                      Salvar
+                    }
+                  </button>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -62,8 +62,9 @@
       </div>
     </z-card>
 
-    <div class="list-page__table-wrapper">
-      <table z-table class="list-page__table">
+    <div class="w-full">
+      <div class="overflow-hidden rounded-md border">
+        <table z-table>
         <thead z-table-header>
           <tr z-table-row>
             <th z-table-head>Nome</th>
@@ -99,7 +100,10 @@
               } @else {
                 @for (usuario of usuarios; track usuario.id) {
                   <tr z-table-row>
-                    <td z-table-cell>{{ usuario.nome }}</td>
+                    <td z-table-cell class="flex items-center gap-3">
+                    <gp-avatar [name]="usuario.nome" size="sm" />
+                    {{ usuario.nome }}
+                  </td>
                     <td z-table-cell>{{ usuario.email }}</td>
                     <td z-table-cell>{{ cargoLabel(usuario.cargo) }}</td>
                     <td z-table-cell>
@@ -110,6 +114,11 @@
                         <button z-button zType="ghost" zSize="icon" zTooltip="Editar usuário" (click)="abrirFormulario(usuario)" aria-label="Editar usuário">
                           <ng-icon name="lucidePencil" />
                         </button>
+                        @if (usuario.cargo === 'vigia') {
+                          <button z-button zType="ghost" zSize="icon" zTooltip="Configurar senhas" (click)="abrirSenhas(usuario)" aria-label="Configurar senhas do vigia">
+                            <ng-icon name="lucideLock" />
+                          </button>
+                        }
                         <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Inativar usuário" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
                           <ng-icon name="lucideBan" />
                         </button>
