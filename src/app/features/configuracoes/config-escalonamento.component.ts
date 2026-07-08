@@ -5,6 +5,8 @@ import { NgIcon } from '@ng-icons/core';
 import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { ConfiguracoesService } from './configuracoes.service';
+import { ConfigEscalonamentoFormComponent } from './config-escalonamento-form.component';
+import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
@@ -36,6 +38,7 @@ import { NivelEscalonamento } from '../../core/models/config.model';
 })
 export class ConfigEscalonamentoComponent implements OnInit, OnDestroy {
   private readonly configuracoesService = inject(ConfiguracoesService);
+  private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
 
@@ -91,6 +94,29 @@ export class ConfigEscalonamentoComponent implements OnInit, OnDestroy {
           this.error.set(err.message ?? 'Erro ao carregar escalonamentos.');
           this.loading.set(false);
         },
+      });
+  }
+
+  abrirFormulario(item?: NivelEscalonamento): void {
+    const dialogRef = this.dialog.create({
+      zTitle: item ? 'Editar nível' : 'Novo nível',
+      zContent: ConfigEscalonamentoFormComponent,
+      zWidth: '520px',
+      zData: item ?? null,
+      zOkText: item ? 'Salvar' : 'Criar',
+      zOnOk: (instance) => {
+        instance.submit();
+        return false;
+      },
+    });
+
+    dialogRef
+      .afterClosed
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.carregarEscalonamentos();
+        }
       });
   }
 

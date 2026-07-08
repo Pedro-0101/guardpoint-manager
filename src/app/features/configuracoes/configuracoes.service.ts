@@ -28,13 +28,11 @@ interface EmpresaDto {
 export interface CreateEscalonamentoPayload {
   nivel: number;
   atrasoMinutos: number;
-  descricao?: string;
   usuarioIds: string[];
 }
 
 export interface UpdateEscalonamentoPayload {
   atrasoMinutos: number;
-  descricao?: string;
   usuarioIds: string[];
 }
 
@@ -83,9 +81,6 @@ export class ConfiguracoesService {
       atraso_minutos: data.atrasoMinutos,
       usuario_ids: data.usuarioIds,
     };
-    if (data.descricao) {
-      body['descricao'] = data.descricao;
-    }
     return this.api
       .post<ConfigEscalonamentoDto>('/config/escalonamento', body)
       .pipe(map(mapEscalonamentoFromDto));
@@ -96,9 +91,6 @@ export class ConfiguracoesService {
       atraso_minutos: data.atrasoMinutos,
       usuario_ids: data.usuarioIds,
     };
-    if (data.descricao) {
-      body['descricao'] = data.descricao;
-    }
     return this.api
       .put<ConfigEscalonamentoDto>(`/config/escalonamento/${id}`, body)
       .pipe(map(mapEscalonamentoFromDto));
