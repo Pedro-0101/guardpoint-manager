@@ -10,7 +10,7 @@
         class="w-full"
         [zNumeric]="true"
         [zMin]="1"
-        [zMax]="10"
+        [zMax]="5"
         [zStep]="1"
       />
     </z-form-control>
@@ -20,11 +20,13 @@
           Nível é obrigatório.
         } @else if (form.controls.nivel.errors?.['min']) {
           O nível deve ser maior que 0.
+        } @else if (form.controls.nivel.errors?.['max']) {
+          O nível máximo é 5.
         }
       </z-form-message>
     } @else {
       <z-form-message>
-        {{ isEdit() ? 'O nível não pode ser alterado na edição.' : 'Ordem de prioridade do escalonamento (1 = primeiro a ser notificado).' }}
+        {{ isSistema() ? 'Nível definido pelo sistema e não pode ser alterado.' : isEdit() ? 'O nível não pode ser alterado na edição.' : 'Ordem de prioridade do escalonamento (1 = primeiro a ser notificado).' }}
       </z-form-message>
     }
   </z-form-field>
@@ -53,7 +55,7 @@
         }
       </z-form-message>
     } @else {
-      <z-form-message>Tempo em minutos sem check-in para acionar este nível de escalonamento.</z-form-message>
+      <z-form-message>{{ isSistema() ? 'Valor definido pelo sistema e não pode ser alterado.' : 'Tempo em minutos sem check-in para acionar este nível de escalonamento.' }}</z-form-message>
     }
   </z-form-field>
 
@@ -68,7 +70,7 @@
         class="w-full"
       />
     </z-form-control>
-    <z-form-message>Descrição opcional para identificar este nível de escalonamento.</z-form-message>
+    <z-form-message>{{ isSistema() ? 'Valor definido pelo sistema e não pode ser alterado.' : 'Descrição opcional para identificar este nível de escalonamento.' }}</z-form-message>
   </z-form-field>
 
   <z-form-field>
@@ -86,6 +88,12 @@
         }
       </z-select>
     </z-form-control>
-    <z-form-message>Usuários que serão notificados quando este nível for acionado.</z-form-message>
+    @if (form.controls.usuarioIds.invalid && form.controls.usuarioIds.touched) {
+      <z-form-message [zError]="true">
+        Selecione pelo menos 1 usuário para receber este alerta.
+      </z-form-message>
+    } @else {
+      <z-form-message>Usuários que serão notificados quando este nível for acionado.</z-form-message>
+    }
   </z-form-field>
 </form>

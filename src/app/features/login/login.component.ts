@@ -9,7 +9,12 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
 import { ZardInputDirective } from '@/shared/components/input/input.directive';
-import { ZardFormFieldComponent, ZardFormLabelComponent, ZardFormControlComponent } from '@/shared/components/form/form.component';
+import {
+  ZardFormFieldComponent,
+  ZardFormLabelComponent,
+  ZardFormControlComponent,
+  ZardFormMessageComponent,
+} from '@/shared/components/form/form.component';
 import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
 
 @Component({
@@ -24,6 +29,7 @@ import { ZardAlertDialogService } from '@/shared/components/alert-dialog';
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
+    ZardFormMessageComponent,
   ],
   templateUrl: './login.component.html',
 })

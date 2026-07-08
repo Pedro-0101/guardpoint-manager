@@ -102,7 +102,11 @@
                       </td>
                       <td z-table-cell>{{ item.atrasoMinutos }} min</td>
                       <td z-table-cell>{{ item.descricao || '—' }}</td>
-                      <td z-table-cell>{{ item.usuarioIds?.length || 0 }} {{ (item.usuarioIds?.length || 0) === 1 ? 'usuário' : 'usuários' }}</td>
+                      <td z-table-cell>
+                        <span [zTooltip]="getNomesUsuarios(item.usuarioIds ?? [])">
+                          {{ item.usuarioIds?.length || 0 }} {{ (item.usuarioIds?.length || 0) === 1 ? 'usuário' : 'usuários' }}
+                        </span>
+                      </td>
                       <td z-table-cell class="list-page__actions">
                         @if (!item.sistema) {
                           <button z-button zType="ghost" zSize="icon" zTooltip="Editar nível" (click)="abrirFormulario(item)" aria-label="Editar nível">
@@ -113,7 +117,9 @@
                           </button>
                         }
                         @if (item.sistema) {
-                          <span class="text-xs text-muted-foreground italic">Sistema</span>
+                          <button z-button zType="ghost" zSize="icon" zTooltip="Editar usuários notificados" (click)="abrirFormulario(item)" aria-label="Editar usuários notificados">
+                            <ng-icon name="lucidePencil" />
+                          </button>
                         }
                       </td>
                     </tr>

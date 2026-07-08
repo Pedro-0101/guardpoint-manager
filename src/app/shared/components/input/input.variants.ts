@@ -26,12 +26,17 @@ export const inputVariants = cva(
         true: 'show-spinner',
         false: '',
       },
+      zPass: {
+        true: 'pr-10',
+        false: '',
+      },
     },
     defaultVariants: {
       zSize: 'default',
       zBorderless: false,
       zError: false,
       zNumeric: false,
+      zPass: false,
     },
   },
 );

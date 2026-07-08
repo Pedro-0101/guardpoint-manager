@@ -23,11 +23,12 @@
           <z-form-control>
             <input
               z-input
+              [zPass]="true"
+              [zMinlength]="4"
+              [zMaxlength]="6"
               [formControl]="okCodigo"
               placeholder="4 a 6 dígitos"
               class="w-full max-w-[180px]"
-              minlength="4"
-              maxlength="6"
             />
           </z-form-control>
           @if (okCodigo.invalid && okCodigo.touched) {
@@ -65,11 +66,12 @@
           <z-form-control>
             <input
               z-input
+              [zPass]="true"
+              [zMinlength]="4"
+              [zMaxlength]="6"
               [formControl]="emergenciaCodigo"
               placeholder="4 a 6 dígitos"
               class="w-full max-w-[180px]"
-              minlength="4"
-              maxlength="6"
             />
           </z-form-control>
           @if (emergenciaCodigo.invalid && emergenciaCodigo.touched) {
@@ -116,11 +118,12 @@
                 <z-form-control>
                   <input
                     z-input
+                    [zPass]="true"
+                    [zMinlength]="4"
+                    [zMaxlength]="6"
                     formControlName="codigo"
                     placeholder="4 a 6 dígitos"
                     class="w-full"
-                    minlength="4"
-                    maxlength="6"
                   />
                 </z-form-control>
                 @if (novoCustomForm.controls.codigo.invalid && novoCustomForm.controls.codigo.touched) {
@@ -197,11 +200,12 @@
                     <z-form-control>
                       <input
                         z-input
+                        [zPass]="true"
+                        [zMinlength]="4"
+                        [zMaxlength]="6"
                         [formControl]="form.codigo"
                         placeholder="4 a 6 dígitos"
                         class="w-full"
-                        minlength="4"
-                        maxlength="6"
                       />
                     </z-form-control>
                     @if (form.codigo.invalid && form.codigo.touched) {

@@ -20,7 +20,7 @@
   <z-form-field>
     <z-form-label [zRequired]="true">Email</z-form-label>
     <z-form-control>
-      <input z-input type="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
+      <input z-input type="email" autocomplete="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
     </z-form-control>
     @if (form.controls.email.invalid && form.controls.email.touched) {
       <z-form-message [zError]="true">
@@ -38,21 +38,7 @@
   <z-form-field>
     <z-form-label [zRequired]="!isEdit()">{{ isEdit() ? 'Nova senha (opcional)' : 'Senha' }}</z-form-label>
     <z-form-control>
-      <div class="relative">
-        <input z-input class="w-full pr-10" [type]="hideSenha() ? 'password' : 'text'" formControlName="senha" />
-        <button
-          z-button
-          zType="ghost"
-          zSize="icon"
-          type="button"
-          class="absolute right-1 top-1/2 size-7 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-          (click)="hideSenha.set(!hideSenha())"
-          [attr.aria-label]="hideSenha() ? 'Mostrar senha' : 'Ocultar senha'"
-          tabindex="-1"
-        >
-          <ng-icon [name]="hideSenha() ? 'lucideEyeOff' : 'lucideEye'" />
-        </button>
-      </div>
+      <input z-input [zPass]="true" [zMinlength]="isEdit() ? 5 : 6" autocomplete="new-password" formControlName="senha" class="w-full" />
     </z-form-control>
     @if (form.controls.senha.invalid && form.controls.senha.touched) {
       <z-form-message [zError]="true">

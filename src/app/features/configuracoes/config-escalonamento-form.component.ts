@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, type ValidatorFn } from '@angular/forms';
 import {
   ConfiguracoesService,
   CreateEscalonamentoPayload,
@@ -48,6 +48,7 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
 
   readonly loading = signal(false);
   readonly isEdit = signal(false);
+  readonly isSistema = signal(false);
   readonly usuarios = signal<UsuarioOption[]>([]);
 
   form = this.fb.nonNullable.group({
@@ -69,7 +70,23 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
         usuarioIds: this.data.usuarioIds ?? [],
       });
       this.form.controls.nivel.disable();
+
+      if (this.data.sistema) {
+        this.isSistema.set(true);
+        this.form.controls.atrasoMinutos.disable();
+        this.form.controls.descricao.disable();
+      }
+
     }
+    this.form.controls.usuarioIds.addValidators(this.peloMenosUmUsuario());
+    this.form.controls.usuarioIds.updateValueAndValidity();
+  }
+
+  private peloMenosUmUsuario(): ValidatorFn {
+    return (control) => {
+      const value = control.value;
+      return Array.isArray(value) && value.length >= 1 ? null : { minimoUmUsuario: true };
+    };
   }
 
   private carregarUsuarios(): void {
@@ -98,11 +115,16 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
     const raw = this.form.getRawValue();
 
     const request$ = this.isEdit()
-      ? this.configuracoesService.atualizarEscalonamento(this.data!.id, {
-          atrasoMinutos: raw.atrasoMinutos,
-          descricao: raw.descricao,
-          usuarioIds: raw.usuarioIds,
-        } as UpdateEscalonamentoPayload)
+      ? this.configuracoesService.atualizarEscalonamento(
+          this.data!.id,
+          this.isSistema()
+            ? { usuarioIds: raw.usuarioIds } as UpdateEscalonamentoPayload
+            : {
+                atrasoMinutos: raw.atrasoMinutos,
+                descricao: raw.descricao,
+                usuarioIds: raw.usuarioIds,
+              } as UpdateEscalonamentoPayload,
+        )
       : this.configuracoesService.criarEscalonamento({
           nivel: raw.nivel,
           atrasoMinutos: raw.atrasoMinutos,

@@ -27,8 +27,9 @@
               <a z-button zType="link" class="p-0" href="#">Esqueceu a senha?</a>
             </div>
             <z-form-control>
-              <input z-input type="password" formControlName="senha" placeholder="••••••••" class="w-full" />
+              <input z-input [zPass]="true" [zMinlength]="6" formControlName="senha" placeholder="••••••••" class="w-full" />
             </z-form-control>
+            <z-form-message>Use pelo menos 6 caracteres.</z-form-message>
           </z-form-field>
 
           <div class="flex items-center gap-2">

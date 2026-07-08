@@ -1,10 +1,14 @@
-import { Directive, ElementRef, OnDestroy, Renderer2, computed, effect, inject, input } from '@angular/core';
+import { Directive, ElementRef, OnDestroy, Renderer2, computed, effect, inject, input, signal } from '@angular/core';
 
 import type { ClassValue } from 'clsx';
 
 import { mergeClasses } from '@/shared/utils/merge-classes';
 
 import { inputVariants, type ZardInputVariants } from './input.variants';
+
+const EYE_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+
+const EYE_OFF_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"></path><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"></path><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"></path><path d="m2 2 20 20"></path></svg>`;
 
 /**
  * Diretiva que estiliza inputs, textareas e selects com o design system do GuardPoint.
@@ -45,6 +49,11 @@ import { inputVariants, type ZardInputVariants } from './input.variants';
  * @example Input com limite de caracteres
  * ```html
  * <input z-input [zMaxlength]="50" placeholder="Máximo 50 caracteres" />
+ * ```
+ *
+ * @example Campo de senha com botão de mostrar/ocultar
+ * ```html
+ * <input z-input [zPass]="true" [zMinlength]="6" [zMaxlength]="30" placeholder="••••••••" />
  * ```
  *
  * @example Textarea
@@ -143,10 +152,38 @@ export class ZardInputDirective implements OnDestroy {
    */
   readonly zMaxlength = input<number | undefined>(undefined);
 
+  /**
+   * Número mínimo de caracteres exigidos (atributo `minlength` nativo).
+   * Funciona para qualquer input de texto, independente de `zNumeric`.
+   *
+   * @example
+   * ```html
+   * <input z-input [zMinlength]="6" placeholder="Mínimo 6 caracteres" />
+   * ```
+   */
+  readonly zMinlength = input<number | undefined>(undefined);
+
+  /**
+   * Ativa o modo de campo de senha: força `type="password"` e adiciona um botão
+   * para mostrar/ocultar os caracteres digitados. Combine com `zMinlength` e
+   * `zMaxlength` para aplicar as regras de tamanho da senha.
+   *
+   * @default false
+   *
+   * @example
+   * ```html
+   * <input z-input [zPass]="true" [zMinlength]="6" [zMaxlength]="30" />
+   * ```
+   */
+  readonly zPass = input<boolean>(false);
+
   private readonly el = inject(ElementRef<HTMLElement>);
   private readonly renderer = inject(Renderer2);
   private readonly unlisteners: (() => void)[] = [];
   private wheelUnlistener: (() => void) | null = null;
+  private readonly showPassword = signal(false);
+  private passwordToggleButton: HTMLButtonElement | null = null;
+  private passwordWrapped = false;
 
   constructor() {
     effect(() => {
@@ -168,6 +205,22 @@ export class ZardInputDirective implements OnDestroy {
       if (maxlength !== undefined && maxlength !== null) {
         this.renderer.setAttribute(this.el.nativeElement, 'maxlength', String(maxlength));
       }
+    });
+
+    effect(() => {
+      const minlength = this.zMinlength();
+      if (minlength !== undefined && minlength !== null) {
+        this.renderer.setAttribute(this.el.nativeElement, 'minlength', String(minlength));
+      }
+    });
+
+    effect(() => {
+      const native = this.el.nativeElement;
+      if (!this.zPass() || !(native instanceof HTMLInputElement)) return;
+
+      this.renderer.setAttribute(native, 'type', this.showPassword() ? 'text' : 'password');
+      this.ensurePasswordToggle(native);
+      this.updatePasswordToggleIcon();
     });
 
     effect(() => {
@@ -273,6 +326,45 @@ export class ZardInputDirective implements OnDestroy {
     }
   }
 
+  private ensurePasswordToggle(native: HTMLInputElement): void {
+    if (this.passwordWrapped) return;
+    const parent = this.renderer.parentNode(native);
+    if (!parent) return;
+    this.passwordWrapped = true;
+
+    const wrapper = this.renderer.createElement('div');
+    this.renderer.addClass(wrapper, 'relative');
+    this.renderer.insertBefore(parent, wrapper, native);
+    this.renderer.removeChild(parent, native);
+    this.renderer.appendChild(wrapper, native);
+
+    const button = this.renderer.createElement('button') as HTMLButtonElement;
+    this.renderer.setAttribute(button, 'type', 'button');
+    this.renderer.setAttribute(button, 'tabindex', '-1');
+    this.renderer.setAttribute(
+      button,
+      'class',
+      'absolute right-1 top-1/2 flex size-7 -translate-y-1/2 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-50',
+    );
+
+    this.unlisteners.push(
+      this.renderer.listen(button, 'click', (event: Event) => {
+        event.preventDefault();
+        this.showPassword.set(!this.showPassword());
+      }),
+    );
+
+    this.renderer.appendChild(wrapper, button);
+    this.passwordToggleButton = button;
+  }
+
+  private updatePasswordToggleIcon(): void {
+    if (!this.passwordToggleButton) return;
+    const revealed = this.showPassword();
+    this.renderer.setProperty(this.passwordToggleButton, 'innerHTML', revealed ? EYE_OFF_ICON : EYE_ICON);
+    this.renderer.setAttribute(this.passwordToggleButton, 'aria-label', revealed ? 'Ocultar senha' : 'Mostrar senha');
+  }
+
   private shake(): void {
     const native = this.el.nativeElement;
     this.renderer.addClass(native, 'shake');
@@ -289,6 +381,7 @@ export class ZardInputDirective implements OnDestroy {
         zBorderless: this.zBorderless(),
         zError: this.zError(),
         zNumeric: this.zNumeric(),
+        zPass: this.zPass(),
       }),
       this.class(),
     ),

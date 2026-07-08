@@ -141,6 +141,16 @@ export class ConfigEscalonamentoComponent implements OnInit, OnDestroy {
       });
   }
 
+  getNomesUsuarios(usuarioIds: string[]): string {
+    if (usuarioIds.length === 0) return '';
+    const nomes = usuarioIds
+      .map((id) => this.usuarios().find((u) => u.id === id)?.nome)
+      .filter((n): n is string => !!n)
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    if (nomes.length <= 10) return nomes.join('\n');
+    return nomes.slice(0, 10).join('\n') + '\n...';
+  }
+
   abrirFormulario(item?: NivelEscalonamento): void {
     const dialogRef = this.dialog.create({
       zTitle: item ? 'Editar nível' : 'Novo nível',

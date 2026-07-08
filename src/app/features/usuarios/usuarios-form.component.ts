@@ -1,10 +1,8 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgIcon } from '@ng-icons/core';
 import { UsuariosService, CreateUsuarioPayload, UpdateUsuarioPayload } from './usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
-import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardRadioComponent } from '@/shared/components/radio';
 import {
   ZardFormFieldComponent,
@@ -21,13 +19,11 @@ import { Usuario } from '../../core/models/usuario.model';
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
-    ZardButtonComponent,
     ZardRadioComponent,
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
     ZardFormMessageComponent,
-    NgIcon,
   ],
   templateUrl: './usuarios-form.component.html',
 })
@@ -40,7 +36,6 @@ export class UsuariosFormComponent implements OnInit {
 
   readonly loading = signal(false);
   readonly isEdit = signal(false);
-  readonly hideSenha = signal(true);
 
   readonly cargos = [
     { value: 'vigia', label: 'Vigia' },
