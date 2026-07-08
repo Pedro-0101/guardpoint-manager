@@ -12,6 +12,9 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { ZardSelectComponent } from '@/shared/components/select/select.component';
+import { ZardSelectItemComponent } from '@/shared/components/select/select-item.component';
+import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
@@ -25,6 +28,11 @@ const CARGO_LABELS: Record<string, string> = {
   vigia: 'Vigia',
 };
 
+const CARGO_OPTIONS = Object.entries(CARGO_LABELS).map(([value, label]) => ({
+  value,
+  label,
+}));
+
 @Component({
   selector: 'gp-usuarios-list',
   imports: [
@@ -34,6 +42,9 @@ const CARGO_LABELS: Record<string, string> = {
     ZardButtonComponent,
     ZardInputDirective,
     ZardCardComponent,
+    ZardSelectComponent,
+    ZardSelectItemComponent,
+    ZardCheckboxComponent,
     NgIcon,
     ZardSkeletonComponent,
     StatusBadge,
@@ -51,6 +62,10 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   readonly searchControl = new FormControl('', { nonNullable: true });
+  readonly cargosControl = new FormControl<string[]>([], { nonNullable: true });
+  readonly ativosOnlyControl = new FormControl(true, { nonNullable: true });
+
+  readonly cargoOptions = CARGO_OPTIONS;
 
   private readonly usuariosSubject = new BehaviorSubject<Usuario[]>([]);
   readonly usuarios$ = this.usuariosSubject.asObservable();
@@ -65,15 +80,32 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       startWith(''),
       distinctUntilChanged()
     ),
+    this.cargosControl.valueChanges.pipe(startWith<string[]>([])),
+    this.ativosOnlyControl.valueChanges.pipe(startWith(true)),
   ]).pipe(
-    map(([usuarios, term]) => {
-      if (!term.trim()) return usuarios;
-      const lower = term.toLowerCase().trim();
-      return usuarios.filter(
-        (u) =>
-          u.nome.toLowerCase().includes(lower) ||
-          u.email.toLowerCase().includes(lower)
-      );
+    map(([usuarios, term, selectedCargos, ativosOnly]) => {
+      let filtered = usuarios;
+
+      if (ativosOnly) {
+        filtered = filtered.filter((u) => u.ativo);
+      }
+
+      if (selectedCargos.length > 0) {
+        filtered = filtered.filter((u) =>
+          selectedCargos.includes(u.cargo)
+        );
+      }
+
+      if (term.trim()) {
+        const lower = term.toLowerCase().trim();
+        filtered = filtered.filter(
+          (u) =>
+            u.nome.toLowerCase().includes(lower) ||
+            u.email.toLowerCase().includes(lower)
+        );
+      }
+
+      return filtered;
     })
   );
 
@@ -154,5 +186,16 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   cargoLabel(cargo: string): string {
     return CARGO_LABELS[cargo] ?? cargo;
+  }
+
+  limparFiltroCargo(value: string): void {
+    const current = this.cargosControl.value;
+    this.cargosControl.setValue(current.filter((v) => v !== value));
+  }
+
+  limparTodosFiltros(): void {
+    this.searchControl.setValue('');
+    this.cargosControl.setValue([]);
+    this.ativosOnlyControl.setValue(true);
   }
 }

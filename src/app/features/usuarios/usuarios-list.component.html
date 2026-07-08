@@ -27,6 +27,38 @@
             <input z-input id="usuario-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome ou email..." />
           </div>
         </div>
+
+        <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-[260px]">
+          <label class="form-label" for="filtro-cargos-select">Tipo de usuário</label>
+          <z-select
+            id="filtro-cargos-select"
+            [zMultiple]="true"
+            [formControl]="cargosControl"
+            [zPlaceholder]="'Todos os tipos'"
+          >
+            @for (option of cargoOptions; track option.value) {
+              <z-select-item [zValue]="option.value">{{ option.label }}</z-select-item>
+            }
+          </z-select>
+        </div>
+
+        <div class="flex items-center gap-3 min-w-fit">
+          <div class="flex items-center gap-2">
+            <z-checkbox [formControl]="ativosOnlyControl" />
+            <span class="text-sm text-muted-foreground whitespace-nowrap">Somente ativos</span>
+          </div>
+
+          <button
+            z-button
+            zType="ghost"
+            zSize="sm"
+            class="text-muted-foreground"
+            (click)="limparTodosFiltros()"
+          >
+            <ng-icon name="lucideX" class="size-3.5" />
+            Limpar filtros
+          </button>
+        </div>
       </div>
     </z-card>
 
@@ -60,7 +92,7 @@
                     <gp-empty-state
                       icon="lucideUserX"
                       title="Nenhum usuário encontrado"
-                      [description]="searchControl.value ? 'Nenhum usuário corresponde à busca.' : 'Nenhum usuário cadastrado.'"
+                      [description]="searchControl.value || cargosControl.value.length || !ativosOnlyControl.value ? 'Nenhum usuário corresponde aos filtros.' : 'Nenhum usuário cadastrado.'"
                     />
                   </td>
                 </tr>
