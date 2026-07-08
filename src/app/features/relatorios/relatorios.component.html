@@ -72,8 +72,9 @@
       <button class="relatorios__retry-btn" (click)="buscar()">Tentar novamente</button>
     </div>
   } @else {
-    <div class="relatorios__table-wrapper">
-      <table z-table class="relatorios__table">
+    <div class="w-full">
+      <div class="overflow-hidden rounded-md border">
+        <table z-table>
         <thead z-table-header>
           <tr z-table-row>
             <th z-table-head>Vigia</th>
@@ -117,6 +118,7 @@
           }
         </tbody>
       </table>
+      </div>
     </div>
 
     @if (dataSource().length > 0) {

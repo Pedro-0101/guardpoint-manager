@@ -89,8 +89,9 @@
         </div>
       </z-card>
 
-      <div class="list-page__table-wrapper">
-        <table z-table class="list-page__table">
+      <div class="w-full">
+        <div class="overflow-hidden rounded-md border">
+          <table z-table>
           <thead z-table-header>
             <tr z-table-row>
               <th z-table-head>Posto</th>
@@ -201,54 +202,56 @@
                     @if (isExpanded(grupo.key)) {
                       <tr z-table-row class="detail-row">
                         <td z-table-cell [attr.colspan]="7">
-                          <div class="detail-panel">
-                            <table class="detail-table">
-                              <thead>
-                                <tr>
-                                  <th class="detail-th">Dia(s)</th>
-                                  <th class="detail-th">Horário</th>
-                                  <th class="detail-th text-center">Tolerância</th>
-                                  <th class="detail-th">Status</th>
-                                  <th class="detail-th">Ações</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                @for (escala of grupo.escalas; track escala.id) {
-                                  <tr class="detail-tr">
-                                    <td class="detail-td">
-                                      {{ formatarDias(escala.diaSemanaInicio, escala.diaSemanaFim) }}
-                                    </td>
-                                    <td class="detail-td">
-                                      {{ formatarHorario(escala.horaInicio, escala.horaFim) }}
-                                    </td>
-                                    <td class="detail-td text-center">
-                                      {{ escala.toleranciaMin }} min
-                                    </td>
-                                    <td class="detail-td">
-                                      <gp-status-badge
-                                        [status]="escala.ativo ? 'ativo' : 'cancelado'"
-                                      />
-                                    </td>
-                                    <td class="detail-td detail-actions">
-                                      @if (escala.ativo) {
-                                        <button
-                                          z-button
-                                          zType="ghost"
-                                          zSize="icon"
-                                          class="text-destructive"
-                                          zTooltip="Desativar"
-                                          (click)="confirmarExclusaoIndividual(escala); $event.stopPropagation()"
-                                          aria-label="Desativar escala"
-                                        >
-                                          <ng-icon name="lucideTrash2" />
-                                        </button>
-                                      }
-                                    </td>
+                           <div class="detail-panel">
+                              <table z-table>
+                                <thead z-table-header>
+                                  <tr z-table-row>
+                                    <th z-table-head>Dia(s)</th>
+                                    <th z-table-head>Horário</th>
+                                    <th z-table-head class="text-center">Tolerância</th>
+                                    <th z-table-head>Status</th>
+                                    <th z-table-head>Ações</th>
                                   </tr>
-                                }
-                              </tbody>
-                            </table>
-                          </div>
+                                </thead>
+                                <tbody z-table-body>
+                                  @for (escala of grupo.escalas; track escala.id) {
+                                    <tr z-table-row>
+                                      <td z-table-cell>
+                                        {{ formatarDias(escala.diaSemanaInicio, escala.diaSemanaFim) }}
+                                      </td>
+                                      <td z-table-cell>
+                                        {{ formatarHorario(escala.horaInicio, escala.horaFim) }}
+                                      </td>
+                                      <td z-table-cell class="text-center">
+                                        {{ escala.toleranciaMin }} min
+                                      </td>
+                                      <td z-table-cell>
+                                        <gp-status-badge
+                                          [status]="escala.ativo ? 'ativo' : 'cancelado'"
+                                        />
+                                      </td>
+                                      <td z-table-cell>
+                                        @if (escala.ativo) {
+                                          <div class="flex items-center gap-1">
+                                            <button
+                                              z-button
+                                              zType="ghost"
+                                              zSize="icon"
+                                              class="text-destructive"
+                                              zTooltip="Desativar"
+                                              (click)="confirmarExclusaoIndividual(escala); $event.stopPropagation()"
+                                              aria-label="Desativar escala"
+                                            >
+                                              <ng-icon name="lucideTrash2" />
+                                            </button>
+                                          </div>
+                                        }
+                                      </td>
+                                    </tr>
+                                  }
+                                </tbody>
+                              </table>
+                            </div>
                         </td>
                       </tr>
                     }
@@ -258,6 +261,7 @@
             }
           </tbody>
         </table>
+        </div>
       </div>
     }
   </div>
