@@ -44,7 +44,14 @@ export class ZardRadioRegistry {
   template: `
     <span [class]="classes()">
       @if (checked()) {
-        <span class="absolute top-1/2 left-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary"></span>
+        <svg viewBox="0 0 16 16" fill="none" class="h-4 w-4 overflow-visible">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" class="text-primary"/>
+          <circle cx="8" cy="8" r="4" fill="currentColor" class="text-primary"/>
+        </svg>
+      } @else {
+        <svg viewBox="0 0 16 16" fill="none" class="h-4 w-4 overflow-visible">
+          <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5" class="text-primary"/>
+        </svg>
       }
     </span>
     <ng-content />
