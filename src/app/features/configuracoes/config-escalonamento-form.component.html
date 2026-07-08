@@ -58,6 +58,20 @@
   </z-form-field>
 
   <z-form-field>
+    <z-form-label>Descrição</z-form-label>
+    <z-form-control>
+      <input
+        z-input
+        type="text"
+        formControlName="descricao"
+        placeholder="Ex: Notificação de sabotagem"
+        class="w-full"
+      />
+    </z-form-control>
+    <z-form-message>Descrição opcional para identificar este nível de escalonamento.</z-form-message>
+  </z-form-field>
+
+  <z-form-field>
     <z-form-label>Usuários notificados</z-form-label>
     <z-form-control>
       <z-select
@@ -65,6 +79,7 @@
         [zMaxLabelCount]="3"
         [formControl]="form.controls.usuarioIds"
         [zPlaceholder]="'Selecione os usuários...'"
+        class="!h-auto !min-h-9"
       >
         @for (usuario of usuarios(); track usuario.value) {
           <z-select-item [zValue]="usuario.value">{{ usuario.label }}</z-select-item>

@@ -41,9 +41,9 @@ import { ZardSelectItemComponent } from './select-item.component';
     >
       @if (zMultiple()) {
         @if (selectedValues().length > 0) {
-          <div class="flex flex-wrap gap-1 items-center overflow-hidden">
-            @for (value of selectedValues().slice(0, zMaxLabelCount()); track value) {
-              <span class="inline-flex items-center gap-1 rounded border border-border bg-secondary px-1.5 py-0.5 text-xs leading-none whitespace-nowrap">
+           <div class="flex flex-wrap gap-1 items-center">
+             @for (value of selectedValues().slice(0, zMaxLabelCount()); track value) {
+               <span class="inline-flex items-center gap-1 rounded border border-border bg-secondary px-1.5 py-0.5 text-xs leading-none">
                 {{ getItemLabel(value) }}
                 <button
                   type="button"

@@ -53,6 +53,7 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
   form = this.fb.nonNullable.group({
     nivel: [1, [Validators.required, Validators.min(1)]],
     atrasoMinutos: [5, [Validators.required, Validators.min(1)]],
+    descricao: [''],
     usuarioIds: [[] as string[]],
   });
 
@@ -64,6 +65,7 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
       this.form.patchValue({
         nivel: this.data.nivel,
         atrasoMinutos: this.data.atrasoMinutos,
+        descricao: this.data.descricao ?? '',
         usuarioIds: this.data.usuarioIds ?? [],
       });
       this.form.controls.nivel.disable();
@@ -98,11 +100,13 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
     const request$ = this.isEdit()
       ? this.configuracoesService.atualizarEscalonamento(this.data!.id, {
           atrasoMinutos: raw.atrasoMinutos,
+          descricao: raw.descricao,
           usuarioIds: raw.usuarioIds,
         } as UpdateEscalonamentoPayload)
       : this.configuracoesService.criarEscalonamento({
           nivel: raw.nivel,
           atrasoMinutos: raw.atrasoMinutos,
+          descricao: raw.descricao,
           usuarioIds: raw.usuarioIds,
         } as CreateEscalonamentoPayload);
 

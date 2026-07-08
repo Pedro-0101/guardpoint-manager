@@ -28,12 +28,14 @@ interface EmpresaDto {
 export interface CreateEscalonamentoPayload {
   nivel: number;
   atrasoMinutos: number;
+  descricao?: string;
   usuarioIds: string[];
 }
 
 export interface UpdateEscalonamentoPayload {
-  atrasoMinutos: number;
-  usuarioIds: string[];
+  atrasoMinutos?: number;
+  descricao?: string;
+  usuarioIds?: string[];
 }
 
 function mapEscalonamentoFromDto(dto: ConfigEscalonamentoDto): NivelEscalonamento {
@@ -81,16 +83,25 @@ export class ConfiguracoesService {
       atraso_minutos: data.atrasoMinutos,
       usuario_ids: data.usuarioIds,
     };
+    if (data.descricao !== undefined) {
+      body['descricao'] = data.descricao;
+    }
     return this.api
       .post<ConfigEscalonamentoDto>('/config/escalonamento', body)
       .pipe(map(mapEscalonamentoFromDto));
   }
 
   atualizarEscalonamento(id: string, data: UpdateEscalonamentoPayload): Observable<NivelEscalonamento> {
-    const body: Record<string, unknown> = {
-      atraso_minutos: data.atrasoMinutos,
-      usuario_ids: data.usuarioIds,
-    };
+    const body: Record<string, unknown> = {};
+    if (data.atrasoMinutos !== undefined) {
+      body['atraso_minutos'] = data.atrasoMinutos;
+    }
+    if (data.descricao !== undefined) {
+      body['descricao'] = data.descricao;
+    }
+    if (data.usuarioIds !== undefined) {
+      body['usuario_ids'] = data.usuarioIds;
+    }
     return this.api
       .put<ConfigEscalonamentoDto>(`/config/escalonamento/${id}`, body)
       .pipe(map(mapEscalonamentoFromDto));
