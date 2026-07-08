@@ -1,126 +1,94 @@
 <gp-page-layout>
-<div class="list-page">
-  <gp-config-nav />
-
-  <header class="list-page__header">
-    <div>
-      <h1 class="list-page__title">Escalonamento de alertas</h1>
-      <p class="list-page__subtitle">
-        Configure os níveis de atraso e os destinatários notificados via WhatsApp
-      </p>
-    </div>
-  </header>
-
-  @if (loading()) {
-    <div class="list-page__loading">
-      <gp-loading-spinner message="Carregando níveis de escalonamento..." />
-    </div>
-  } @else if (error(); as errorMsg) {
-    <div class="list-page__error">
-      <ng-icon name="lucideAlertCircle" />
-      <p>{{ errorMsg }}</p>
-      <button class="list-page__retry-btn" (click)="carregar()">Tentar novamente</button>
-    </div>
-  } @else {
-    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate>
-      @if (niveisArray.length === 0) {
-        <gp-empty-state
-          icon="lucideList"
-          title="Nenhum nível de escalonamento configurado"
-          description="Adicione um nível para começar a notificar atrasos via WhatsApp."
-        />
-      } @else {
-        <div class="niveis">
-          @for (nivel of niveisArray.controls; track $index) {
-            <div class="niveis__row" [formGroup]="nivel">
-              <div class="form-field niveis__field niveis__field--small">
-                <label class="form-label" for="nivel-input-{{ $index }}">Nível</label>
-                <input z-input id="nivel-input-{{ $index }}" type="number" formControlName="nivel" min="1" max="5" />
-                @if (nivelDuplicado($index)) {
-                  <p class="form-field__hint">Nível repetido em outra linha.</p>
-                }
-                @if (nivel.controls.nivel.invalid && nivel.controls.nivel.touched) {
-                  <p class="form-field__error">
-                    @if (nivel.controls.nivel.errors?.['required']) {
-                      Nível é obrigatório.
-                    } @else {
-                      Nível deve estar entre 1 e 5.
-                    }
-                  </p>
-                }
-              </div>
-
-              <div class="form-field niveis__field">
-                <label class="form-label" for="atraso-input-{{ $index }}">Atraso (minutos)</label>
-                <input z-input id="atraso-input-{{ $index }}" type="number" formControlName="atrasoMinutos" min="1" max="1440" />
-                @if (nivel.controls.atrasoMinutos.invalid && nivel.controls.atrasoMinutos.touched) {
-                  <p class="form-field__error">
-                    @if (nivel.controls.atrasoMinutos.errors?.['required']) {
-                      Atraso é obrigatório.
-                    } @else {
-                      Valor deve estar entre 1 e 1440 minutos.
-                    }
-                  </p>
-                }
-              </div>
-
-              <div class="form-field niveis__field">
-                <label class="form-label" for="whatsapp-input-{{ $index }}">WhatsApp</label>
-                <input
-                  z-input
-                  id="whatsapp-input-{{ $index }}"
-                  formControlName="whatsappPara"
-                  placeholder="Ex: 5511999999999"
-                />
-                @if (nivel.controls.whatsappPara.invalid && nivel.controls.whatsappPara.touched) {
-                  <p class="form-field__error">
-                    @if (nivel.controls.whatsappPara.errors?.['required']) {
-                      WhatsApp é obrigatório.
-                    } @else if (nivel.controls.whatsappPara.errors?.['maxlength']) {
-                      Máximo de 20 caracteres.
-                    } @else {
-                      Informe um número válido (10 a 15 dígitos).
-                    }
-                  </p>
-                }
-              </div>
-
-              <div class="form-field niveis__field">
-                <label class="form-label" for="cargo-input-{{ $index }}">Cargo alvo</label>
-                <input z-input id="cargo-input-{{ $index }}" formControlName="cargoAlvo" placeholder="Ex: Supervisor" />
-                @if (nivel.controls.cargoAlvo.invalid && nivel.controls.cargoAlvo.touched) {
-                  <p class="form-field__error">Máximo de 50 caracteres.</p>
-                }
-              </div>
-
-              <button
-                type="button"
-                z-button zType="ghost" zSize="icon"
-                class="text-destructive"
-                (click)="removerNivel($index)"
-                aria-label="Remover nível"
-              >
-                <ng-icon name="lucideTrash2" />
-              </button>
-            </div>
-          }
-        </div>
-      }
-
-      <div class="niveis__actions">
-        <button type="button" z-button zType="outline" [zDisabled]="niveisArray.length >= 5" (click)="adicionarNivel()">
-          <ng-icon name="lucidePlus" />
-          Adicionar nível
-        </button>
-
-        <button type="submit" z-button [zDisabled]="saving() || form.invalid">
-          @if (saving()) {
-            <gp-loading-spinner size="sm" />
-          }
-          Salvar
-        </button>
+  <div class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h1 class="list-page__title">Escalonamento</h1>
+        <p class="list-page__subtitle">Níveis de escalonamento para atrasos dos vigias</p>
       </div>
-    </form>
-  }
-</div>
+    </header>
+
+    @if (error(); as errorMsg) {
+      <div class="list-page__error">
+        <ng-icon name="lucideAlertCircle" />
+        <p>{{ errorMsg }}</p>
+        <button class="list-page__retry-btn" (click)="carregarEscalonamentos()">Tentar novamente</button>
+      </div>
+    } @else {
+      <z-card class="p-4 mb-6">
+        <div class="flex flex-wrap gap-4 items-end">
+          <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
+            <label class="form-label" for="esc-search-input">Buscar</label>
+            <div class="relative flex items-center">
+              <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+              <input z-input id="esc-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Descrição ou nível..." />
+            </div>
+          </div>
+        </div>
+      </z-card>
+
+      <div class="list-page__table-wrapper">
+        <table z-table class="list-page__table">
+          <thead z-table-header>
+            <tr z-table-row>
+              <th z-table-head>Nível</th>
+              <th z-table-head>Atraso (min)</th>
+              <th z-table-head>Descrição</th>
+              <th z-table-head>Usuários notificados</th>
+              <th z-table-head>Ações</th>
+            </tr>
+          </thead>
+          <tbody z-table-body>
+            @if (loading()) {
+              @for (row of [1,2,3,4,5]; track row) {
+                <tr z-table-row>
+                  <td z-table-cell><z-skeleton class="h-[14px] w-[40px] rounded" /></td>
+                  <td z-table-cell><z-skeleton class="h-[14px] w-[60px] rounded" /></td>
+                  <td z-table-cell><z-skeleton class="h-[14px] w-[180px] rounded" /></td>
+                  <td z-table-cell><z-skeleton class="h-[14px] w-[60px] rounded" /></td>
+                  <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
+                </tr>
+              }
+            } @else {
+              @if ((filteredEscalonamentos$ | async); as items) {
+                @if (items.length === 0) {
+                  <tr>
+                    <td z-table-cell [attr.colspan]="5">
+                      <gp-empty-state
+                        icon="lucideLayers"
+                        title="Nenhum nível configurado"
+                        [description]="searchControl.value ? 'Nenhum nível corresponde à busca.' : 'Nenhum nível de escalonamento cadastrado.'"
+                      />
+                    </td>
+                  </tr>
+                } @else {
+                  @for (item of items; track item.id) {
+                    <tr z-table-row>
+                      <td z-table-cell>
+                        <span class="inline-flex items-center justify-center rounded-full bg-muted size-7 text-sm font-semibold leading-none">
+                          {{ item.nivel }}
+                        </span>
+                      </td>
+                      <td z-table-cell>{{ item.atrasoMinutos }} min</td>
+                      <td z-table-cell>{{ item.descricao || '—' }}</td>
+                      <td z-table-cell>{{ item.usuarioIds?.length || 0 }} {{ (item.usuarioIds?.length || 0) === 1 ? 'usuário' : 'usuários' }}</td>
+                      <td z-table-cell class="list-page__actions">
+                        @if (!item.sistema) {
+                          <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Remover nível" (click)="confirmarExclusao(item)" aria-label="Remover nível">
+                            <ng-icon name="lucideTrash2" />
+                          </button>
+                        }
+                        @if (item.sistema) {
+                          <span class="text-xs text-muted-foreground italic">Sistema</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                }
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
 </gp-page-layout>

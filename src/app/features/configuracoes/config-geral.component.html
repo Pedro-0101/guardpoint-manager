@@ -1,67 +1,64 @@
 <gp-page-layout>
-<div class="settings-page">
-  <gp-config-nav />
+  <div class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h1 class="list-page__title">Configurações Gerais</h1>
+        <p class="list-page__subtitle">Dados e preferências da empresa</p>
+      </div>
+    </header>
 
-  <header class="settings-page__header">
-    <div>
-      <h1 class="settings-page__title">Configurações gerais</h1>
-      <p class="settings-page__subtitle">Dados e preferências da empresa</p>
-    </div>
-  </header>
-
-  @if (loading()) {
-    <div class="settings-page__loading">
-      <gp-loading-spinner message="Carregando configurações..." />
-    </div>
-  } @else if (error(); as errorMsg) {
-    <div class="settings-page__error">
-      <ng-icon name="lucideAlertCircle" />
-      <p>{{ errorMsg }}</p>
-      <button class="settings-page__retry-btn" (click)="carregar()">Tentar novamente</button>
-    </div>
-  } @else {
-    <form [formGroup]="form" (ngSubmit)="salvar()" novalidate class="settings-form">
-      <div class="form-field settings-form__field">
-        <label class="form-label" for="nome-empresa-input">Nome da empresa</label>
-        <input z-input id="nome-empresa-input" formControlName="nome" placeholder="Razão social ou nome fantasia" />
-        @if (form.controls.nome.invalid && form.controls.nome.touched) {
-          <p class="form-field__error">
-            @if (form.controls.nome.errors?.['required']) {
-              Nome é obrigatório.
-            } @else {
-              Máximo de 255 caracteres.
+    @if (error(); as errorMsg) {
+      <div class="list-page__error">
+        <ng-icon name="lucideAlertCircle" />
+        <p>{{ errorMsg }}</p>
+        <button class="list-page__retry-btn" (click)="carregarEmpresa()">Tentar novamente</button>
+      </div>
+    } @else {
+      <z-card class="p-6">
+        @if (loading()) {
+          <div class="config-grid">
+            @for (row of [1,2,3,4,5]; track row) {
+              <div class="config-field">
+                <z-skeleton class="h-3 w-24 rounded mb-2" />
+                <z-skeleton class="h-6 w-48 rounded" />
+              </div>
             }
-          </p>
-        }
-      </div>
-
-      <div class="settings-form__row">
-        <div class="settings-form__readonly">
-          <span class="settings-form__readonly-label">CNPJ</span>
-          <span class="settings-form__readonly-value">{{ empresa()?.cnpj }}</span>
-        </div>
-
-        <div class="settings-form__readonly">
-          <span class="settings-form__readonly-label">Status</span>
-          <gp-status-badge [status]="empresa()?.ativa ? 'ativo' : 'cancelado'" />
-        </div>
-      </div>
-
-      <!-- eslint-disable-next-line @angular-eslint/template/label-has-associated-control -->
-      <label class="settings-form__toggle">
-        <z-switch formControlName="alertaSonoro" />
-        Tocar som de alerta em coação
-      </label>
-
-      <div class="settings-form__actions">
-        <button type="submit" z-button [zDisabled]="saving() || form.invalid">
-          @if (saving()) {
-            <gp-loading-spinner size="sm" />
+          </div>
+        } @else {
+          @if (empresa(); as e) {
+            <div class="config-grid">
+              <div class="config-field">
+                <span class="config-field__label">Nome</span>
+                <span class="config-field__value">{{ e.nome }}</span>
+              </div>
+              <div class="config-field">
+                <span class="config-field__label">CNPJ</span>
+                <span class="config-field__value">{{ e.cnpj || '—' }}</span>
+              </div>
+              <div class="config-field">
+                <span class="config-field__label">Status</span>
+                <span class="config-field__value">
+                  <span class="config-badge" [class.config-badge--active]="e.ativa" [class.config-badge--inactive]="!e.ativa">
+                    {{ e.ativa ? 'Ativa' : 'Inativa' }}
+                  </span>
+                </span>
+              </div>
+              <div class="config-field">
+                <span class="config-field__label">Alerta sonoro</span>
+                <span class="config-field__value">
+                  <span class="config-badge" [class.config-badge--active]="e.alertaSonoro" [class.config-badge--inactive]="!e.alertaSonoro">
+                    {{ e.alertaSonoro ? 'Ativado' : 'Desativado' }}
+                  </span>
+                </span>
+              </div>
+              <div class="config-field">
+                <span class="config-field__label">Cadastrada em</span>
+                <span class="config-field__value">{{ e.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+            </div>
           }
-          Salvar
-        </button>
-      </div>
-    </form>
-  }
-</div>
+        }
+      </z-card>
+    }
+  </div>
 </gp-page-layout>

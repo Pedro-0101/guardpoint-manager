@@ -3,7 +3,8 @@ export interface NivelEscalonamento {
   empresaId: string;
   nivel: number;
   atrasoMinutos: number;
-  cargoAlvo: string | null;
-  whatsappPara: string;
+  descricao?: string;
+  sistema: boolean;
+  usuarioIds: string[] | null;
   createdAt: string;
 }
