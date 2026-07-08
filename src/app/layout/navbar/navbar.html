@@ -107,7 +107,13 @@
       }
     </button>
 
-    <button class="navbar__icon-btn navbar__notifications">
+    <button
+      class="navbar__icon-btn navbar__notifications"
+      z-menu
+      zTrigger="click"
+      zPlacement="bottomRight"
+      [zMenuTriggerFor]="notificationPanel"
+    >
       <ng-icon name="lucideBell" />
       @if (notificationCount() > 0) {
         <z-badge
@@ -118,6 +124,11 @@
         </z-badge>
       }
     </button>
+    <ng-template #notificationPanel>
+      <div z-menu-content class="w-[380px] p-0 overflow-hidden" (click)="$event.stopPropagation()">
+        <gp-notification-list />
+      </div>
+    </ng-template>
 
     <div class="navbar__user">
       <gp-avatar [name]="userName()" size="sm" />

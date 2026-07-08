@@ -1,0 +1,52 @@
+<div class="notification-panel">
+  <div class="notification-panel__header">
+    <div class="notification-panel__header-left">
+      <ng-icon name="lucideBell" class="notification-panel__header-icon" />
+      <span class="notification-panel__title">Notificações</span>
+    </div>
+    @if (openCount() > 0) {
+      <span class="notification-panel__count">{{ openCount() }} nova(s)</span>
+    }
+  </div>
+
+  <z-divider zSpacing="sm" />
+
+  <div class="notification-panel__list">
+    @for (item of notifications(); track item.id) {
+      <button class="notification-panel__item" type="button">
+        <div
+          class="notification-panel__item-icon"
+          [style.background]="iconBg(item.gravidade)"
+          [style.color]="iconColor(item.gravidade)"
+        >
+          <ng-icon [name]="tipoIcon(item.tipo)" class="size-4" />
+        </div>
+        <div class="notification-panel__item-content">
+          <div class="notification-panel__item-header">
+            <span class="notification-panel__item-tipo">{{ tipoLabel(item.tipo) }}</span>
+            @if (item.status === 'aberto') {
+              <span class="notification-panel__item-dot"></span>
+            } @else {
+              <span class="notification-panel__item-status">{{ statusLabel(item.status) }}</span>
+            }
+          </div>
+          <p class="notification-panel__item-desc">{{ item.mensagem }}</p>
+          <span class="notification-panel__item-time">{{ item.tempo }}</span>
+        </div>
+      </button>
+    } @empty {
+      <div class="notification-panel__empty">
+        <ng-icon name="lucideBellOff" class="notification-panel__empty-icon" />
+        <span class="notification-panel__empty-title">Nenhuma notificação</span>
+        <span class="notification-panel__empty-desc">Você está em dia com todos os alertas</span>
+      </div>
+    }
+  </div>
+
+  <z-divider zSpacing="sm" />
+
+  <a routerLink="/alertas" class="notification-panel__footer">
+    Ver todos os alertas
+    <ng-icon name="lucideChevronRight" class="size-4" />
+  </a>
+</div>

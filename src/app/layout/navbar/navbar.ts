@@ -23,6 +23,7 @@ import { ZardButtonComponent } from '../../shared/components/button/button.compo
 import { ZardBadgeComponent } from '../../shared/components/badge/badge.component';
 import { ZardMenuImports } from '../../shared/components/menu/menu.imports';
 import { GpAvatarComponent } from '../../shared/components/avatar/gp-avatar';
+import { NotificationListComponent } from '../../shared/components/notification-list/notification-list';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
@@ -34,6 +35,7 @@ import { ThemeService } from '../../core/services/theme.service';
     ZardButtonComponent,
     ZardBadgeComponent,
     GpAvatarComponent,
+    NotificationListComponent,
     ...ZardMenuImports,
   ],
   templateUrl: './navbar.html',
