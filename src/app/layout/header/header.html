@@ -27,9 +27,7 @@
     </button>
 
     <div class="header__user">
-      <div class="header__avatar">
-        <ng-icon name="lucideUser" />
-      </div>
+      <gp-avatar [name]="userName()" size="sm" />
       <div class="header__user-info">
         <span class="header__user-name">{{ userName() }}</span>
         @if (userRole()) {

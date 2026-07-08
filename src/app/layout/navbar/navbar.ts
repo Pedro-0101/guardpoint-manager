@@ -22,6 +22,7 @@ import {
 import { ZardButtonComponent } from '../../shared/components/button/button.component';
 import { ZardBadgeComponent } from '../../shared/components/badge/badge.component';
 import { ZardMenuImports } from '../../shared/components/menu/menu.imports';
+import { GpAvatarComponent } from '../../shared/components/avatar/gp-avatar';
 import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
@@ -32,6 +33,7 @@ import { ThemeService } from '../../core/services/theme.service';
     NgIcon,
     ZardButtonComponent,
     ZardBadgeComponent,
+    GpAvatarComponent,
     ...ZardMenuImports,
   ],
   templateUrl: './navbar.html',

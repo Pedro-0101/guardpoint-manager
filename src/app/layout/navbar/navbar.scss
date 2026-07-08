@@ -109,21 +109,6 @@
   }
 }
 
-.navbar__avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  ng-icon {
-    font-size: 18px;
-  }
-}
-
 .navbar__user-info {
   display: flex;
   flex-direction: column;

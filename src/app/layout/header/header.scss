@@ -74,21 +74,6 @@
   }
 }
 
-.header__avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  span {
-    font-size: 20px;
-  }
-}
-
 .header__user-info {
   display: flex;
   flex-direction: column;
