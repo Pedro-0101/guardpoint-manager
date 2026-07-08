@@ -27,7 +27,7 @@
 
     <div class="form-field">
       <label class="form-label" for="intervalo-input">Intervalo de check-in (minutos)</label>
-      <input z-input id="intervalo-input" type="number" formControlName="intervalo_min" min="1" max="120" placeholder="Opcional" />
+      <input z-input id="intervalo-input" type="number" formControlName="intervalo_min" placeholder="Opcional" [zNumeric]="true" [zMin]="1" [zMax]="120" [zStep]="1" />
       @if (form.controls.intervalo_min.invalid && form.controls.intervalo_min.touched) {
         <p class="form-field__error">Valor deve estar entre 1 e 120 minutos.</p>
       }

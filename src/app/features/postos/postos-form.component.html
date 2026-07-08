@@ -89,7 +89,7 @@
   <z-form-field>
     <z-form-label [zRequired]="true">Raio de tolerância (metros)</z-form-label>
     <z-form-control>
-      <input z-input type="number" formControlName="raioM" min="10" max="5000" class="w-full" />
+      <input z-input type="number" formControlName="raioM" class="w-full" [zNumeric]="true" [zMin]="10" [zMax]="5000" [zStep]="1" />
     </z-form-control>
     @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
       <z-form-message [zError]="true">

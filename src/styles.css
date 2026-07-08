@@ -145,6 +145,35 @@
     appearance: textfield;
   }
 
+  input.show-spinner[type="number"]::-webkit-inner-spin-button,
+  input.show-spinner[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: auto;
+    margin: initial;
+    background: inherit;
+    opacity: 0.8;
+    cursor: pointer;
+  }
+
+  input.show-spinner[type="number"]::-webkit-inner-spin-button:hover,
+  input.show-spinner[type="number"]::-webkit-outer-spin-button:hover {
+    opacity: 1;
+  }
+
+  input.show-spinner[type="number"] {
+    -moz-appearance: auto;
+    appearance: auto;
+    color-scheme: light;
+  }
+
+  .dark input.show-spinner[type="number"] {
+    color-scheme: light;
+  }
+
+  .dark input.show-spinner[type="number"]::-webkit-inner-spin-button,
+  .dark input.show-spinner[type="number"]::-webkit-outer-spin-button {
+    filter: invert(1) hue-rotate(180deg);
+  }
+
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus,
@@ -186,4 +215,24 @@ input:autofill {
 ::-webkit-scrollbar-track {
   border-radius: 5px;
   background: var(--muted);
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+input.shake,
+textarea.shake {
+  animation: shake 0.4s ease-in-out;
 }
