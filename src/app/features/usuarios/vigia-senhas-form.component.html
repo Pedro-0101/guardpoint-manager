@@ -29,6 +29,7 @@
               [formControl]="okCodigo"
               placeholder="4 a 6 dígitos"
               class="w-full max-w-[180px]"
+              autocomplete="new-password"
             />
           </z-form-control>
           @if (okCodigo.invalid && okCodigo.touched) {
@@ -72,6 +73,7 @@
               [formControl]="emergenciaCodigo"
               placeholder="4 a 6 dígitos"
               class="w-full max-w-[180px]"
+              autocomplete="new-password"
             />
           </z-form-control>
           @if (emergenciaCodigo.invalid && emergenciaCodigo.touched) {
@@ -124,6 +126,7 @@
                     formControlName="codigo"
                     placeholder="4 a 6 dígitos"
                     class="w-full"
+                    autocomplete="new-password"
                   />
                 </z-form-control>
                 @if (novoCustomForm.controls.codigo.invalid && novoCustomForm.controls.codigo.touched) {
@@ -206,6 +209,7 @@
                         [formControl]="form.codigo"
                         placeholder="4 a 6 dígitos"
                         class="w-full"
+                        autocomplete="new-password"
                       />
                     </z-form-control>
                     @if (form.codigo.invalid && form.codigo.touched) {

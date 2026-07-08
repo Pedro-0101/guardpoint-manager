@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
-import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
+import { Subject, ReplaySubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosFormComponent } from './usuarios-form.component';
@@ -70,7 +70,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
 
   readonly cargoOptions = CARGO_OPTIONS;
 
-  private readonly usuariosSubject = new BehaviorSubject<Usuario[]>([]);
+  private readonly usuariosSubject = new ReplaySubject<Usuario[]>(1);
   readonly usuarios$ = this.usuariosSubject.asObservable();
 
   readonly loading = signal(true);

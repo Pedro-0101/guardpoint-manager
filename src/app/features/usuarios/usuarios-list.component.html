@@ -24,7 +24,7 @@
           <label class="form-label" for="usuario-search-input">Buscar usuário</label>
           <div class="relative flex items-center">
             <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-            <input z-input id="usuario-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome ou email..." />
+            <input z-input id="usuario-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome ou email..." autocomplete="off" />
           </div>
         </div>
 
@@ -100,10 +100,12 @@
               } @else {
                 @for (usuario of usuarios; track usuario.id) {
                   <tr z-table-row>
-                    <td z-table-cell class="flex items-center gap-3">
-                    <gp-avatar [name]="usuario.nome" size="sm" />
-                    {{ usuario.nome }}
-                  </td>
+                    <td z-table-cell>
+                      <div class="flex items-center gap-3">
+                        <gp-avatar [name]="usuario.nome" size="sm" />
+                        {{ usuario.nome }}
+                      </div>
+                    </td>
                     <td z-table-cell>{{ usuario.email }}</td>
                     <td z-table-cell>{{ cargoLabel(usuario.cargo) }}</td>
                     <td z-table-cell>
