@@ -88,7 +88,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    console.log('[VigiaSenhasForm] ngOnInit', { usuarioId: this.usuario.id, usuarioNome: this.usuario.nome });
     this.carregarDados();
   }
 
@@ -132,13 +131,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   private inicializarForms(): void {
     const ok = this.okSenha();
     const emergencia = this.emergenciaSenha();
-    const custom = this.customSenhas();
-    console.log('[VigiaSenhasForm] inicializarForms', {
-      ok: ok?.codigo,
-      emergencia: emergencia?.codigo,
-      customizadas: custom.length,
-      senhasTotal: this.senhas().length,
-    });
 
     if (ok) {
       this.okCodigo.setValue(ok.codigo);
@@ -171,13 +163,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   }
 
   salvarOk(): void {
-    console.log('[VigiaSenhasForm] salvarOk chamado', {
-      invalid: this.okCodigo.invalid,
-      saving: this.savingOk(),
-      value: this.okCodigo.value,
-      okSenha: this.okSenha(),
-    });
-
     if (this.okCodigo.invalid) {
       this.okCodigo.markAsTouched();
       return;
@@ -209,13 +194,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   }
 
   salvarEmergencia(): void {
-    console.log('[VigiaSenhasForm] salvarEmergencia chamado', {
-      invalid: this.emergenciaCodigo.invalid,
-      saving: this.savingEmergencia(),
-      value: this.emergenciaCodigo.value,
-      emergenciaSenha: this.emergenciaSenha(),
-    });
-
     if (this.emergenciaCodigo.invalid) {
       this.emergenciaCodigo.markAsTouched();
       return;
@@ -247,7 +225,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   }
 
   salvarCustom(senhaId: string): void {
-    console.log('[VigiaSenhasForm] salvarCustom chamado', { senhaId, savingCustomId: this.savingCustomId() });
     const form = this.customForms[senhaId];
     if (!form) {
       this.notification.error('Senha customizada não encontrada. Recarregue o diálogo.');
@@ -291,7 +268,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   }
 
   removerCustom(senhaId: string): void {
-    console.log('[VigiaSenhasForm] removerCustom chamado', { senhaId });
     if (this.deletingSenhaId()) return;
 
     this.deletingSenhaId.set(senhaId);
@@ -314,7 +290,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   }
 
   criarCustom(): void {
-    console.log('[VigiaSenhasForm] criarCustom chamado', { invalid: this.novoCustomForm.invalid, saving: this.savingNewCustom(), values: this.novoCustomForm.getRawValue() });
     if (this.novoCustomForm.invalid) {
       this.novoCustomForm.markAllAsTouched();
       return;

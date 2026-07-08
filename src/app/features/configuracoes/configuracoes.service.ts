@@ -104,7 +104,9 @@ export class ConfiguracoesService {
     }
     return this.api
       .put<ConfigEscalonamentoDto>(`/config/escalonamento/${id}`, body)
-      .pipe(map(mapEscalonamentoFromDto));
+      .pipe(
+        map((dto) => mapEscalonamentoFromDto(dto)),
+      );
   }
 
   removerEscalonamento(id: string): Observable<void> {

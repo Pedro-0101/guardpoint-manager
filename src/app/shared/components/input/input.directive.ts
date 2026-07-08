@@ -146,6 +146,7 @@ export class ZardInputDirective implements OnDestroy {
   private readonly el = inject(ElementRef<HTMLElement>);
   private readonly renderer = inject(Renderer2);
   private readonly unlisteners: (() => void)[] = [];
+  private wheelUnlistener: (() => void) | null = null;
 
   constructor() {
     effect(() => {
@@ -169,6 +170,20 @@ export class ZardInputDirective implements OnDestroy {
       }
     });
 
+    effect(() => {
+      if (this.wheelUnlistener) {
+        this.wheelUnlistener();
+        this.wheelUnlistener = null;
+      }
+
+      if (this.zNumeric()) {
+        const native = this.el.nativeElement;
+        const handler = (event: WheelEvent) => this.onWheel(event);
+        native.addEventListener('wheel', handler, { passive: false });
+        this.wheelUnlistener = () => native.removeEventListener('wheel', handler);
+      }
+    });
+
     this.unlisteners.push(
       this.renderer.listen(this.el.nativeElement, 'blur', () => this.clampAndShake()),
     );
@@ -180,13 +195,13 @@ export class ZardInputDirective implements OnDestroy {
     this.unlisteners.push(
       this.renderer.listen(this.el.nativeElement, 'keydown', (event: KeyboardEvent) => this.onKeydown(event)),
     );
-
-    this.unlisteners.push(
-      this.renderer.listen(this.el.nativeElement, 'wheel', (event: WheelEvent) => this.onWheel(event)),
-    );
   }
 
   ngOnDestroy(): void {
+    if (this.wheelUnlistener) {
+      this.wheelUnlistener();
+      this.wheelUnlistener = null;
+    }
     for (const unlisten of this.unlisteners) {
       unlisten();
     }
