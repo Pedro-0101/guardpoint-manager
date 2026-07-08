@@ -27,6 +27,33 @@
               <input z-input id="esc-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Descrição ou nível..." />
             </div>
           </div>
+
+          <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-[260px]">
+            <label class="form-label" for="filtro-usuarios-select">Usuários notificados</label>
+            <z-select
+              id="filtro-usuarios-select"
+              [zMultiple]="true"
+              [formControl]="usuariosControl"
+              [zPlaceholder]="'Todos os usuários'"
+            >
+              @for (usuario of usuarios(); track usuario.id) {
+                <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
+              }
+            </z-select>
+          </div>
+
+          <div class="flex items-center gap-3 min-w-fit">
+            <button
+              z-button
+              zType="ghost"
+              zSize="sm"
+              class="text-muted-foreground"
+              (click)="limparTodosFiltros()"
+            >
+              <ng-icon name="lucideX" class="size-3.5" />
+              Limpar filtros
+            </button>
+          </div>
         </div>
       </z-card>
 
@@ -60,7 +87,7 @@
                       <gp-empty-state
                         icon="lucideLayers"
                         title="Nenhum nível configurado"
-                        [description]="searchControl.value ? 'Nenhum nível corresponde à busca.' : 'Nenhum nível de escalonamento cadastrado.'"
+                        [description]="searchControl.value || usuariosControl.value.length ? 'Nenhum nível corresponde aos filtros.' : 'Nenhum nível de escalonamento cadastrado.'"
                       />
                     </td>
                   </tr>
