@@ -14,7 +14,6 @@ import { ZardInputDirective } from '@/shared/components/input';
 import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
-import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { NotificationService } from '../../core/services/notification.service';
@@ -31,7 +30,6 @@ import { ConfigEscalonamento } from '../../core/models/config.model';
     ZardCardComponent,
     NgIcon,
     ZardSkeletonComponent,
-    StatusBadge,
     EmptyState,
     PageLayoutComponent,
     ...ZardTooltipImports,
