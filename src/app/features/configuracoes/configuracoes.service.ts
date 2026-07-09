@@ -16,6 +16,7 @@ interface ConfigEscalonamentoDto {
   descricao?: string;
   usuario_ids: string[];
   sistema: boolean;
+  em_uso: boolean;
   created_at: string;
 }
 
@@ -37,6 +38,7 @@ function mapEscalonamentoFromDto(dto: ConfigEscalonamentoDto): ConfigEscalonamen
     descricao: dto.descricao,
     usuarioIds: dto.usuario_ids ?? [],
     sistema: dto.sistema,
+    emUso: dto.em_uso,
     createdAt: dto.created_at,
   };
 }

@@ -44,7 +44,7 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
   readonly isEdit = signal(false);
 
   form = this.fb.nonNullable.group({
-    atrasoMinutos: [5, [Validators.required, Validators.min(1)]],
+    atrasoMinutos: [0, [Validators.required, Validators.min(0)]],
     descricao: [''],
     usuarioIds: [[] as string[], [Validators.required]],
   });

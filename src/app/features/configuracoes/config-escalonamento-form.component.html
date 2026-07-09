@@ -9,7 +9,7 @@
         placeholder="Ex: 5"
         class="w-full"
         [zNumeric]="true"
-        [zMin]="1"
+        [zMin]="0"
         [zMax]="1440"
         [zStep]="1"
       />
@@ -19,7 +19,7 @@
         @if (form.controls.atrasoMinutos.errors?.['required']) {
           Atraso é obrigatório.
         } @else if (form.controls.atrasoMinutos.errors?.['min']) {
-          O atraso deve ser maior que 0.
+          O atraso não pode ser negativo.
         }
       </z-form-message>
     } @else {

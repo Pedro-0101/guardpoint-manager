@@ -5,6 +5,7 @@ export interface ConfigEscalonamento {
   descricao?: string;
   usuarioIds: string[];
   sistema: boolean;
+  emUso: boolean;
   createdAt: string;
 }
 

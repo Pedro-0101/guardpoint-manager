@@ -4,9 +4,11 @@ import { NgIcon } from '@ng-icons/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UsuariosService, CreateSenhaVigiaPayload, UpdateSenhaVigiaPayload } from './usuarios.service';
+import { ConfiguracoesService } from '../configuracoes/configuracoes.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
+import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
 import {
   ZardFormFieldComponent,
   ZardFormLabelComponent,
@@ -18,9 +20,11 @@ import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Usuario } from '../../core/models/usuario.model';
 import { SenhaVigia } from '../../core/models/senha.model';
+import { ConfigEscalonamento } from '../../core/models/config.model';
 
 interface CustomFormControls {
   codigo: FormControl<string>;
+  escalonamentoId: FormControl<string | null>;
 }
 
 @Component({
@@ -34,12 +38,15 @@ interface CustomFormControls {
     ZardFormControlComponent,
     ZardFormMessageComponent,
     ZardSkeletonComponent,
+    ZardSelectComponent,
+    ZardSelectItemComponent,
     NgIcon,
   ],
   templateUrl: './vigia-senhas-form.component.html',
 })
 export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   private readonly usuariosService = inject(UsuariosService);
+  private readonly configuracoesService = inject(ConfiguracoesService);
   private readonly notification = inject(NotificationService);
   private readonly dialogRef = inject(ZardDialogRef<VigiaSenhasFormComponent>);
   private readonly fb = inject(FormBuilder);
@@ -48,10 +55,13 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
 
   readonly loading = signal(true);
   readonly senhas = signal<SenhaVigia[]>([]);
+  readonly escalonamentos = signal<ConfigEscalonamento[]>([]);
 
   readonly okSenha = computed(() => this.senhas().find((s) => s.tipo === 'ok') ?? null);
   readonly emergenciaSenha = computed(() => this.senhas().find((s) => s.tipo === 'emergencia') ?? null);
   readonly customSenhas = computed(() => this.senhas().filter((s) => s.tipo === 'customizada'));
+  readonly escalonamentosSistema = computed(() => this.escalonamentos().filter((e) => e.sistema));
+  readonly escalonamentoSistemaId = computed(() => this.escalonamentosSistema()[0]?.id ?? null);
 
   private readonly atLeastTwoNumbers = (control: FormControl<string>): ValidationErrors | null => {
     const digitCount = (control.value.match(/\d/g) ?? []).length;
@@ -77,12 +87,14 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   readonly showingNewCustom = signal(false);
   readonly savingNewCustom = signal(false);
 
-  novoCustomForm = this.fb.nonNullable.group({
-    codigo: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers]],
+  novoCustomForm = this.fb.group({
+    codigo: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers]),
+    escalonamentoId: this.fb.control<string | null>(null, [Validators.required]),
   });
 
   ngOnInit(): void {
     this.carregarDados();
+    this.carregarEscalonamentos();
   }
 
   ngOnDestroy(): void {
@@ -130,11 +142,37 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
     this.loading.set(false);
   }
 
+  private carregarEscalonamentos(): void {
+    this.configuracoesService
+      .listarEscalonamentos()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (list) => {
+          this.escalonamentos.set(list);
+        },
+        error: (err) => {
+          console.error('[VigiaSenhasForm] Erro ao carregar escalonamentos:', err);
+          this.notification.error(err.message ?? 'Erro ao carregar escalonamentos.');
+        },
+      });
+  }
+
+  escalonamentosDisponiveis(escalonamentoAtualId: string | null): ConfigEscalonamento[] {
+    return this.escalonamentos().filter((e) => {
+      if (e.id === escalonamentoAtualId) return true;
+      if (e.sistema || e.atrasoMinutos !== 0) return false;
+      return !e.emUso;
+    });
+  }
+
   private buildCustomForm(senha: SenhaVigia): CustomFormControls {
     return {
       codigo: new FormControl(senha.codigo, {
         nonNullable: true,
         validators: [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers],
+      }),
+      escalonamentoId: new FormControl(senha.escalonamentoId, {
+        validators: [Validators.required],
       }),
     };
   }
@@ -175,14 +213,19 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
       this.emergenciaCodigo.markAsTouched();
       return;
     }
+    if (!this.escalonamentoSistemaId()) {
+      this.notification.error('Nível de escalonamento do sistema não encontrado.');
+      return;
+    }
     if (this.savingEmergencia()) return;
 
     this.savingEmergencia.set(true);
     const emergencia = this.emergenciaSenha();
+    const escalonamentoId = this.escalonamentoSistemaId() ?? undefined;
 
     const request$ = emergencia
-      ? this.usuariosService.atualizarSenha(this.usuario.id, emergencia.id, { codigo: this.emergenciaCodigo.value })
-      : this.usuariosService.criarSenha(this.usuario.id, { tipo: 'emergencia', codigo: this.emergenciaCodigo.value });
+      ? this.usuariosService.atualizarSenha(this.usuario.id, emergencia.id, { codigo: this.emergenciaCodigo.value, escalonamentoId })
+      : this.usuariosService.criarSenha(this.usuario.id, { tipo: 'emergencia', codigo: this.emergenciaCodigo.value, escalonamentoId });
 
     request$
       .pipe(takeUntil(this.destroy$))
@@ -207,8 +250,9 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
       this.notification.error('Senha customizada não encontrada. Recarregue o diálogo.');
       return;
     }
-    if (form.codigo.invalid) {
+    if (form.codigo.invalid || form.escalonamentoId.invalid) {
       form.codigo.markAsTouched();
+      form.escalonamentoId.markAsTouched();
       return;
     }
     if (this.savingCustomId()) return;
@@ -216,6 +260,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
     this.savingCustomId.set(senhaId);
     const payload: UpdateSenhaVigiaPayload = {
       codigo: form.codigo.value,
+      escalonamentoId: form.escalonamentoId.value ?? undefined,
     };
 
     this.usuariosService
@@ -270,6 +315,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
     const payload: CreateSenhaVigiaPayload = {
       tipo: 'customizada',
       codigo: raw.codigo,
+      escalonamentoId: raw.escalonamentoId ?? undefined,
     };
 
     this.usuariosService

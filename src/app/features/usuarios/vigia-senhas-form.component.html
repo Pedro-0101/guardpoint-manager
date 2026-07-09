@@ -12,7 +12,7 @@
       <h4 class="font-medium text-sm">Senha OK</h4>
       <p class="text-xs text-muted-foreground mt-0.5 mb-3">
         @if (okSenha()) {
-          Código atual: <strong>{{ okSenha()?.codigo }}</strong>. Altere abaixo.
+          Configure um novo código de 2 a 6 caracteres para alterar a senha atual.
         } @else {
           Senha ainda não definida. Configure um código de 2 a 6 caracteres.
         }
@@ -62,7 +62,7 @@
       <h4 class="font-medium text-sm">Senha de Emergência</h4>
       <p class="text-xs text-muted-foreground mt-0.5 mb-3">
         @if (emergenciaSenha()) {
-          Código atual: <strong>{{ emergenciaSenha()?.codigo }}</strong>. Altere abaixo.
+          Configure um novo código de 2 a 6 caracteres para alterar a senha atual.
         } @else {
           Senha ainda não definida. Configure um código de 2 a 6 caracteres.
         }
@@ -150,7 +150,27 @@
                 }
               }
             </z-form-field>
-  
+
+            <z-form-field>
+              <z-form-label [zRequired]="true">Escalonamento</z-form-label>
+              <z-form-control>
+                <z-select
+                  formControlName="escalonamentoId"
+                  [zPlaceholder]="'Selecione o nível...'"
+                  class="w-full"
+                >
+                  @for (esc of escalonamentosDisponiveis(null); track esc.id) {
+                    <z-select-item [zValue]="esc.id">
+                      {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
+                    </z-select-item>
+                  }
+                </z-select>
+              </z-form-control>
+              @if (novoCustomForm.controls.escalonamentoId.invalid && novoCustomForm.controls.escalonamentoId.touched) {
+                <z-form-message [zError]="true">Selecione um nível de escalonamento.</z-form-message>
+              }
+            </z-form-field>
+
             <div class="flex items-center gap-2 justify-end">
               <button type="button" z-button zType="ghost" zSize="sm" (click)="cancelarNovaCustom()">
                 Cancelar
@@ -207,7 +227,27 @@
                     }
                   }
                 </z-form-field>
-  
+
+                <z-form-field class="mb-3">
+                  <z-form-label [zRequired]="true">Escalonamento</z-form-label>
+                  <z-form-control>
+                    <z-select
+                      [formControl]="form.escalonamentoId"
+                      [zPlaceholder]="'Selecione o nível...'"
+                      class="w-full"
+                    >
+                      @for (esc of escalonamentosDisponiveis(form.escalonamentoId.value); track esc.id) {
+                        <z-select-item [zValue]="esc.id">
+                          {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
+                        </z-select-item>
+                      }
+                    </z-select>
+                  </z-form-control>
+                  @if (form.escalonamentoId.invalid && form.escalonamentoId.touched) {
+                    <z-form-message [zError]="true">Selecione um nível de escalonamento.</z-form-message>
+                  }
+                </z-form-field>
+
                 <div class="flex items-center gap-2 justify-end">
                   <button
                     type="button"
@@ -230,7 +270,7 @@
                     z-button
                     zSize="sm"
                     (click)="salvarCustom(senha.id)"
-                    [zDisabled]="savingCustomId() === senha.id || form.codigo.invalid"
+                    [zDisabled]="savingCustomId() === senha.id || form.codigo.invalid || form.escalonamentoId.invalid"
                   >
                     @if (savingCustomId() === senha.id) {
                       Salvando...
