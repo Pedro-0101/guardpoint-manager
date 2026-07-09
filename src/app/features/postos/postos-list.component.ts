@@ -12,6 +12,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { ZardSegmentedComponent } from '@/shared/components/segmented/segmented.component';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
@@ -28,6 +29,7 @@ import { Posto } from '../../core/models/posto.model';
     ZardButtonComponent,
     ZardInputDirective,
     ZardCardComponent,
+    ZardSegmentedComponent,
     NgIcon,
     ZardSkeletonComponent,
     StatusBadge,
@@ -39,6 +41,12 @@ import { Posto } from '../../core/models/posto.model';
   styleUrl: './postos-list.component.scss',
 })
 export class PostosListComponent implements OnInit, OnDestroy {
+  readonly tabOptions = [
+    { value: 'lista', label: 'Lista' },
+    { value: 'mapa', label: 'Mapa' },
+  ];
+
+  readonly selectedTab = signal<string>('lista');
   private readonly postosService = inject(PostosService);
   private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
