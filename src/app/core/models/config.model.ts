@@ -12,4 +12,3 @@ export interface CreateEscalonamentoPayload {
   descricao?: string;
   usuarioIds: string[];
 }
-

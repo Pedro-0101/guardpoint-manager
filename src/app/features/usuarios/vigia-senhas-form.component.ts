@@ -1,9 +1,11 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormBuilder, ReactiveFormsModule, Validators, ValidationErrors } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UsuariosService, CreateSenhaVigiaPayload, UpdateSenhaVigiaPayload } from './usuarios.service';
+import { ConfiguracoesService } from '../configuracoes/configuracoes.service';
+import { ConfigEscalonamento } from '../../core/models/config.model';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
@@ -23,6 +25,7 @@ import { SenhaVigia } from '../../core/models/senha.model';
 interface CustomFormControls {
   codigo: FormControl<string>;
   descricao: FormControl<string>;
+  escalonamentoId: FormControl<string | null>;
 }
 
 @Component({
@@ -44,6 +47,7 @@ interface CustomFormControls {
 })
 export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   private readonly usuariosService = inject(UsuariosService);
+  private readonly configuracoesService = inject(ConfiguracoesService);
   private readonly notification = inject(NotificationService);
   private readonly dialogRef = inject(ZardDialogRef<VigiaSenhasFormComponent>);
   private readonly fb = inject(FormBuilder);
@@ -52,18 +56,24 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
 
   readonly loading = signal(true);
   readonly senhas = signal<SenhaVigia[]>([]);
+  readonly escalonamentos = signal<ConfigEscalonamento[]>([]);
 
   readonly okSenha = computed(() => this.senhas().find((s) => s.tipo === 'ok') ?? null);
   readonly emergenciaSenha = computed(() => this.senhas().find((s) => s.tipo === 'emergencia') ?? null);
   readonly customSenhas = computed(() => this.senhas().filter((s) => s.tipo === 'customizada'));
 
+  private readonly atLeastTwoNumbers = (control: FormControl<string>): ValidationErrors | null => {
+    const digitCount = (control.value.match(/\d/g) ?? []).length;
+    return digitCount >= 2 ? null : { atLeastTwoNumbers: { required: 2, actual: digitCount } };
+  };
+
   readonly okCodigo = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, Validators.minLength(4), Validators.maxLength(6)],
+    validators: [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers],
   });
   readonly emergenciaCodigo = new FormControl('', {
     nonNullable: true,
-    validators: [Validators.required, Validators.minLength(4), Validators.maxLength(6)],
+    validators: [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers],
   });
 
   customForms: Record<string, CustomFormControls> = {};
@@ -77,12 +87,27 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   readonly savingNewCustom = signal(false);
 
   novoCustomForm = this.fb.nonNullable.group({
-    codigo: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(6)]],
+    codigo: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers]],
     descricao: [''],
+    escalonamentoId: [null as string | null, [Validators.required]],
   });
 
   ngOnInit(): void {
     this.carregarDados();
+    this.carregarEscalonamentos();
+  }
+
+  private carregarEscalonamentos(): void {
+    this.configuracoesService.obterEscalonamento()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (config) => {
+          this.escalonamentos.set([config]);
+        },
+        error: (err) => {
+          console.error('[VigiaSenhasForm] Erro ao carregar escalonamento:', err);
+        },
+      });
   }
 
   ngOnDestroy(): void {
@@ -134,9 +159,10 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
     return {
       codigo: new FormControl(senha.codigo, {
         nonNullable: true,
-        validators: [Validators.required, Validators.minLength(4), Validators.maxLength(6)],
+        validators: [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers],
       }),
       descricao: new FormControl(senha.descricao ?? '', { nonNullable: true }),
+      escalonamentoId: new FormControl(senha.escalonamentoId ?? null),
     };
   }
 
@@ -220,6 +246,10 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
       descricao: form.descricao.value,
     };
 
+    if (form.escalonamentoId.value) {
+      payload.escalonamentoId = form.escalonamentoId.value;
+    }
+
     this.usuariosService
       .atualizarSenha(this.usuario.id, senhaId, payload)
       .pipe(takeUntil(this.destroy$))
@@ -276,6 +306,10 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
 
     if (raw.descricao) {
       payload.descricao = raw.descricao;
+    }
+
+    if (raw.escalonamentoId) {
+      payload.escalonamentoId = raw.escalonamentoId;
     }
 
     this.usuariosService

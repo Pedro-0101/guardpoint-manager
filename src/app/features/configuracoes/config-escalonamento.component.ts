@@ -78,13 +78,6 @@ export class ConfigEscalonamentoComponent implements OnInit, OnDestroy {
     });
   }
 
-  getNomesUsuarios(ids: string[]): string {
-    const map = this.usuariosMap();
-    const nomes = ids.map((id) => map[id]).filter((n): n is string => !!n).sort((a, b) => a.localeCompare(b, 'pt-BR'));
-    if (nomes.length <= 10) return nomes.join('\n');
-    return nomes.slice(0, 10).join('\n') + '\n...';
-  }
-
   abrirFormulario(): void {
     const current = this.config();
     const dialogRef = this.dialog.create({

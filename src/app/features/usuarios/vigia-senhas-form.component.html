@@ -14,7 +14,7 @@
         @if (okSenha()) {
           Código atual: <strong>{{ okSenha()?.codigo }}</strong>. Altere abaixo.
         } @else {
-          Senha ainda não definida. Configure um código de 4 a 6 dígitos.
+          Senha ainda não definida. Configure um código de 2 a 6 caracteres.
         }
       </p>
       <div class="flex items-end gap-2">
@@ -24,16 +24,22 @@
             <input
               z-input
               [zPass]="true"
-              [zMinlength]="4"
+              [zMinlength]="2"
               [zMaxlength]="6"
               [formControl]="okCodigo"
-              placeholder="4 a 6 dígitos"
+              placeholder="2 a 6 caracteres"
               class="w-full"
               autocomplete="new-password"
             />
           </z-form-control>
           @if (okCodigo.invalid && okCodigo.touched) {
-            <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+            @if (okCodigo.errors?.['minlength'] || okCodigo.errors?.['maxlength']) {
+              <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+            } @else if (okCodigo.errors?.['atLeastTwoNumbers']) {
+              <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+            } @else {
+              <z-form-message [zError]="true">Código inválido.</z-form-message>
+            }
           }
         </z-form-field>
         <button
@@ -58,7 +64,7 @@
         @if (emergenciaSenha()) {
           Código atual: <strong>{{ emergenciaSenha()?.codigo }}</strong>. Altere abaixo.
         } @else {
-          Senha ainda não definida. Configure um código de 4 a 6 dígitos.
+          Senha ainda não definida. Configure um código de 2 a 6 caracteres.
         }
       </p>
       <div class="flex items-end gap-2">
@@ -68,16 +74,22 @@
             <input
               z-input
               [zPass]="true"
-              [zMinlength]="4"
+              [zMinlength]="2"
               [zMaxlength]="6"
               [formControl]="emergenciaCodigo"
-              placeholder="4 a 6 dígitos"
+              placeholder="2 a 6 caracteres"
               class="w-full"
               autocomplete="new-password"
             />
           </z-form-control>
           @if (emergenciaCodigo.invalid && emergenciaCodigo.touched) {
-            <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+            @if (emergenciaCodigo.errors?.['minlength'] || emergenciaCodigo.errors?.['maxlength']) {
+              <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+            } @else if (emergenciaCodigo.errors?.['atLeastTwoNumbers']) {
+              <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+            } @else {
+              <z-form-message [zError]="true">Código inválido.</z-form-message>
+            }
           }
         </z-form-field>
         <button
@@ -121,32 +133,58 @@
                   <input
                     z-input
                     [zPass]="true"
-                    [zMinlength]="4"
+                    [zMinlength]="2"
                     [zMaxlength]="6"
                     formControlName="codigo"
-                    placeholder="4 a 6 dígitos"
+                    placeholder="2 a 6 caracteres"
                     class="w-full"
                     autocomplete="new-password"
                   />
                 </z-form-control>
                 @if (novoCustomForm.controls.codigo.invalid && novoCustomForm.controls.codigo.touched) {
-                  <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+                  @if (novoCustomForm.controls.codigo.errors?.['minlength'] || novoCustomForm.controls.codigo.errors?.['maxlength']) {
+                    <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                  } @else if (novoCustomForm.controls.codigo.errors?.['atLeastTwoNumbers']) {
+                    <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                  } @else {
+                    <z-form-message [zError]="true">Código inválido.</z-form-message>
+                  }
                 }
               </z-form-field>
 
               <z-form-field>
-                <z-form-label>Descrição</z-form-label>
+                <z-form-label [zRequired]="true">Escalonamento</z-form-label>
                 <z-form-control>
-                  <input
-                    z-input
-                    formControlName="descricao"
-                    placeholder="Opcional"
+                  <z-select
+                    formControlName="escalonamentoId"
+                    [zPlaceholder]="'Selecione o nível...'"
                     class="w-full"
-                  />
+                  >
+                    @for (esc of escalonamentos(); track esc.id) {
+                      <z-select-item [zValue]="esc.id">
+                        {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
+                      </z-select-item>
+                    }
+                  </z-select>
                 </z-form-control>
+                @if (novoCustomForm.controls.escalonamentoId.invalid && novoCustomForm.controls.escalonamentoId.touched) {
+                  <z-form-message [zError]="true">Selecione um nível de escalonamento.</z-form-message>
+                }
               </z-form-field>
             </div>
 
+            <z-form-field>
+              <z-form-label>Descrição</z-form-label>
+              <z-form-control>
+                <input
+                  z-input
+                  formControlName="descricao"
+                  placeholder="Opcional"
+                  class="w-full"
+                />
+              </z-form-control>
+            </z-form-field>
+  
             <div class="flex items-center gap-2 justify-end">
               <button type="button" z-button zType="ghost" zSize="sm" (click)="cancelarNovaCustom()">
                 Cancelar
@@ -186,32 +224,55 @@
                       <input
                         z-input
                         [zPass]="true"
-                        [zMinlength]="4"
+                        [zMinlength]="2"
                         [zMaxlength]="6"
                         [formControl]="form.codigo"
-                        placeholder="4 a 6 dígitos"
+                        placeholder="2 a 6 caracteres"
                         class="w-full"
                         autocomplete="new-password"
                       />
                     </z-form-control>
                     @if (form.codigo.invalid && form.codigo.touched) {
-                      <z-form-message [zError]="true">Código deve ter entre 4 e 6 dígitos.</z-form-message>
+                      @if (form.codigo.errors?.['minlength'] || form.codigo.errors?.['maxlength']) {
+                        <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                      } @else if (form.codigo.errors?.['atLeastTwoNumbers']) {
+                        <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                      } @else {
+                        <z-form-message [zError]="true">Código inválido.</z-form-message>
+                      }
                     }
                   </z-form-field>
 
                   <z-form-field>
-                    <z-form-label>Descrição</z-form-label>
+                    <z-form-label [zRequired]="true">Escalonamento</z-form-label>
                     <z-form-control>
-                      <input
-                        z-input
-                        [formControl]="form.descricao"
-                        placeholder="Opcional"
+                      <z-select
+                        [formControl]="form.escalonamentoId"
+                        [zPlaceholder]="'Selecione o nível...'"
                         class="w-full"
-                      />
+                      >
+                        @for (esc of escalonamentos(); track esc.id) {
+                          <z-select-item [zValue]="esc.id">
+                            {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
+                          </z-select-item>
+                        }
+                      </z-select>
                     </z-form-control>
                   </z-form-field>
                 </div>
 
+                <z-form-field>
+                  <z-form-label>Descrição</z-form-label>
+                  <z-form-control>
+                    <input
+                      z-input
+                      [formControl]="form.descricao"
+                      placeholder="Opcional"
+                      class="w-full"
+                    />
+                  </z-form-control>
+                </z-form-field>
+  
                 <div class="flex items-center gap-2 justify-end">
                   <button
                     type="button"

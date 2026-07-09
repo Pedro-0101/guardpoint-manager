@@ -24,11 +24,13 @@ export interface CreateSenhaVigiaPayload {
   tipo: SenhaVigia['tipo'];
   codigo: string;
   descricao?: string;
+  escalonamentoId?: string;
 }
 
 export interface UpdateSenhaVigiaPayload {
   codigo?: string;
   descricao?: string;
+  escalonamentoId?: string;
 }
 
 interface SenhaVigiaDto {
@@ -38,6 +40,7 @@ interface SenhaVigiaDto {
   tipo: string;
   codigo: string;
   descricao?: string;
+  escalonamento_id?: string;
   created_at: string;
   updated_at: string;
 }
@@ -48,6 +51,7 @@ function mapSenhaFromDto(dto: SenhaVigiaDto): SenhaVigia {
     tipo: dto.tipo as SenhaVigia['tipo'],
     codigo: dto.codigo,
     descricao: dto.descricao,
+    escalonamentoId: dto.escalonamento_id,
     usuarioId: dto.usuario_id,
     empresaId: dto.empresa_id,
     createdAt: dto.created_at,
@@ -93,6 +97,9 @@ export class UsuariosService {
     if (data.descricao !== undefined) {
       body['descricao'] = data.descricao;
     }
+    if (data.escalonamentoId !== undefined) {
+      body['escalonamento_id'] = data.escalonamentoId;
+    }
     return this.api
       .post<SenhaVigiaDto>(`/usuarios/${userId}/senhas`, body)
       .pipe(map(mapSenhaFromDto));
@@ -105,6 +112,9 @@ export class UsuariosService {
     }
     if (data.descricao !== undefined) {
       body['descricao'] = data.descricao;
+    }
+    if (data.escalonamentoId !== undefined) {
+      body['escalonamento_id'] = data.escalonamentoId;
     }
     return this.api
       .put<SenhaVigiaDto>(`/usuarios/${userId}/senhas/${senhaId}`, body)
