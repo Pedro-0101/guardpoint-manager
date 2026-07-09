@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, FormBuilder, ReactiveFormsModule, Validators, ValidationErrors } from '@angular/forms';
+import { FormControl, FormBuilder, ReactiveFormsModule, Validators, ValidationErrors, type ValidatorFn } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -17,7 +17,8 @@ import {
 } from '@/shared/components/form';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
-import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
+import { ZardDialogService, Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
+import { VigiaSenhasExportDialog } from './vigia-senhas-export-dialog.component';
 import { Usuario } from '../../core/models/usuario.model';
 import { SenhaVigia } from '../../core/models/senha.model';
 import { ConfigEscalonamento } from '../../core/models/config.model';
@@ -49,6 +50,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   private readonly configuracoesService = inject(ConfiguracoesService);
   private readonly notification = inject(NotificationService);
   private readonly dialogRef = inject(ZardDialogRef<VigiaSenhasFormComponent>);
+  private readonly dialog = inject(ZardDialogService);
   private readonly fb = inject(FormBuilder);
   private readonly destroy$ = new Subject<void>();
   readonly usuario = inject<Usuario>(Z_MODAL_DATA);
@@ -63,8 +65,9 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   readonly escalonamentosSistema = computed(() => this.escalonamentos().filter((e) => e.sistema));
   readonly escalonamentoSistemaId = computed(() => this.escalonamentosSistema()[0]?.id ?? null);
 
-  private readonly atLeastTwoNumbers = (control: FormControl<string>): ValidationErrors | null => {
-    const digitCount = (control.value.match(/\d/g) ?? []).length;
+  private readonly atLeastTwoNumbers: ValidatorFn = (control) => {
+    const value = String(control.value ?? '');
+    const digitCount = (value.match(/\d/g) ?? []).length;
     return digitCount >= 2 ? null : { atLeastTwoNumbers: { required: 2, actual: digitCount } };
   };
 
@@ -341,6 +344,21 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   cancelarNovaCustom(): void {
     this.novoCustomForm.reset();
     this.showingNewCustom.set(false);
+  }
+
+  exportar(): void {
+    this.dialog.create({
+      zTitle: `Exportar senhas — ${this.usuario.nome}`,
+      zContent: VigiaSenhasExportDialog,
+      zWidth: '600px',
+      zData: {
+        usuarioNome: this.usuario.nome,
+        senhas: this.senhas(),
+        escalonamentos: this.escalonamentos(),
+      },
+      zCancelText: 'Fechar',
+      zOkText: null,
+    });
   }
 
   private atualizarSenhaLocal(updated: SenhaVigia): void {

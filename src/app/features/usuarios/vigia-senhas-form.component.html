@@ -8,6 +8,13 @@
       <z-skeleton class="h-24 w-full rounded-lg" />
     </div>
   } @else {
+    <div class="flex items-center justify-end mb-3">
+      <button type="button" z-button zSize="sm" zType="outline" (click)="exportar()">
+        <ng-icon name="lucideFileText" class="size-3.5" />
+        Exportar
+      </button>
+    </div>
+
     <div class="rounded-lg border p-4">
       <h4 class="font-medium text-sm">Senha OK</h4>
       <p class="text-xs text-muted-foreground mt-0.5 mb-3">
