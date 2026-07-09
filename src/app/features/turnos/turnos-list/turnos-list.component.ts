@@ -247,6 +247,7 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   formatarData(iso: string): string {
     const date = new Date(iso);
     return date.toLocaleString('pt-BR', {
+      weekday: 'short',
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
