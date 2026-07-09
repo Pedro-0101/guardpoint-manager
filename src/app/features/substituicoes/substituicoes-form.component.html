@@ -51,7 +51,11 @@
       <z-form-field>
         <z-form-label [zRequired]="true">Data início</z-form-label>
         <z-form-control>
-          <input z-input type="date" formControlName="dataInicio" class="w-full" />
+          <z-date-picker
+            [value]="dataInicioValue()"
+            placeholder="Selecionar data"
+            (dateChange)="onDataInicioChange($event)"
+          />
         </z-form-control>
         @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
           <z-form-message [zError]="true">Data início é obrigatória.</z-form-message>
@@ -63,7 +67,11 @@
       <z-form-field>
         <z-form-label [zRequired]="true">Data fim</z-form-label>
         <z-form-control>
-          <input z-input type="date" formControlName="dataFim" class="w-full" />
+          <z-date-picker
+            [value]="dataFimValue()"
+            placeholder="Selecionar data"
+            (dateChange)="onDataFimChange($event)"
+          />
         </z-form-control>
         @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
           <z-form-message [zError]="true">Data fim é obrigatória.</z-form-message>

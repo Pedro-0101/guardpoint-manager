@@ -12,6 +12,7 @@ import { PostosService } from '../postos/postos.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardDatePickerComponent } from '@/shared/components/date-picker';
 import { ZardComboboxImports, type ZardComboboxOption } from '@/shared/components/combobox';
 import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
 import {
@@ -25,6 +26,7 @@ import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import {
   Substituicao,
+  SubstituicaoPrefill,
   CreateSubstituicaoPayload,
   UpdateSubstituicaoPayload,
 } from '../../core/models/substituicao.model';
@@ -44,6 +46,7 @@ function periodoValidator(group: AbstractControl): ValidationErrors | null {
   imports: [
     ReactiveFormsModule,
     ZardInputDirective,
+    ZardDatePickerComponent,
     ZardComboboxImports,
     ZardCheckboxComponent,
     ZardFormFieldComponent,
@@ -62,11 +65,14 @@ export class SubstituicoesFormComponent implements OnInit {
   private readonly usuariosService = inject(UsuariosService);
   private readonly dialogRef = inject(ZardDialogRef<SubstituicoesFormComponent>);
   private readonly notification = inject(NotificationService);
-  readonly data = inject<Substituicao | null>(Z_MODAL_DATA, { optional: true }) ?? null;
+  readonly data = inject<Substituicao | SubstituicaoPrefill | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   readonly loading = signal(false);
   readonly loadingDeps = signal(false);
   readonly isEdit = signal(false);
+
+  readonly dataInicioValue = signal<Date | null>(null);
+  readonly dataFimValue = signal<Date | null>(null);
 
   readonly postos = signal<Posto[]>([]);
   readonly vigias = signal<Usuario[]>([]);
@@ -95,17 +101,25 @@ export class SubstituicoesFormComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.data) {
-      this.isEdit.set(true);
+      if ('id' in this.data && this.data.id) {
+        this.isEdit.set(true);
+      }
+      if (this.data.dataInicio) {
+        this.dataInicioValue.set(this.parseDateString(this.data.dataInicio));
+      }
+      if (this.data.dataFim) {
+        this.dataFimValue.set(this.parseDateString(this.data.dataFim));
+      }
       this.form.patchValue({
-        usuarioId: this.data.usuarioId,
-        postoId: this.data.postoId,
-        dataInicio: this.data.dataInicio,
-        dataFim: this.data.dataFim,
-        horaInicio: this.data.horaInicio,
-        horaFim: this.data.horaFim,
-        motivo: this.data.motivo,
-        toleranciaMin: this.data.toleranciaMin,
-        ativo: this.data.ativo,
+        usuarioId: this.data.usuarioId ?? '',
+        postoId: this.data.postoId ?? '',
+        dataInicio: this.data.dataInicio ?? '',
+        dataFim: this.data.dataFim ?? '',
+        horaInicio: this.data.horaInicio ?? '',
+        horaFim: this.data.horaFim ?? '',
+        motivo: this.data.motivo ?? '',
+        toleranciaMin: this.data.toleranciaMin ?? 5,
+        ativo: this.data.ativo ?? true,
       });
     }
 
@@ -131,6 +145,34 @@ export class SubstituicoesFormComponent implements OnInit {
     });
   }
 
+  onDataInicioChange(date: Date | null): void {
+    this.dataInicioValue.set(date);
+    this.form.controls.dataInicio.setValue(date ? this.dateToString(date) : '');
+    this.form.controls.dataInicio.markAsTouched();
+    this.form.controls.dataInicio.updateValueAndValidity();
+    this.form.updateValueAndValidity();
+  }
+
+  onDataFimChange(date: Date | null): void {
+    this.dataFimValue.set(date);
+    this.form.controls.dataFim.setValue(date ? this.dateToString(date) : '');
+    this.form.controls.dataFim.markAsTouched();
+    this.form.controls.dataFim.updateValueAndValidity();
+    this.form.updateValueAndValidity();
+  }
+
+  private dateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private parseDateString(str: string): Date {
+    const [year, month, day] = str.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  }
+
   submit(): void {
     if (this.loading()) return;
     if (this.form.invalid) {
@@ -154,7 +196,7 @@ export class SubstituicoesFormComponent implements OnInit {
         ativo: raw.ativo,
       };
 
-      this.substituicoesService.atualizar(this.data!.id, payload).subscribe({
+      this.substituicoesService.atualizar((this.data as Substituicao).id, payload).subscribe({
         next: () => {
           this.loading.set(false);
           this.notification.success('Substituição atualizada com sucesso.');

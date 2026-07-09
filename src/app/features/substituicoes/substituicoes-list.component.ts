@@ -27,6 +27,7 @@ import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
+import { ZardDatePickerComponent } from '@/shared/components/date-picker';
 import { NotificationService } from '../../core/services/notification.service';
 import { Substituicao } from '../../core/models/substituicao.model';
 import { Posto } from '../../core/models/posto.model';
@@ -44,6 +45,7 @@ import { Usuario } from '../../core/models/usuario.model';
     ZardSelectComponent,
     ZardSelectItemComponent,
     ZardCheckboxComponent,
+    ZardDatePickerComponent,
     NgIcon,
     ZardSkeletonComponent,
     StatusBadge,
@@ -65,8 +67,10 @@ export class SubstituicoesListComponent implements OnInit, OnDestroy {
   readonly searchControl = new FormControl('', { nonNullable: true });
   readonly postosControl = new FormControl<string[]>([], { nonNullable: true });
   readonly vigiasControl = new FormControl<string[]>([], { nonNullable: true });
-  readonly dataControl = new FormControl('', { nonNullable: true });
   readonly ativasOnlyControl = new FormControl(true, { nonNullable: true });
+
+  readonly dataFiltroValue = signal<Date | null>(null);
+  private readonly dataFiltroSubject = new BehaviorSubject<string>('');
 
   private readonly substituicoesSubject = new BehaviorSubject<Substituicao[]>([]);
   readonly substituicoes$ = this.substituicoesSubject.asObservable();
@@ -86,7 +90,7 @@ export class SubstituicoesListComponent implements OnInit, OnDestroy {
     ),
     this.postosControl.valueChanges.pipe(startWith<string[]>([])),
     this.vigiasControl.valueChanges.pipe(startWith<string[]>([])),
-    this.dataControl.valueChanges.pipe(startWith('')),
+    this.dataFiltroSubject,
     this.ativasOnlyControl.valueChanges.pipe(startWith(true)),
   ]).pipe(
     map(([substituicoes, term, selectedPostos, selectedVigias, data, ativasOnly]) => {
@@ -180,8 +184,21 @@ export class SubstituicoesListComponent implements OnInit, OnDestroy {
     this.searchControl.setValue('');
     this.postosControl.setValue([]);
     this.vigiasControl.setValue([]);
-    this.dataControl.setValue('');
+    this.dataFiltroValue.set(null);
+    this.dataFiltroSubject.next('');
     this.ativasOnlyControl.setValue(true);
+  }
+
+  onDataChange(date: Date | null): void {
+    this.dataFiltroValue.set(date);
+    this.dataFiltroSubject.next(date ? this.dateToString(date) : '');
+  }
+
+  private dateToString(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   abrirFormulario(substituicao?: Substituicao): void {
