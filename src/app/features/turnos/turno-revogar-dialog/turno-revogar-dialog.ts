@@ -30,6 +30,8 @@ export class TurnoRevogarDialog {
   readonly resultado = signal<RevogarSessaoResponse | null>(null);
 
   revogar(): void {
+    if (!this.turno.id) return;
+
     this.revogando.set(true);
     this.erro.set(null);
 

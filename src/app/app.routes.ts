@@ -42,7 +42,7 @@ export const routes: Routes = [
       {
         path: 'turnos',
         data: { breadcrumb: 'Turnos' },
-        canActivate: [roleGuard(['admin'])],
+        canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/turnos/turnos-list/turnos-list.component').then(
             (m) => m.TurnosListComponent
@@ -51,7 +51,7 @@ export const routes: Routes = [
       {
         path: 'turnos/:id',
         data: { breadcrumb: 'Detalhe' },
-        canActivate: [roleGuard(['admin'])],
+        canActivate: [roleGuard(['admin', 'supervisor'])],
         loadComponent: () =>
           import('./features/turnos/turno-detail/turno-detail').then(
             (m) => m.TurnoDetailComponent

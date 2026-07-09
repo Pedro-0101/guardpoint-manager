@@ -1,9 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Observable, map } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
-import { WebSocketService } from '../../core/websocket/websocket.service';
-import { StatusChangePayload } from '../../core/websocket/websocket.types';
-import { Turno, TurnoComPosicao, TurnoDetalhe } from '../../core/models/turno.model';
+import { Turno, TurnoComPosicao, TurnoDetalhe, TurnoFilter, TurnoListResponse } from '../../core/models/turno.model';
 import { Checkin } from '../../core/models/checkin.model';
 import { Posto } from '../../core/models/posto.model';
 import { Usuario } from '../../core/models/usuario.model';
@@ -14,11 +12,12 @@ export interface RevogarSessaoResponse {
 }
 
 interface TurnoDto {
-  id: string;
+  id: string | null;
   empresa_id: string;
   usuario_id: string;
   posto_id: string;
   posto_nome?: string;
+  usuario_nome?: string;
   status: string;
   inicio_previsto: string;
   fim_previsto: string;
@@ -30,6 +29,11 @@ interface TurnoDto {
   usuario?: UsuarioDto;
   checkins?: CheckinDto[];
   ultimo_checkin?: CheckinDto;
+}
+
+interface TurnoListResponseDto {
+  data: TurnoDto[];
+  total: number;
 }
 
 interface CheckinDto {
@@ -70,36 +74,25 @@ interface UsuarioDto {
 @Injectable({ providedIn: 'root' })
 export class TurnosService {
   private readonly api = inject(ApiService);
-  private readonly ws = inject(WebSocketService);
 
-  private readonly turnosSubject = new BehaviorSubject<Turno[]>([]);
-  readonly turnosAtivos$ = this.turnosSubject.asObservable();
-
-  constructor() {
-    this.ws
-      .onEvent<StatusChangePayload>('status_change')
-      .subscribe((payload) => this.handleStatusChange(payload));
-  }
-
-  listar(params?: {
-    status?: string;
-    busca?: string;
-  }): Observable<Turno[]> {
+  listar(params?: TurnoFilter): Observable<TurnoListResponse> {
     return this.api
-      .get<TurnoDto[]>('/turnos/ativos', params)
+      .get<TurnoListResponseDto>('/turnos/', params as Record<string, string | number | boolean>)
       .pipe(
-        map((dtos) => {
-          const turnos = dtos.map((dto) => this.mapTurnoFromDto(dto));
-          this.turnosSubject.next(turnos);
-          return turnos;
-        }),
+        map((response) => ({
+          data: response.data.map((dto) => this.mapTurnoFromDto(dto)),
+          total: response.total,
+        })),
       );
   }
 
   listarMapa(): Observable<TurnoComPosicao[]> {
     return this.api
-      .get<TurnoDto[]>('/turnos/ativos')
-      .pipe(map((dtos) => dtos.map((dto) => this.mapTurnoComPosicaoFromDto(dto))));
+      .get<TurnoListResponseDto>('/turnos/', {
+        status: 'em_andamento,pausado,critico',
+        limit: 100,
+      } as Record<string, string | number | boolean>)
+      .pipe(map((response) => response.data.map((dto) => this.mapTurnoComPosicaoFromDto(dto))));
   }
 
   obter(id: string): Observable<TurnoDetalhe> {
@@ -112,14 +105,6 @@ export class TurnosService {
     return this.api.post<RevogarSessaoResponse>(`/turnos/${turnoId}/revogar`, {});
   }
 
-  private handleStatusChange(payload: StatusChangePayload): void {
-    const current = this.turnosSubject.value;
-    const updated = current.map((t) =>
-      t.id === payload.turnoId ? { ...t, status: payload.status } : t,
-    );
-    this.turnosSubject.next(updated);
-  }
-
   private mapTurnoFromDto(dto: TurnoDto): Turno {
     return {
       id: dto.id,
@@ -127,7 +112,7 @@ export class TurnosService {
       usuarioId: dto.usuario_id,
       postoId: dto.posto_id,
       postoNome: dto.posto_nome ?? dto.posto?.nome ?? '',
-      usuarioNome: dto.usuario?.nome ?? '',
+      usuarioNome: dto.usuario_nome ?? dto.usuario?.nome ?? '',
       status: dto.status as Turno['status'],
       inicioPrevisto: dto.inicio_previsto,
       fimPrevisto: dto.fim_previsto,

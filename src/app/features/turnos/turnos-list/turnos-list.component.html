@@ -3,7 +3,7 @@
   <header class="list-page__header">
     <div>
       <h1 class="list-page__title">Turnos</h1>
-      <p class="list-page__subtitle">Monitoramento de turnos ativos</p>
+      <p class="list-page__subtitle">Histórico, ativos e programação futura de turnos</p>
     </div>
   </header>
 
@@ -16,24 +16,62 @@
   } @else {
     <z-card class="p-4 mb-6">
       <div class="flex flex-wrap gap-4 items-end">
-        <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-sm">
-          <label class="form-label" for="search-input">Buscar turno</label>
-          <div class="relative flex items-center">
-            <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-            <input z-input id="search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Nome do vigia ou posto..." />
-          </div>
+        <div class="flex flex-col gap-1.5 min-w-[240px]">
+          <span class="form-label">Período</span>
+          <z-date-picker
+            [zRange]="true"
+            placeholder="Selecionar período"
+            (dateRangeChange)="onDateRangeChange($event)"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5 min-w-[200px]">
+          <span class="form-label">Posto</span>
+          <z-select [formControl]="postoControl" [zMultiple]="true" [zPlaceholder]="'Todos'">
+            @for (posto of postos(); track posto.id) {
+              <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
+            }
+          </z-select>
+        </div>
+
+        <div class="flex flex-col gap-1.5 min-w-[200px]">
+          <span class="form-label">Vigia</span>
+          <z-select [formControl]="usuarioControl" [zMultiple]="true" [zPlaceholder]="'Todos'">
+            @for (user of usuarios(); track user.id) {
+              <z-select-item [zValue]="user.id">{{ user.nome }}</z-select-item>
+            }
+          </z-select>
         </div>
 
         <div class="flex flex-col gap-1.5 min-w-[160px]">
-          <label class="form-label" for="status-select">Status</label>
-          <z-select id="status-select" [formControl]="statusControl">
+          <span class="form-label">Status</span>
+          <z-select [formControl]="statusControl" [zMultiple]="true" [zPlaceholder]="'Todos'">
             @for (filtro of statusFilters; track filtro.value) {
-              <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
+              @if (filtro.value) {
+                <z-select-item [zValue]="filtro.value">{{ filtro.label }}</z-select-item>
+              }
             }
           </z-select>
         </div>
       </div>
     </z-card>
+
+    <div class="list-page__info-bar">
+      <span class="list-page__total">Total: {{ total() }} turno{{ total() !== 1 ? 's' : '' }}</span>
+      @if (totalPages() > 1) {
+        <div class="list-page__pagination">
+          <button z-button zType="ghost" zSize="sm" [disabled]="page() === 0" (click)="voltarPagina()">
+            <ng-icon name="lucideChevronLeft" />
+            Anterior
+          </button>
+          <span class="list-page__page-info">Página {{ page() + 1 }} de {{ totalPages() }}</span>
+          <button z-button zType="ghost" zSize="sm" [disabled]="page() >= totalPages() - 1" (click)="avancarPagina()">
+            Próximo
+            <ng-icon name="lucideChevronRight" />
+          </button>
+        </div>
+      }
+    </div>
 
     <div class="w-full">
       <div class="overflow-hidden rounded-md border">
@@ -44,6 +82,7 @@
             <th z-table-head>Posto</th>
             <th z-table-head>Status</th>
             <th z-table-head>Início</th>
+            <th z-table-head>Fim</th>
             <th z-table-head>Ações</th>
           </tr>
         </thead>
@@ -55,41 +94,45 @@
                 <td z-table-cell><z-skeleton class="h-[14px] w-[120px] rounded" /></td>
                 <td z-table-cell><z-skeleton class="h-6 w-[90px] rounded-full" /></td>
                 <td z-table-cell><z-skeleton class="h-[14px] w-[150px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[150px] rounded" /></td>
                 <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
               </tr>
             }
           } @else {
-            @if ((filteredTurnos$ | async); as turnos) {
-              @if (turnos.length === 0) {
+            @if (turnos(); as turnosList) {
+              @if (turnosList.length === 0) {
                 <tr>
-                  <td z-table-cell [attr.colspan]="5">
+                  <td z-table-cell [attr.colspan]="6">
                     <gp-empty-state
                       icon="lucideClock"
                       title="Nenhum turno encontrado"
-                      [description]="searchControl.value || statusControl.value ? 'Nenhum turno corresponde aos filtros aplicados.' : 'Nenhum turno registrado.'"
+                      description="Nenhum turno corresponde aos filtros aplicados."
                     />
                   </td>
                 </tr>
               } @else {
-                @for (turno of turnos; track turno.id) {
-                  <tr z-table-row class="list-page__row">
+                @for (turno of turnosList; track turno.id ?? $index) {
+                  <tr z-table-row class="list-page__row" [class.list-page__row--clickable]="!!turno.id" (click)="verDetalhe(turno)" (keydown.enter)="verDetalhe(turno)" tabindex="0">
                     <td z-table-cell>{{ turno.usuarioNome }}</td>
                     <td z-table-cell>{{ turno.postoNome }}</td>
                     <td z-table-cell>
                       <gp-status-badge [status]="turno.status" />
                     </td>
-                    <td z-table-cell>{{ formatarData(turno.inicioReal ?? turno.inicioPrevisto) }}</td>
+                    <td z-table-cell>{{ formatarData(turno.inicioPrevisto) }}</td>
+                    <td z-table-cell>{{ formatarData(turno.fimPrevisto) }}</td>
                     <td z-table-cell class="list-page__actions">
-                        <button
-                          z-button
-                          zType="ghost"
-                          zSize="icon"
-                          zTooltip="Ver detalhes do turno"
-                          (click)="verDetalhe(turno)"
-                          aria-label="Ver detalhes do turno"
-                        >
-                          <ng-icon name="lucideEye" />
-                        </button>
+                      <button
+                        z-button
+                        zType="ghost"
+                        zSize="icon"
+                        [zTooltip]="turno.id ? 'Ver detalhes do turno' : 'Turno agendado sem detalhes disponíveis'"
+                        [zDisabled]="!turno.id"
+                        (click)="$event.stopPropagation(); verDetalhe(turno)"
+                        (keydown.enter)="$event.stopPropagation(); verDetalhe(turno)"
+                        aria-label="Ver detalhes do turno"
+                      >
+                        <ng-icon name="lucideEye" />
+                      </button>
                     </td>
                   </tr>
                 }

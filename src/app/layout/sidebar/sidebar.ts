@@ -27,7 +27,7 @@ export class Sidebar {
   private readonly allItems: NavItem[] = [
     { label: 'Dashboard', icon: 'lucideLayoutDashboard', route: '/dashboard' },
     { label: 'Mapa', icon: 'lucideMap', route: '/mapa', roles: ['admin', 'supervisor'] },
-    { label: 'Turnos', icon: 'lucideClock', route: '/turnos', roles: ['admin'] },
+    { label: 'Turnos', icon: 'lucideClock', route: '/turnos', roles: ['admin', 'supervisor'] },
     { label: 'Alertas', icon: 'lucideBell', route: '/alertas', roles: ['admin', 'supervisor'] },
     { label: 'Postos', icon: 'lucideMapPin', route: '/postos' },
     { label: 'Escalas', icon: 'lucideCalendarDays', route: '/escalas', roles: ['admin', 'supervisor'] },

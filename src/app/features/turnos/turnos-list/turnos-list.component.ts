@@ -1,14 +1,15 @@
 import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
-import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
-import { Subject, combineLatest } from 'rxjs';
-import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
+import { Subject, merge } from 'rxjs';
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { TurnosService } from '../turnos.service';
+import { PostosService } from '../../postos/postos.service';
+import { UsuariosService } from '../../usuarios/usuarios.service';
+import { ZardDatePickerComponent } from '@/shared/components/date-picker';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
-import { ZardInputDirective } from '@/shared/components/input';
 import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSelectImports } from '@/shared/components/select';
@@ -16,7 +17,8 @@ import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skele
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout';
-import { Turno } from '../../../core/models/turno.model';
+import { Turno, TurnoFilter } from '../../../core/models/turno.model';
+import { Posto } from '../../../core/models/posto.model';
 
 interface StatusFilter {
   value: string;
@@ -32,14 +34,20 @@ const STATUS_FILTERS: StatusFilter[] = [
   { value: 'critico', label: 'Crítico' },
 ];
 
+const PAGE_LIMIT = 20;
+
+function toDateInput(d: Date | null): string | undefined {
+  if (!d) return undefined;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 @Component({
   selector: 'gp-turnos-list',
   imports: [
-    AsyncPipe,
     ReactiveFormsModule,
+    ZardDatePickerComponent,
     ZardTableImports,
     ZardButtonComponent,
-    ZardInputDirective,
     ZardCardComponent,
     ZardSelectImports,
     NgIcon,
@@ -54,49 +62,55 @@ const STATUS_FILTERS: StatusFilter[] = [
 })
 export class TurnosListComponent implements OnInit, OnDestroy {
   private readonly turnosService = inject(TurnosService);
+  private readonly postosService = inject(PostosService);
+  private readonly usuariosService = inject(UsuariosService);
   private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
 
-  readonly searchControl = new FormControl('', { nonNullable: true });
-  readonly statusControl = new FormControl('', { nonNullable: true });
+  private readonly hoje = new Date();
+
+  readonly statusControl = new FormControl<string[]>([], { nonNullable: true });
+  readonly postoControl = new FormControl<string[]>([], { nonNullable: true });
+  readonly usuarioControl = new FormControl<string[]>([], { nonNullable: true });
+
+  readonly dateRange = signal<{ start: Date | null; end: Date | null }>({ start: this.hoje, end: this.hoje });
 
   readonly statusFilters = STATUS_FILTERS;
 
-  readonly turnos$ = this.turnosService.turnosAtivos$;
-
+  readonly turnos = signal<Turno[]>([]);
+  readonly total = signal(0);
+  readonly page = signal(0);
+  readonly postos = signal<Posto[]>([]);
+  readonly usuarios = signal<{ id: string; nome: string }[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
-  readonly filteredTurnos$ = combineLatest([
-    this.turnos$,
-    this.searchControl.valueChanges.pipe(
-      debounceTime(300),
-      startWith(''),
-      distinctUntilChanged(),
-    ),
-    this.statusControl.valueChanges.pipe(startWith('')),
-  ]).pipe(
-    map(([turnos, busca, status]) => {
-      let result = turnos;
+  readonly totalPages = signal(0);
 
-      if (status) {
-        result = result.filter((t) => t.status === status);
-      }
-
-      if (busca.trim()) {
-        const lower = busca.toLowerCase().trim();
-        result = result.filter(
-          (t) =>
-            t.usuarioNome.toLowerCase().includes(lower) ||
-            t.postoNome.toLowerCase().includes(lower),
-        );
-      }
-
-      return result;
-    }),
-  );
+  private readonly filterChange$ = new Subject<void>();
 
   ngOnInit(): void {
+    this.carregarPostos();
+    this.carregarUsuarios();
+
+    merge(
+      this.statusControl.valueChanges.pipe(
+        distinctUntilChanged((a, b) => a.length === b.length && a.every((v, i) => v === b[i])),
+      ),
+      this.postoControl.valueChanges.pipe(
+        distinctUntilChanged((a, b) => a.length === b.length && a.every((v, i) => v === b[i])),
+      ),
+      this.usuarioControl.valueChanges.pipe(
+        distinctUntilChanged((a, b) => a.length === b.length && a.every((v, i) => v === b[i])),
+      ),
+      this.filterChange$,
+    )
+      .pipe(debounceTime(300), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.page.set(0);
+        this.carregarTurnos();
+      });
+
     this.carregarTurnos();
   }
 
@@ -105,15 +119,24 @@ export class TurnosListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  onDateRangeChange(range: { start: Date | null; end: Date | null }): void {
+    this.dateRange.set(range);
+    this.filterChange$.next();
+  }
+
   carregarTurnos(): void {
     this.loading.set(true);
     this.error.set(null);
 
+    const filter = this.buildFilter();
     this.turnosService
-      .listar()
+      .listar(filter)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
+        next: (response) => {
+          this.turnos.set(response.data);
+          this.total.set(response.total);
+          this.totalPages.set(Math.ceil(response.total / PAGE_LIMIT));
           this.loading.set(false);
         },
         error: (err) => {
@@ -123,7 +146,62 @@ export class TurnosListComponent implements OnInit, OnDestroy {
       });
   }
 
+  private buildFilter(): TurnoFilter {
+    const filter: TurnoFilter = {
+      sort_by: 'inicio_previsto',
+      sort_order: 'asc',
+      limit: PAGE_LIMIT,
+      offset: this.page() * PAGE_LIMIT,
+    };
+
+    const statuses = this.statusControl.value;
+    if (statuses.length > 0) filter.status = statuses.join(',');
+
+    const range = this.dateRange();
+    const dataInicio = toDateInput(range.start);
+    const dataFim = toDateInput(range.end);
+    if (dataInicio) filter.data_inicio = dataInicio;
+    if (dataFim) filter.data_fim = dataFim;
+
+    const postoIds = this.postoControl.value;
+    if (postoIds.length > 0) filter.posto_id = postoIds.join(',');
+
+    const usuarioIds = this.usuarioControl.value;
+    if (usuarioIds.length > 0) filter.usuario_id = usuarioIds.join(',');
+
+    return filter;
+  }
+
+  private carregarPostos(): void {
+    this.postosService.listar({ ativos: 'true' }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (postos) => this.postos.set(postos),
+    });
+  }
+
+  private carregarUsuarios(): void {
+    this.usuariosService.listar().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (usuarios) => this.usuarios.set(
+        usuarios.filter((u) => u.cargo === 'vigia').map((u) => ({ id: u.id, nome: u.nome }))
+      ),
+    });
+  }
+
+  voltarPagina(): void {
+    if (this.page() > 0) {
+      this.page.update((p) => p - 1);
+      this.carregarTurnos();
+    }
+  }
+
+  avancarPagina(): void {
+    if (this.page() < this.totalPages() - 1) {
+      this.page.update((p) => p + 1);
+      this.carregarTurnos();
+    }
+  }
+
   verDetalhe(turno: Turno): void {
+    if (turno.status === 'agendado') return;
     this.router.navigate(['/turnos', turno.id]);
   }
 

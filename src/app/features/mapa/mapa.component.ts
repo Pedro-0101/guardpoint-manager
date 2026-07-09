@@ -97,6 +97,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   verDetalhe(turno: TurnoComPosicao): void {
+    if (!turno.id) return;
     this.router.navigate(['/turnos', turno.id]);
   }
 
@@ -106,6 +107,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     if (index === -1) return;
 
     const turno = current[index];
+    if (!turno.id) return;
     const prevCheckin = turno.ultimoCheckin;
 
     const updatedCheckin: Checkin = {
@@ -134,6 +136,9 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     const index = current.findIndex((t) => t.id === payload.turnoId);
     if (index === -1) return;
 
+    const turno = current[index];
+    if (!turno.id) return;
+
     if (payload.status === 'finalizado') {
       this.removerMarker(payload.turnoId);
       const updated = [...current];
@@ -143,7 +148,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     const updated = [...current];
-    updated[index] = { ...updated[index], status: payload.status };
+    updated[index] = { ...turno, status: payload.status };
     this.turnos.set(updated);
 
     this.atualizarMarkerIndividual(updated[index]);
@@ -151,6 +156,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private atualizarMarkerIndividual(turno: TurnoComPosicao): void {
     if (!this.pinsLayer || !this.map) return;
+    if (!turno.id) return;
     const checkin = turno.ultimoCheckin;
     if (!checkin) return;
 
@@ -240,6 +246,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     const coords: [number, number][] = [];
 
     for (const turno of this.turnosComPosicao) {
+      if (!turno.id) continue;
       const checkin = turno.ultimoCheckin!;
       const lat = checkin.latitude;
       const lng = checkin.longitude;
