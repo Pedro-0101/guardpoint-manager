@@ -1,9 +1,10 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Subject, ReplaySubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
+import { AuthService } from '../../core/auth/auth.service';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosFormComponent } from './usuarios-form.component';
 import { VigiaSenhasFormComponent } from './vigia-senhas-form.component';
@@ -60,9 +61,11 @@ const CARGO_OPTIONS = Object.entries(CARGO_LABELS).map(([value, label]) => ({
 })
 export class UsuariosListComponent implements OnInit, OnDestroy {
   private readonly usuariosService = inject(UsuariosService);
+  private readonly authService = inject(AuthService);
   private readonly dialog = inject(ZardDialogService);
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
+  readonly isAdmin = computed(() => this.authService.userRole() === 'admin');
 
   readonly searchControl = new FormControl('', { nonNullable: true });
   readonly cargosControl = new FormControl<string[]>([], { nonNullable: true });

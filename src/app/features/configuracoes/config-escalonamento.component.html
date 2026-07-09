@@ -1,61 +1,123 @@
 <gp-page-layout>
-  <div class="list-page">
-    <header class="list-page__header">
-      <div>
-        <h1 class="list-page__title">Escalonamento</h1>
-        <p class="list-page__subtitle">Configuração de escalonamento para atrasos dos vigias</p>
-      </div>
-      <button z-button (click)="abrirFormulario()" [zDisabled]="!config()">
-        <ng-icon name="lucidePencil" />
-        Editar
-      </button>
-    </header>
+<div class="list-page">
+  <header class="list-page__header">
+    <div>
+      <h1 class="list-page__title">Escalonamentos</h1>
+      <p class="list-page__subtitle">Configure os escalonamentos de alertas para atraso dos vigias</p>
+    </div>
+    <button z-button (click)="abrirFormulario()">
+      <ng-icon name="lucidePlus" />
+      Novo escalonamento
+    </button>
+  </header>
 
-    @if (error(); as errorMsg) {
-      <div class="list-page__error">
-        <ng-icon name="lucideAlertCircle" />
-        <p>{{ errorMsg }}</p>
-        <button class="list-page__retry-btn" (click)="carregarDados()">Tentar novamente</button>
+  @if (error(); as errorMsg) {
+    <div class="list-page__error">
+      <ng-icon name="lucideAlertCircle" />
+      <p>{{ errorMsg }}</p>
+      <button class="list-page__retry-btn" (click)="carregarDados()">Tentar novamente</button>
+    </div>
+  } @else {
+    <z-card class="p-4 mb-6">
+      <div class="flex flex-wrap gap-4 items-end">
+        <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
+          <label class="form-label" for="esc-search-input">Buscar escalonamento</label>
+          <div class="relative flex items-center">
+            <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
+            <input z-input id="esc-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Descrição ou atraso..." autocomplete="off" />
+          </div>
+        </div>
       </div>
-    } @else if (loading()) {
-      <z-card class="p-6">
-        <div class="space-y-4">
-          <z-skeleton class="h-[14px] w-[120px] rounded" />
-          <z-skeleton class="h-[14px] w-[200px] rounded" />
-          <z-skeleton class="h-[14px] w-[300px] rounded" />
-        </div>
-      </z-card>
-    } @else if (config(); as cfg) {
-      <z-card class="p-6">
-        <div class="space-y-4">
-          <div class="flex items-center gap-8">
-            <div>
-              <p class="text-sm text-muted-foreground">Atraso para acionar</p>
-              <p class="text-lg font-semibold">{{ cfg.atrasoMinutos }} min</p>
-            </div>
-            <div>
-              <p class="text-sm text-muted-foreground">Usuários notificados</p>
-              <p class="text-lg font-semibold">{{ cfg.usuarioIds.length }} {{ cfg.usuarioIds.length === 1 ? 'usuário' : 'usuários' }}</p>
-            </div>
-          </div>
-          @if (cfg.descricao) {
-            <div>
-              <p class="text-sm text-muted-foreground">Descrição</p>
-              <p>{{ cfg.descricao }}</p>
-            </div>
-          }
-          <div>
-            <p class="text-sm text-muted-foreground mb-1">Notificados</p>
-            <div class="flex flex-wrap gap-1.5">
-              @for (id of cfg.usuarioIds; track id) {
-                <span class="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium">
-                  {{ usuariosMap()[id] || id }}
-                </span>
+    </z-card>
+
+    <div class="w-full">
+      <div class="overflow-hidden rounded-md border">
+        <table z-table>
+        <thead z-table-header>
+          <tr z-table-row>
+            <th z-table-head>Descrição</th>
+            <th z-table-head>Atraso</th>
+            <th z-table-head>Usuários notificados</th>
+            <th z-table-head>Ações</th>
+          </tr>
+        </thead>
+        <tbody z-table-body>
+          @if (loading()) {
+            @for (row of [1,2,3,4,5]; track row) {
+              <tr z-table-row>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[180px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[80px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="h-[14px] w-[200px] rounded" /></td>
+                <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
+              </tr>
+            }
+          } @else {
+            @if ((filteredEscalonamentos$ | async); as list) {
+              @if (list.length === 0) {
+                <tr>
+                  <td z-table-cell [attr.colspan]="4">
+                    <gp-empty-state
+                      icon="lucideSettings2"
+                      title="Nenhum escalonamento encontrado"
+                      [description]="searchControl.value ? 'Nenhum escalonamento corresponde ao filtro.' : 'Nenhum escalonamento cadastrado.'"
+                    />
+                  </td>
+                </tr>
+              } @else {
+                @for (item of list; track item.id) {
+                  <tr z-table-row>
+                    <td z-table-cell>{{ item.descricao || '—' }}</td>
+                    <td z-table-cell>
+                      <span class="font-semibold">{{ item.atrasoMinutos }}</span> min
+                    </td>
+                    <td z-table-cell>
+                      <div class="flex flex-wrap gap-1">
+                        @for (uid of item.usuarioIds; track uid) {
+                          <span class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs">
+                            {{ usuarioNome(uid) }}
+                          </span>
+                        }
+                      </div>
+                    </td>
+                    <td z-table-cell class="list-page__actions">
+                      @if (item.sistema) {
+                        <button
+                          z-button zType="ghost" zSize="icon"
+                          zTooltip="Alterar usuários"
+                          (click)="abrirUsuarios(item)"
+                          aria-label="Alterar usuários"
+                        >
+                          <ng-icon name="lucideUsers" />
+                        </button>
+                      } @else {
+                        <button
+                          z-button zType="ghost" zSize="icon"
+                          zTooltip="Editar escalonamento"
+                          (click)="abrirFormulario(item)"
+                          aria-label="Editar escalonamento"
+                        >
+                          <ng-icon name="lucidePencil" />
+                        </button>
+                        <button
+                          z-button zType="ghost" zSize="icon"
+                          class="text-destructive"
+                          zTooltip="Excluir escalonamento"
+                          (click)="confirmarExclusao(item)"
+                          aria-label="Excluir escalonamento"
+                        >
+                          <ng-icon name="lucideTrash2" />
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
               }
-            </div>
-          </div>
-        </div>
-      </z-card>
-    }
-  </div>
+            }
+          }
+        </tbody>
+      </table>
+      </div>
+    </div>
+  }
+</div>
 </gp-page-layout>

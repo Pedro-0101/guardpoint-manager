@@ -117,9 +117,15 @@
                           <ng-icon name="lucidePencil" />
                         </button>
                         @if (usuario.cargo === 'vigia') {
-                          <button z-button zType="ghost" zSize="icon" zTooltip="Configurar senhas" (click)="abrirSenhas(usuario)" aria-label="Configurar senhas do vigia">
-                            <ng-icon name="lucideLock" />
-                          </button>
+                          @if (isAdmin()) {
+                            <button z-button zType="ghost" zSize="icon" zTooltip="Configurar senhas" (click)="abrirSenhas(usuario)" aria-label="Configurar senhas do vigia">
+                              <ng-icon name="lucideLock" />
+                            </button>
+                          } @else {
+                            <button z-button zType="ghost" zSize="icon" class="opacity-30 cursor-not-allowed" zTooltip="Apenas admin pode configurar senhas" aria-label="Configurar senhas do vigia" disabled>
+                              <ng-icon name="lucideLock" />
+                            </button>
+                          }
                         }
                         <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Inativar usuário" (click)="confirmarExclusao(usuario)" aria-label="Inativar usuário">
                           <ng-icon name="lucideBan" />

@@ -36,10 +36,12 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
   private readonly usuariosService = inject(UsuariosService);
   private readonly dialogRef = inject(ZardDialogRef<ConfigEscalonamentoFormComponent>);
   private readonly notification = inject(NotificationService);
-  readonly data = inject<ConfigEscalonamento | null>(Z_MODAL_DATA, { optional: true }) ?? null;
+  readonly data = inject<ConfigEscalonamento & { apenasUsuarios?: boolean } | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   readonly loading = signal(false);
   readonly usuarios = signal<Usuario[]>([]);
+  readonly apenasUsuarios = signal(false);
+  readonly isEdit = signal(false);
 
   form = this.fb.nonNullable.group({
     atrasoMinutos: [5, [Validators.required, Validators.min(1)]],
@@ -51,18 +53,25 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
     this.carregarUsuarios();
 
     if (this.data) {
+      this.isEdit.set(true);
+      this.apenasUsuarios.set(this.data.apenasUsuarios ?? false);
       this.form.patchValue({
         atrasoMinutos: this.data.atrasoMinutos,
         descricao: this.data.descricao ?? '',
         usuarioIds: this.data.usuarioIds ?? [],
       });
+
+      if (this.data.apenasUsuarios) {
+        this.form.controls.atrasoMinutos.disable();
+        this.form.controls.descricao.disable();
+      }
     }
   }
 
   private carregarUsuarios(): void {
     this.usuariosService.listar().subscribe({
       next: (users) => {
-        this.usuarios.set(users.filter((u) => u.ativo));
+        this.usuarios.set(users.filter((u) => u.ativo && u.cargo !== 'vigia'));
       },
       error: () => {
         this.notification.error('Erro ao carregar usuários.');
@@ -80,22 +89,46 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
     this.loading.set(true);
     const raw = this.form.getRawValue();
 
-    this.configuracoesService
-      .salvarEscalonamento({
-        atrasoMinutos: raw.atrasoMinutos,
-        descricao: raw.descricao,
-        usuarioIds: raw.usuarioIds,
-      })
-      .subscribe({
+    if (this.isEdit()) {
+      const request$ = this.apenasUsuarios()
+        ? this.configuracoesService.atualizarUsuariosEscalonamento(this.data!.id, {
+            usuarioIds: raw.usuarioIds,
+          })
+        : this.configuracoesService.atualizarEscalonamento(this.data!.id, {
+            atrasoMinutos: raw.atrasoMinutos,
+            descricao: raw.descricao,
+            usuarioIds: raw.usuarioIds,
+          });
+
+      request$.subscribe({
         next: () => {
           this.loading.set(false);
-          this.notification.success('Configuração de escalonamento salva com sucesso.');
+          this.notification.success('Escalonamento atualizado com sucesso.');
           this.dialogRef.close(true);
         },
         error: (err) => {
           this.loading.set(false);
-          this.notification.error(err.message ?? 'Erro ao salvar configuração de escalonamento.');
+          this.notification.error(err.message ?? 'Erro ao salvar escalonamento.');
         },
       });
+    } else {
+      this.configuracoesService
+        .criarEscalonamento({
+          atrasoMinutos: raw.atrasoMinutos,
+          descricao: raw.descricao,
+          usuarioIds: raw.usuarioIds,
+        })
+        .subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.notification.success('Escalonamento criado com sucesso.');
+            this.dialogRef.close(true);
+          },
+          error: (err) => {
+            this.loading.set(false);
+            this.notification.error(err.message ?? 'Erro ao criar escalonamento.');
+          },
+        });
+    }
   }
 }

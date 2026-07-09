@@ -58,10 +58,10 @@
     </z-form-control>
     @if (form.controls.usuarioIds.invalid && form.controls.usuarioIds.touched) {
       <z-form-message [zError]="true">
-        Selecione pelo menos 1 usuário para receber o alerta.
+        Selecione pelo menos 1 usuário.
       </z-form-message>
     } @else {
-      <z-form-message>Usuários que serão notificados quando o escalonamento for acionado.</z-form-message>
+      <z-form-message>Mínimo de 1 usuário obrigatório.</z-form-message>
     }
   </z-form-field>
 </form>

@@ -2,7 +2,12 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { Empresa } from '../../core/models/empresa.model';
-import { ConfigEscalonamento, CreateEscalonamentoPayload } from '../../core/models/config.model';
+import {
+  ConfigEscalonamento,
+  CreateEscalonamentoPayload,
+  UpdateEscalonamentoPayload,
+  UpdateEscalonamentoUsuariosPayload,
+} from '../../core/models/config.model';
 
 interface ConfigEscalonamentoDto {
   id: string;
@@ -10,6 +15,7 @@ interface ConfigEscalonamentoDto {
   atraso_minutos: number;
   descricao?: string;
   usuario_ids: string[];
+  sistema: boolean;
   created_at: string;
 }
 
@@ -30,6 +36,7 @@ function mapEscalonamentoFromDto(dto: ConfigEscalonamentoDto): ConfigEscalonamen
     atrasoMinutos: dto.atraso_minutos,
     descricao: dto.descricao,
     usuarioIds: dto.usuario_ids ?? [],
+    sistema: dto.sistema,
     createdAt: dto.created_at,
   };
 }
@@ -54,13 +61,19 @@ export class ConfiguracoesService {
     return this.api.get<EmpresaDto>('/empresa').pipe(map(mapEmpresaFromDto));
   }
 
-  obterEscalonamento(): Observable<ConfigEscalonamento> {
+  listarEscalonamentos(): Observable<ConfigEscalonamento[]> {
     return this.api
-      .get<ConfigEscalonamentoDto>('/config/escalonamento')
+      .get<ConfigEscalonamentoDto[]>('/config/escalonamento')
+      .pipe(map((dtos) => dtos.map(mapEscalonamentoFromDto)));
+  }
+
+  obterEscalonamento(id: string): Observable<ConfigEscalonamento> {
+    return this.api
+      .get<ConfigEscalonamentoDto>(`/config/escalonamento/${id}`)
       .pipe(map(mapEscalonamentoFromDto));
   }
 
-  salvarEscalonamento(data: CreateEscalonamentoPayload): Observable<ConfigEscalonamento> {
+  criarEscalonamento(data: CreateEscalonamentoPayload): Observable<ConfigEscalonamento> {
     const body: Record<string, unknown> = {
       atraso_minutos: data.atrasoMinutos,
       usuario_ids: data.usuarioIds,
@@ -69,7 +82,30 @@ export class ConfiguracoesService {
       body['descricao'] = data.descricao;
     }
     return this.api
-      .put<ConfigEscalonamentoDto>('/config/escalonamento', body)
+      .post<ConfigEscalonamentoDto>('/config/escalonamento', body)
+      .pipe(map(mapEscalonamentoFromDto));
+  }
+
+  atualizarEscalonamento(id: string, data: UpdateEscalonamentoPayload): Observable<ConfigEscalonamento> {
+    const body: Record<string, unknown> = {
+      atraso_minutos: data.atrasoMinutos,
+      usuario_ids: data.usuarioIds,
+    };
+    if (data.descricao !== undefined) {
+      body['descricao'] = data.descricao;
+    }
+    return this.api
+      .put<ConfigEscalonamentoDto>(`/config/escalonamento/${id}`, body)
+      .pipe(map(mapEscalonamentoFromDto));
+  }
+
+  excluirEscalonamento(id: string): Observable<void> {
+    return this.api.delete<void>(`/config/escalonamento/${id}`);
+  }
+
+  atualizarUsuariosEscalonamento(id: string, data: UpdateEscalonamentoUsuariosPayload): Observable<ConfigEscalonamento> {
+    return this.api
+      .put<ConfigEscalonamentoDto>(`/config/escalonamento/${id}/usuarios`, { usuario_ids: data.usuarioIds })
       .pipe(map(mapEscalonamentoFromDto));
   }
 }

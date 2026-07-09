@@ -4,12 +4,9 @@ import { NgIcon } from '@ng-icons/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UsuariosService, CreateSenhaVigiaPayload, UpdateSenhaVigiaPayload } from './usuarios.service';
-import { ConfiguracoesService } from '../configuracoes/configuracoes.service';
-import { ConfigEscalonamento } from '../../core/models/config.model';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
-import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
 import {
   ZardFormFieldComponent,
   ZardFormLabelComponent,
@@ -24,8 +21,6 @@ import { SenhaVigia } from '../../core/models/senha.model';
 
 interface CustomFormControls {
   codigo: FormControl<string>;
-  descricao: FormControl<string>;
-  escalonamentoId: FormControl<string | null>;
 }
 
 @Component({
@@ -34,8 +29,6 @@ interface CustomFormControls {
     ReactiveFormsModule,
     ZardInputDirective,
     ZardButtonComponent,
-    ZardSelectComponent,
-    ZardSelectItemComponent,
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
@@ -47,7 +40,6 @@ interface CustomFormControls {
 })
 export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   private readonly usuariosService = inject(UsuariosService);
-  private readonly configuracoesService = inject(ConfiguracoesService);
   private readonly notification = inject(NotificationService);
   private readonly dialogRef = inject(ZardDialogRef<VigiaSenhasFormComponent>);
   private readonly fb = inject(FormBuilder);
@@ -56,7 +48,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
 
   readonly loading = signal(true);
   readonly senhas = signal<SenhaVigia[]>([]);
-  readonly escalonamentos = signal<ConfigEscalonamento[]>([]);
 
   readonly okSenha = computed(() => this.senhas().find((s) => s.tipo === 'ok') ?? null);
   readonly emergenciaSenha = computed(() => this.senhas().find((s) => s.tipo === 'emergencia') ?? null);
@@ -88,26 +79,10 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
 
   novoCustomForm = this.fb.nonNullable.group({
     codigo: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers]],
-    descricao: [''],
-    escalonamentoId: [null as string | null, [Validators.required]],
   });
 
   ngOnInit(): void {
     this.carregarDados();
-    this.carregarEscalonamentos();
-  }
-
-  private carregarEscalonamentos(): void {
-    this.configuracoesService.obterEscalonamento()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (config) => {
-          this.escalonamentos.set([config]);
-        },
-        error: (err) => {
-          console.error('[VigiaSenhasForm] Erro ao carregar escalonamento:', err);
-        },
-      });
   }
 
   ngOnDestroy(): void {
@@ -161,8 +136,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
         nonNullable: true,
         validators: [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers],
       }),
-      descricao: new FormControl(senha.descricao ?? '', { nonNullable: true }),
-      escalonamentoId: new FormControl(senha.escalonamentoId ?? null),
     };
   }
 
@@ -243,12 +216,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
     this.savingCustomId.set(senhaId);
     const payload: UpdateSenhaVigiaPayload = {
       codigo: form.codigo.value,
-      descricao: form.descricao.value,
     };
-
-    if (form.escalonamentoId.value) {
-      payload.escalonamentoId = form.escalonamentoId.value;
-    }
 
     this.usuariosService
       .atualizarSenha(this.usuario.id, senhaId, payload)
@@ -303,14 +271,6 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
       tipo: 'customizada',
       codigo: raw.codigo,
     };
-
-    if (raw.descricao) {
-      payload.descricao = raw.descricao;
-    }
-
-    if (raw.escalonamentoId) {
-      payload.escalonamentoId = raw.escalonamentoId;
-    }
 
     this.usuariosService
       .criarSenha(this.usuario.id, payload)

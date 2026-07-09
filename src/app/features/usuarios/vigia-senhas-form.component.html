@@ -126,63 +126,29 @@
         <div class="rounded-lg border border-dashed p-4 mb-3">
           <h5 class="text-sm font-medium mb-3">Nova senha customizada</h5>
           <form [formGroup]="novoCustomForm" novalidate class="space-y-3">
-            <div class="grid grid-cols-2 gap-3">
-              <z-form-field>
-                <z-form-label [zRequired]="true">Código</z-form-label>
-                <z-form-control>
-                  <input
-                    z-input
-                    [zPass]="true"
-                    [zMinlength]="2"
-                    [zMaxlength]="6"
-                    formControlName="codigo"
-                    placeholder="2 a 6 caracteres"
-                    class="w-full"
-                    autocomplete="new-password"
-                  />
-                </z-form-control>
-                @if (novoCustomForm.controls.codigo.invalid && novoCustomForm.controls.codigo.touched) {
-                  @if (novoCustomForm.controls.codigo.errors?.['minlength'] || novoCustomForm.controls.codigo.errors?.['maxlength']) {
-                    <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
-                  } @else if (novoCustomForm.controls.codigo.errors?.['atLeastTwoNumbers']) {
-                    <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
-                  } @else {
-                    <z-form-message [zError]="true">Código inválido.</z-form-message>
-                  }
-                }
-              </z-form-field>
-
-              <z-form-field>
-                <z-form-label [zRequired]="true">Escalonamento</z-form-label>
-                <z-form-control>
-                  <z-select
-                    formControlName="escalonamentoId"
-                    [zPlaceholder]="'Selecione o nível...'"
-                    class="w-full"
-                  >
-                    @for (esc of escalonamentos(); track esc.id) {
-                      <z-select-item [zValue]="esc.id">
-                        {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
-                      </z-select-item>
-                    }
-                  </z-select>
-                </z-form-control>
-                @if (novoCustomForm.controls.escalonamentoId.invalid && novoCustomForm.controls.escalonamentoId.touched) {
-                  <z-form-message [zError]="true">Selecione um nível de escalonamento.</z-form-message>
-                }
-              </z-form-field>
-            </div>
-
             <z-form-field>
-              <z-form-label>Descrição</z-form-label>
+              <z-form-label [zRequired]="true">Código</z-form-label>
               <z-form-control>
                 <input
                   z-input
-                  formControlName="descricao"
-                  placeholder="Opcional"
+                  [zPass]="true"
+                  [zMinlength]="2"
+                  [zMaxlength]="6"
+                  formControlName="codigo"
+                  placeholder="2 a 6 caracteres"
                   class="w-full"
+                  autocomplete="new-password"
                 />
               </z-form-control>
+              @if (novoCustomForm.controls.codigo.invalid && novoCustomForm.controls.codigo.touched) {
+                @if (novoCustomForm.controls.codigo.errors?.['minlength'] || novoCustomForm.controls.codigo.errors?.['maxlength']) {
+                  <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                } @else if (novoCustomForm.controls.codigo.errors?.['atLeastTwoNumbers']) {
+                  <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                } @else {
+                  <z-form-message [zError]="true">Código inválido.</z-form-message>
+                }
+              }
             </z-form-field>
   
             <div class="flex items-center gap-2 justify-end">
@@ -217,60 +183,29 @@
             @let form = customForms[senha.id];
             @if (form) {
               <div class="rounded-lg border p-4">
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                  <z-form-field>
-                    <z-form-label [zRequired]="true">Código</z-form-label>
-                    <z-form-control>
-                      <input
-                        z-input
-                        [zPass]="true"
-                        [zMinlength]="2"
-                        [zMaxlength]="6"
-                        [formControl]="form.codigo"
-                        placeholder="2 a 6 caracteres"
-                        class="w-full"
-                        autocomplete="new-password"
-                      />
-                    </z-form-control>
-                    @if (form.codigo.invalid && form.codigo.touched) {
-                      @if (form.codigo.errors?.['minlength'] || form.codigo.errors?.['maxlength']) {
-                        <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
-                      } @else if (form.codigo.errors?.['atLeastTwoNumbers']) {
-                        <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
-                      } @else {
-                        <z-form-message [zError]="true">Código inválido.</z-form-message>
-                      }
-                    }
-                  </z-form-field>
-
-                  <z-form-field>
-                    <z-form-label [zRequired]="true">Escalonamento</z-form-label>
-                    <z-form-control>
-                      <z-select
-                        [formControl]="form.escalonamentoId"
-                        [zPlaceholder]="'Selecione o nível...'"
-                        class="w-full"
-                      >
-                        @for (esc of escalonamentos(); track esc.id) {
-                          <z-select-item [zValue]="esc.id">
-                            {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
-                          </z-select-item>
-                        }
-                      </z-select>
-                    </z-form-control>
-                  </z-form-field>
-                </div>
-
-                <z-form-field>
-                  <z-form-label>Descrição</z-form-label>
+                <z-form-field class="mb-3">
+                  <z-form-label [zRequired]="true">Código</z-form-label>
                   <z-form-control>
                     <input
                       z-input
-                      [formControl]="form.descricao"
-                      placeholder="Opcional"
+                      [zPass]="true"
+                      [zMinlength]="2"
+                      [zMaxlength]="6"
+                      [formControl]="form.codigo"
+                      placeholder="2 a 6 caracteres"
                       class="w-full"
+                      autocomplete="new-password"
                     />
                   </z-form-control>
+                  @if (form.codigo.invalid && form.codigo.touched) {
+                    @if (form.codigo.errors?.['minlength'] || form.codigo.errors?.['maxlength']) {
+                      <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                    } @else if (form.codigo.errors?.['atLeastTwoNumbers']) {
+                      <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                    } @else {
+                      <z-form-message [zError]="true">Código inválido.</z-form-message>
+                    }
+                  }
                 </z-form-field>
   
                 <div class="flex items-center gap-2 justify-end">
