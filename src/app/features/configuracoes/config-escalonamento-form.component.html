@@ -1,37 +1,5 @@
 <form [formGroup]="form" novalidate class="space-y-6">
   <z-form-field>
-    <z-form-label [zRequired]="!isEdit()">Nível</z-form-label>
-    <z-form-control>
-      <input
-        z-input
-        type="number"
-        formControlName="nivel"
-        placeholder="Ex: 1"
-        class="w-full"
-        [zNumeric]="true"
-        [zMin]="1"
-        [zMax]="5"
-        [zStep]="1"
-      />
-    </z-form-control>
-    @if (form.controls.nivel.invalid && form.controls.nivel.touched) {
-      <z-form-message [zError]="true">
-        @if (form.controls.nivel.errors?.['required']) {
-          Nível é obrigatório.
-        } @else if (form.controls.nivel.errors?.['min']) {
-          O nível deve ser maior que 0.
-        } @else if (form.controls.nivel.errors?.['max']) {
-          O nível máximo é 5.
-        }
-      </z-form-message>
-    } @else {
-      <z-form-message>
-        {{ isSistema() ? 'Nível definido pelo sistema e não pode ser alterado.' : isEdit() ? 'O nível não pode ser alterado na edição.' : 'Ordem de prioridade do escalonamento (1 = primeiro a ser notificado).' }}
-      </z-form-message>
-    }
-  </z-form-field>
-
-  <z-form-field>
     <z-form-label [zRequired]="true">Atraso (minutos)</z-form-label>
     <z-form-control>
       <input
@@ -55,7 +23,7 @@
         }
       </z-form-message>
     } @else {
-      <z-form-message>{{ isSistema() ? 'Valor definido pelo sistema e não pode ser alterado.' : 'Tempo em minutos sem check-in para acionar este nível de escalonamento.' }}</z-form-message>
+      <z-form-message>Tempo em minutos sem check-in para acionar o escalonamento.</z-form-message>
     }
   </z-form-field>
 
@@ -66,15 +34,15 @@
         z-input
         type="text"
         formControlName="descricao"
-        placeholder="Ex: Notificação de sabotagem"
+        placeholder="Ex: Notificação de atraso"
         class="w-full"
       />
     </z-form-control>
-    <z-form-message>{{ isSistema() ? 'Valor definido pelo sistema e não pode ser alterado.' : 'Descrição opcional para identificar este nível de escalonamento.' }}</z-form-message>
+    <z-form-message>Descrição opcional para identificar esta configuração.</z-form-message>
   </z-form-field>
 
   <z-form-field>
-    <z-form-label>Usuários notificados</z-form-label>
+    <z-form-label [zRequired]="true">Usuários notificados</z-form-label>
     <z-form-control>
       <z-select
         [zMultiple]="true"
@@ -83,17 +51,17 @@
         [zPlaceholder]="'Selecione os usuários...'"
         class="!h-auto !min-h-9"
       >
-        @for (usuario of usuarios(); track usuario.value) {
-          <z-select-item [zValue]="usuario.value">{{ usuario.label }}</z-select-item>
+        @for (usuario of usuarios(); track usuario.id) {
+          <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
         }
       </z-select>
     </z-form-control>
     @if (form.controls.usuarioIds.invalid && form.controls.usuarioIds.touched) {
       <z-form-message [zError]="true">
-        Selecione pelo menos 1 usuário para receber este alerta.
+        Selecione pelo menos 1 usuário para receber o alerta.
       </z-form-message>
     } @else {
-      <z-form-message>Usuários que serão notificados quando este nível for acionado.</z-form-message>
+      <z-form-message>Usuários que serão notificados quando o escalonamento for acionado.</z-form-message>
     }
   </z-form-field>
 </form>

@@ -3,7 +3,6 @@ export interface SenhaVigia {
   tipo: 'ok' | 'emergencia' | 'customizada';
   codigo: string;
   descricao?: string;
-  nivelEscalonamentoId?: string | null;
   usuarioId: string;
   empresaId: string;
   createdAt: string;

@@ -7,6 +7,7 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardComboboxImports, type ZardComboboxOption } from '@/shared/components/combobox';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
@@ -26,6 +27,7 @@ interface EditData {
     ReactiveFormsModule,
     ZardInputDirective,
     ZardComboboxImports,
+    ZardButtonComponent,
     LoadingSpinner,
     WeeklyGridComponent,
   ],
@@ -196,24 +198,34 @@ export class EscalasFormComponent implements OnInit {
     tolerancia_min: number;
     dias: DiaEscalaEntry[];
   }): void {
-    const ativas = this.existingEscalas.filter((e) => e.ativo);
-    if (ativas.length === 0) {
-      this.criarNovasEscalas(payload);
+    if (payload.dias.length <= 7) {
+      this.escalasService.substituirLote(payload).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.notification.success('Escala atualizada com sucesso.');
+          this.dialogRef.close(true);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.notification.error(err.message ?? 'Erro ao atualizar escala.');
+        },
+      });
       return;
     }
 
-    const deletes = ativas.map((e) =>
-      this.escalasService.excluir(e.id)
-    );
-    forkJoin(deletes).subscribe({
-      next: () => this.criarNovasEscalas(payload),
-      error: (err) => {
-        this.loading.set(false);
-        this.notification.error(
-          err.message ?? 'Erro ao remover escalas antigas.'
-        );
-      },
-    });
+    const ativas = this.existingEscalas.filter((e) => e.ativo);
+    if (ativas.length > 0) {
+      const deletes = ativas.map((e) => this.escalasService.excluir(e.id));
+      forkJoin(deletes).subscribe({
+        next: () => this.criarNovasEscalas(payload),
+        error: (err) => {
+          this.loading.set(false);
+          this.notification.error(err.message ?? 'Erro ao remover escalas antigas.');
+        },
+      });
+    } else {
+      this.criarNovasEscalas(payload);
+    }
   }
 
   private criarNovasEscalas(payload: {

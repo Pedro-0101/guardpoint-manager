@@ -1,10 +1,15 @@
-export interface NivelEscalonamento {
+export interface ConfigEscalonamento {
   id: string;
   empresaId: string;
-  nivel: number;
   atrasoMinutos: number;
   descricao?: string;
-  sistema: boolean;
-  usuarioIds: string[] | null;
+  usuarioIds: string[];
   createdAt: string;
 }
+
+export interface CreateEscalonamentoPayload {
+  atrasoMinutos: number;
+  descricao?: string;
+  usuarioIds: string[];
+}
+

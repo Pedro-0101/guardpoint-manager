@@ -24,14 +24,11 @@ export interface CreateSenhaVigiaPayload {
   tipo: SenhaVigia['tipo'];
   codigo: string;
   descricao?: string;
-  nivelEscalonamentoId?: string;
 }
 
 export interface UpdateSenhaVigiaPayload {
   codigo?: string;
   descricao?: string;
-  nivelEscalonamentoId?: string;
-  nivelDinamico?: boolean;
 }
 
 interface SenhaVigiaDto {
@@ -41,7 +38,6 @@ interface SenhaVigiaDto {
   tipo: string;
   codigo: string;
   descricao?: string;
-  nivel_escalonamento_id?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -52,7 +48,6 @@ function mapSenhaFromDto(dto: SenhaVigiaDto): SenhaVigia {
     tipo: dto.tipo as SenhaVigia['tipo'],
     codigo: dto.codigo,
     descricao: dto.descricao,
-    nivelEscalonamentoId: dto.nivel_escalonamento_id,
     usuarioId: dto.usuario_id,
     empresaId: dto.empresa_id,
     createdAt: dto.created_at,
@@ -98,9 +93,6 @@ export class UsuariosService {
     if (data.descricao !== undefined) {
       body['descricao'] = data.descricao;
     }
-    if (data.nivelEscalonamentoId !== undefined) {
-      body['nivel_escalonamento_id'] = data.nivelEscalonamentoId;
-    }
     return this.api
       .post<SenhaVigiaDto>(`/usuarios/${userId}/senhas`, body)
       .pipe(map(mapSenhaFromDto));
@@ -113,12 +105,6 @@ export class UsuariosService {
     }
     if (data.descricao !== undefined) {
       body['descricao'] = data.descricao;
-    }
-    if (data.nivelEscalonamentoId !== undefined) {
-      body['nivel_escalonamento_id'] = data.nivelEscalonamentoId;
-    }
-    if (data.nivelDinamico !== undefined) {
-      body['nivel_dinamico'] = data.nivelDinamico;
     }
     return this.api
       .put<SenhaVigiaDto>(`/usuarios/${userId}/senhas/${senhaId}`, body)

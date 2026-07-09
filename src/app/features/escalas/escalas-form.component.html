@@ -88,4 +88,12 @@
       }
     </div>
   </form>
+  <div class="form__actions">
+    <button z-button zType="default" zFullWidth (click)="submit()" [disabled]="loading()">
+      @if (loading()) {
+        <gp-loading-spinner size="xs" />
+      }
+      {{ isEdit() ? 'Salvar alterações' : 'Criar escala' }}
+    </button>
+  </div>
 }

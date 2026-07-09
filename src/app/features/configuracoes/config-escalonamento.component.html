@@ -3,11 +3,11 @@
     <header class="list-page__header">
       <div>
         <h1 class="list-page__title">Escalonamento</h1>
-        <p class="list-page__subtitle">Níveis de escalonamento para atrasos dos vigias</p>
+        <p class="list-page__subtitle">Configuração de escalonamento para atrasos dos vigias</p>
       </div>
-      <button z-button (click)="abrirFormulario()">
-        <ng-icon name="lucidePlus" />
-        Novo nível
+      <button z-button (click)="abrirFormulario()" [zDisabled]="!config()">
+        <ng-icon name="lucidePencil" />
+        Editar
       </button>
     </header>
 
@@ -15,122 +15,47 @@
       <div class="list-page__error">
         <ng-icon name="lucideAlertCircle" />
         <p>{{ errorMsg }}</p>
-        <button class="list-page__retry-btn" (click)="carregarEscalonamentos()">Tentar novamente</button>
+        <button class="list-page__retry-btn" (click)="carregarDados()">Tentar novamente</button>
       </div>
-    } @else {
-      <z-card class="p-4 mb-6">
-        <div class="flex flex-wrap gap-4 items-end">
-          <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
-            <label class="form-label" for="esc-search-input">Buscar</label>
-            <div class="relative flex items-center">
-              <ng-icon name="lucideSearch" class="text-muted-foreground pointer-events-none absolute left-3 size-4" />
-              <input z-input id="esc-search-input" class="w-full pl-9" [formControl]="searchControl" placeholder="Descrição ou nível..." />
+    } @else if (loading()) {
+      <z-card class="p-6">
+        <div class="space-y-4">
+          <z-skeleton class="h-[14px] w-[120px] rounded" />
+          <z-skeleton class="h-[14px] w-[200px] rounded" />
+          <z-skeleton class="h-[14px] w-[300px] rounded" />
+        </div>
+      </z-card>
+    } @else if (config(); as cfg) {
+      <z-card class="p-6">
+        <div class="space-y-4">
+          <div class="flex items-center gap-8">
+            <div>
+              <p class="text-sm text-muted-foreground">Atraso para acionar</p>
+              <p class="text-lg font-semibold">{{ cfg.atrasoMinutos }} min</p>
+            </div>
+            <div>
+              <p class="text-sm text-muted-foreground">Usuários notificados</p>
+              <p class="text-lg font-semibold">{{ cfg.usuarioIds.length }} {{ cfg.usuarioIds.length === 1 ? 'usuário' : 'usuários' }}</p>
             </div>
           </div>
-
-          <div class="flex flex-col gap-1.5 min-w-[200px] flex-1 max-w-[260px]">
-            <label class="form-label" for="filtro-usuarios-select">Usuários notificados</label>
-            <z-select
-              id="filtro-usuarios-select"
-              [zMultiple]="true"
-              [formControl]="usuariosControl"
-              [zPlaceholder]="'Todos os usuários'"
-            >
-              @for (usuario of usuarios(); track usuario.id) {
-                <z-select-item [zValue]="usuario.id">{{ usuario.nome }}</z-select-item>
+          @if (cfg.descricao) {
+            <div>
+              <p class="text-sm text-muted-foreground">Descrição</p>
+              <p>{{ cfg.descricao }}</p>
+            </div>
+          }
+          <div>
+            <p class="text-sm text-muted-foreground mb-1">Notificados</p>
+            <div class="flex flex-wrap gap-1.5">
+              @for (id of cfg.usuarioIds; track id) {
+                <span class="inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium">
+                  {{ usuariosMap()[id] || id }}
+                </span>
               }
-            </z-select>
-          </div>
-
-          <div class="flex items-center gap-3 min-w-fit">
-            <button
-              z-button
-              zType="ghost"
-              zSize="sm"
-              class="text-muted-foreground"
-              (click)="limparTodosFiltros()"
-            >
-              <ng-icon name="lucideX" class="size-3.5" />
-              Limpar filtros
-            </button>
+            </div>
           </div>
         </div>
       </z-card>
-
-      <div class="w-full">
-        <div class="overflow-hidden rounded-md border">
-          <table z-table>
-          <thead z-table-header>
-            <tr z-table-row>
-              <th z-table-head>Nível</th>
-              <th z-table-head>Atraso (min)</th>
-              <th z-table-head>Descrição</th>
-              <th z-table-head>Usuários notificados</th>
-              <th z-table-head>Ações</th>
-            </tr>
-          </thead>
-          <tbody z-table-body>
-            @if (loading()) {
-              @for (row of [1,2,3,4,5]; track row) {
-                <tr z-table-row>
-                  <td z-table-cell><z-skeleton class="h-[14px] w-[40px] rounded" /></td>
-                  <td z-table-cell><z-skeleton class="h-[14px] w-[60px] rounded" /></td>
-                  <td z-table-cell><z-skeleton class="h-[14px] w-[180px] rounded" /></td>
-                  <td z-table-cell><z-skeleton class="h-[14px] w-[60px] rounded" /></td>
-                  <td z-table-cell><z-skeleton class="size-8 rounded-md" /></td>
-                </tr>
-              }
-            } @else {
-              @if ((filteredEscalonamentos$ | async); as items) {
-                @if (items.length === 0) {
-                  <tr>
-                    <td z-table-cell [attr.colspan]="5">
-                      <gp-empty-state
-                        icon="lucideLayers"
-                        title="Nenhum nível configurado"
-                        [description]="searchControl.value || usuariosControl.value.length ? 'Nenhum nível corresponde aos filtros.' : 'Nenhum nível de escalonamento cadastrado.'"
-                      />
-                    </td>
-                  </tr>
-                } @else {
-                  @for (item of items; track item.id) {
-                    <tr z-table-row>
-                      <td z-table-cell>
-                        <span class="inline-flex items-center justify-center rounded-full bg-muted size-7 text-sm font-semibold leading-none">
-                          {{ item.nivel }}
-                        </span>
-                      </td>
-                      <td z-table-cell>{{ item.atrasoMinutos }} min</td>
-                      <td z-table-cell>{{ item.descricao || '—' }}</td>
-                      <td z-table-cell>
-                        <span [zTooltip]="getNomesUsuarios(item.usuarioIds ?? [])">
-                          {{ item.usuarioIds?.length || 0 }} {{ (item.usuarioIds?.length || 0) === 1 ? 'usuário' : 'usuários' }}
-                        </span>
-                      </td>
-                      <td z-table-cell class="list-page__actions">
-                        @if (!item.sistema) {
-                          <button z-button zType="ghost" zSize="icon" zTooltip="Editar nível" (click)="abrirFormulario(item)" aria-label="Editar nível">
-                            <ng-icon name="lucidePencil" />
-                          </button>
-                          <button z-button zType="ghost" zSize="icon" class="text-destructive" zTooltip="Remover nível" (click)="confirmarExclusao(item)" aria-label="Remover nível">
-                            <ng-icon name="lucideTrash2" />
-                          </button>
-                        }
-                        @if (item.sistema) {
-                          <button z-button zType="ghost" zSize="icon" zTooltip="Editar usuários notificados" (click)="abrirFormulario(item)" aria-label="Editar usuários notificados">
-                            <ng-icon name="lucidePencil" />
-                          </button>
-                        }
-                      </td>
-                    </tr>
-                  }
-                }
-              }
-            }
-          </tbody>
-        </table>
-        </div>
-      </div>
     }
   </div>
 </gp-page-layout>

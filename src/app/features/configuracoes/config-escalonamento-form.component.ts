@@ -1,10 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators, type ValidatorFn } from '@angular/forms';
-import {
-  ConfiguracoesService,
-  CreateEscalonamentoPayload,
-  UpdateEscalonamentoPayload,
-} from './configuracoes.service';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ConfiguracoesService } from './configuracoes.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
@@ -17,12 +13,8 @@ import {
 } from '@/shared/components/form';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
-import { NivelEscalonamento } from '../../core/models/config.model';
-
-interface UsuarioOption {
-  value: string;
-  label: string;
-}
+import { ConfigEscalonamento } from '../../core/models/config.model';
+import { Usuario } from '../../core/models/usuario.model';
 
 @Component({
   selector: 'gp-config-escalonamento-form',
@@ -44,59 +36,33 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
   private readonly usuariosService = inject(UsuariosService);
   private readonly dialogRef = inject(ZardDialogRef<ConfigEscalonamentoFormComponent>);
   private readonly notification = inject(NotificationService);
-  readonly data = inject<NivelEscalonamento | null>(Z_MODAL_DATA, { optional: true }) ?? null;
+  readonly data = inject<ConfigEscalonamento | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   readonly loading = signal(false);
-  readonly isEdit = signal(false);
-  readonly isSistema = signal(false);
-  readonly usuarios = signal<UsuarioOption[]>([]);
+  readonly usuarios = signal<Usuario[]>([]);
 
   form = this.fb.nonNullable.group({
-    nivel: [1, [Validators.required, Validators.min(1)]],
     atrasoMinutos: [5, [Validators.required, Validators.min(1)]],
     descricao: [''],
-    usuarioIds: [[] as string[]],
+    usuarioIds: [[] as string[], [Validators.required]],
   });
 
   ngOnInit(): void {
     this.carregarUsuarios();
 
     if (this.data) {
-      this.isEdit.set(true);
       this.form.patchValue({
-        nivel: this.data.nivel,
         atrasoMinutos: this.data.atrasoMinutos,
         descricao: this.data.descricao ?? '',
         usuarioIds: this.data.usuarioIds ?? [],
       });
-      this.form.controls.nivel.disable();
-
-      if (this.data.sistema) {
-        this.isSistema.set(true);
-        this.form.controls.atrasoMinutos.disable();
-        this.form.controls.descricao.disable();
-      }
-
     }
-    this.form.controls.usuarioIds.addValidators(this.peloMenosUmUsuario());
-    this.form.controls.usuarioIds.updateValueAndValidity();
-  }
-
-  private peloMenosUmUsuario(): ValidatorFn {
-    return (control) => {
-      const value = control.value;
-      return Array.isArray(value) && value.length >= 1 ? null : { minimoUmUsuario: true };
-    };
   }
 
   private carregarUsuarios(): void {
     this.usuariosService.listar().subscribe({
       next: (users) => {
-        this.usuarios.set(
-          users
-            .filter((u) => u.cargo === 'admin')
-            .map((u) => ({ value: u.id, label: u.nome })),
-        );
+        this.usuarios.set(users.filter((u) => u.ativo));
       },
       error: () => {
         this.notification.error('Erro ao carregar usuários.');
@@ -114,36 +80,22 @@ export class ConfigEscalonamentoFormComponent implements OnInit {
     this.loading.set(true);
     const raw = this.form.getRawValue();
 
-    const request$ = this.isEdit()
-      ? this.configuracoesService.atualizarEscalonamento(
-          this.data!.id,
-          this.isSistema()
-            ? { usuarioIds: raw.usuarioIds } as UpdateEscalonamentoPayload
-            : {
-                atrasoMinutos: raw.atrasoMinutos,
-                descricao: raw.descricao,
-                usuarioIds: raw.usuarioIds,
-              } as UpdateEscalonamentoPayload,
-        )
-      : this.configuracoesService.criarEscalonamento({
-          nivel: raw.nivel,
-          atrasoMinutos: raw.atrasoMinutos,
-          descricao: raw.descricao,
-          usuarioIds: raw.usuarioIds,
-        } as CreateEscalonamentoPayload);
-
-    request$.subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.notification.success(
-          this.isEdit() ? 'Nível atualizado com sucesso.' : 'Nível criado com sucesso.',
-        );
-        this.dialogRef.close(true);
-      },
-      error: (err) => {
-        this.loading.set(false);
-        this.notification.error(err.message ?? 'Erro ao salvar nível de escalonamento.');
-      },
-    });
+    this.configuracoesService
+      .salvarEscalonamento({
+        atrasoMinutos: raw.atrasoMinutos,
+        descricao: raw.descricao,
+        usuarioIds: raw.usuarioIds,
+      })
+      .subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.notification.success('Configuração de escalonamento salva com sucesso.');
+          this.dialogRef.close(true);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.notification.error(err.message ?? 'Erro ao salvar configuração de escalonamento.');
+        },
+      });
   }
 }

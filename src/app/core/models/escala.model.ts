@@ -56,6 +56,13 @@ export interface CreateEscalaLotePayload {
   usuario_id: string;
 }
 
+export interface CreateEscalaLoteResponse {
+  usuario_id: string;
+  posto_id: string;
+  tolerancia_min: number;
+  dias: DiaEscalaEntry[];
+}
+
 export interface UpdateEscalaPayload {
   ativo?: boolean;
   dia_semana_fim?: number;

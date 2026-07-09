@@ -6,6 +6,7 @@ import {
   EscalaDto,
   CreateEscalaPayload,
   CreateEscalaLotePayload,
+  CreateEscalaLoteResponse,
   UpdateEscalaPayload,
 } from '../../core/models/escala.model';
 
@@ -21,11 +22,24 @@ export class EscalasService {
     offset?: number;
   }): Observable<Escala[]> {
     return this.api
-      .get<{ data: EscalaDto[]; total: number }>(
+      .get<EscalaDto[] | { data: EscalaDto[]; total: number } | { escalas: EscalaDto[] }>(
         '/escalas',
         params as Record<string, string | number | boolean>
       )
-      .pipe(map((res) => res.data.map(mapEscalaFromDto)));
+      .pipe(
+        map((res) => {
+          if (Array.isArray(res)) {
+            return res.map(mapEscalaFromDto);
+          }
+          if ('data' in res && Array.isArray(res.data)) {
+            return res.data.map(mapEscalaFromDto);
+          }
+          if ('escalas' in res && Array.isArray(res.escalas)) {
+            return res.escalas.map(mapEscalaFromDto);
+          }
+          throw new Error('Formato de resposta inesperado da API.');
+        })
+      );
   }
 
   obter(id: string): Observable<Escala> {
@@ -40,10 +54,12 @@ export class EscalasService {
       .pipe(map((dto) => mapEscalaFromDto(dto)));
   }
 
-  criarLote(data: CreateEscalaLotePayload): Observable<Escala[]> {
-    return this.api
-      .post<EscalaDto[]>('/escalas/lote', data)
-      .pipe(map((dtos) => dtos.map(mapEscalaFromDto)));
+  criarLote(data: CreateEscalaLotePayload): Observable<CreateEscalaLoteResponse> {
+    return this.api.post<CreateEscalaLoteResponse>('/escalas/lote', data);
+  }
+
+  substituirLote(data: CreateEscalaLotePayload): Observable<CreateEscalaLoteResponse> {
+    return this.api.put<CreateEscalaLoteResponse>('/escalas/lote', data);
   }
 
   atualizar(

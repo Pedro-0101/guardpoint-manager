@@ -7,7 +7,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { EscalasService } from './escalas.service';
-import { Escala, EscalaDto } from '../../core/models/escala.model';
+import { Escala, EscalaDto, CreateEscalaLoteResponse } from '../../core/models/escala.model';
 
 describe('EscalasService', () => {
   let service: EscalasService;
@@ -128,12 +128,18 @@ describe('EscalasService', () => {
         },
       ],
     };
+    const mockResponse: CreateEscalaLoteResponse = {
+      usuario_id: 'u-1',
+      posto_id: 'p-1',
+      tolerancia_min: 15,
+      dias: payload.dias,
+    };
     const promise = firstValueFrom(service.criarLote(payload));
     httpMock
       .expectOne(`${baseUrl}/escalas/lote`)
-      .flush([mockEscalaDto, { ...mockEscalaDto, id: '3' }]);
+      .flush(mockResponse);
     const result = await promise;
-    expect(result).toHaveLength(2);
-    expect(result[0].id).toBe('1');
+    expect(result.usuario_id).toBe('u-1');
+    expect(result.dias).toHaveLength(2);
   });
 });

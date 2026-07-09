@@ -100,7 +100,7 @@
       <div class="flex items-center justify-between mb-3">
         <div>
           <h4 class="font-medium text-sm">Senhas Customizadas</h4>
-          <p class="text-xs text-muted-foreground mt-0.5">Senhas adicionais vinculadas a níveis de escalonamento.</p>
+          <p class="text-xs text-muted-foreground mt-0.5">Senhas adicionais para usos específicos.</p>
         </div>
         @if (!showingNewCustom()) {
           <button type="button" z-button zSize="sm" zType="outline" (click)="showingNewCustom.set(true)">
@@ -146,24 +146,6 @@
                 </z-form-control>
               </z-form-field>
             </div>
-
-            <z-form-field>
-              <z-form-label>Nível de escalonamento</z-form-label>
-              <z-form-control>
-                <z-select
-                  [formControl]="novoCustomForm.controls.nivelEscalonamentoId"
-                  [zPlaceholder]="'Nível máximo (dinâmico)'"
-                >
-                  <z-select-item [zValue]="''">Nível máximo (dinâmico)</z-select-item>
-                  @for (nivel of niveisEscalonamento(); track nivel.id) {
-                    <z-select-item [zValue]="nivel.id">
-                      Nível {{ nivel.nivel }} ({{ nivel.atrasoMinutos }}min)
-                    </z-select-item>
-                  }
-                </z-select>
-              </z-form-control>
-              <z-form-message>Define quando esta senha pode ser usada no escalonamento de alertas.</z-form-message>
-            </z-form-field>
 
             <div class="flex items-center gap-2 justify-end">
               <button type="button" z-button zType="ghost" zSize="sm" (click)="cancelarNovaCustom()">
@@ -229,23 +211,6 @@
                     </z-form-control>
                   </z-form-field>
                 </div>
-
-                <z-form-field class="mb-3">
-                  <z-form-label>Nível de escalonamento</z-form-label>
-                  <z-form-control>
-                    <z-select
-                      [formControl]="form.nivelEscalonamentoId"
-                      [zPlaceholder]="'Nível máximo (dinâmico)'"
-                    >
-                      <z-select-item [zValue]="''">Nível máximo (dinâmico)</z-select-item>
-                      @for (nivel of niveisEscalonamento(); track nivel.id) {
-                        <z-select-item [zValue]="nivel.id">
-                          Nível {{ nivel.nivel }} ({{ nivel.atrasoMinutos }}min)
-                        </z-select-item>
-                      }
-                    </z-select>
-                  </z-form-control>
-                </z-form-field>
 
                 <div class="flex items-center gap-2 justify-end">
                   <button
