@@ -121,6 +121,19 @@
                     <td z-table-cell>{{ formatarData(turno.inicioPrevisto) }}</td>
                     <td z-table-cell>{{ formatarData(turno.fimPrevisto) }}</td>
                     <td z-table-cell class="list-page__actions">
+                      @if (isAdmin() && turno.status === 'agendado') {
+                        <button
+                          z-button
+                          zType="ghost"
+                          zSize="icon"
+                          zTooltip="Lançar substituição"
+                          (click)="$event.stopPropagation(); abrirSubstituicao(turno)"
+                          (keydown.enter)="$event.stopPropagation(); abrirSubstituicao(turno)"
+                          aria-label="Lançar substituição para este turno"
+                        >
+                          <ng-icon name="lucideUserRoundPlus" />
+                        </button>
+                      }
                       <button
                         z-button
                         zType="ghost"

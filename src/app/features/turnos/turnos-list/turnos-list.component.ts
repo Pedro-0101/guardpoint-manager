@@ -1,12 +1,15 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Router } from '@angular/router';
 import { Subject, merge } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { AuthService } from '../../../core/auth/auth.service';
 import { TurnosService } from '../turnos.service';
 import { PostosService } from '../../postos/postos.service';
 import { UsuariosService } from '../../usuarios/usuarios.service';
+import { SubstituicoesFormComponent } from '../../substituicoes/substituicoes-form.component';
+import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardDatePickerComponent } from '@/shared/components/date-picker';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
@@ -18,6 +21,7 @@ import { StatusBadge } from '../../../shared/components/status-badge/status-badg
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout';
 import { Turno, TurnoFilter } from '../../../core/models/turno.model';
+import { SubstituicaoPrefill } from '../../../core/models/substituicao.model';
 import { Posto } from '../../../core/models/posto.model';
 
 interface StatusFilter {
@@ -61,11 +65,15 @@ function toDateInput(d: Date | null): string | undefined {
   styleUrl: './turnos-list.component.scss',
 })
 export class TurnosListComponent implements OnInit, OnDestroy {
+  private readonly authService = inject(AuthService);
   private readonly turnosService = inject(TurnosService);
   private readonly postosService = inject(PostosService);
   private readonly usuariosService = inject(UsuariosService);
+  private readonly dialog = inject(ZardDialogService);
   private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
+
+  readonly isAdmin = computed(() => this.authService.userRole() === 'admin');
 
   private readonly hoje = new Date();
 
@@ -203,6 +211,37 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   verDetalhe(turno: Turno): void {
     if (turno.status === 'agendado') return;
     this.router.navigate(['/turnos', turno.id]);
+  }
+
+  abrirSubstituicao(turno: Turno): void {
+    const prefill: SubstituicaoPrefill = {
+      postoId: turno.postoId,
+      dataInicio: turno.inicioPrevisto.slice(0, 10),
+      dataFim: turno.fimPrevisto.slice(0, 10),
+      horaInicio: turno.inicioPrevisto.slice(11, 16),
+      horaFim: turno.fimPrevisto.slice(11, 16),
+      excludeUsuarioId: turno.usuarioId,
+    };
+
+    const dialogRef = this.dialog.create({
+      zTitle: 'Lançar substituição',
+      zContent: SubstituicoesFormComponent,
+      zWidth: '640px',
+      zData: prefill,
+      zOkText: 'Criar',
+      zOnOk: (instance: { submit: () => void }) => {
+        instance.submit();
+        return false;
+      },
+    });
+
+    dialogRef.afterClosed
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.carregarTurnos();
+        }
+      });
   }
 
   formatarData(iso: string): string {

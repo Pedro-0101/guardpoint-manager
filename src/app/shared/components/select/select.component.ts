@@ -19,9 +19,11 @@ import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 import { mergeClasses } from '@/shared/utils/merge-classes';
 import { selectVariants, type ZardSelectVariants } from './select.variants';
 import { ZardSelectItemComponent } from './select-item.component';
+import { ZardEmptyComponent } from '../empty/empty.component';
 
 @Component({
   selector: 'z-select',
+  imports: [ZardEmptyComponent],
   template: `
      @if (zLabel(); as label) {
        <label class="block text-sm font-medium mb-1 text-foreground" for="zselect-trigger">{{ label }}</label>
@@ -92,7 +94,11 @@ import { ZardSelectItemComponent } from './select-item.component';
         id="zselect-listbox"
         [attr.aria-multiselectable]="zMultiple() || null"
       >
-        <ng-content />
+        @if (hasItems()) {
+          <ng-content />
+        } @else {
+          <z-empty zSize="sm" zTitle="Nenhum item disponível" zIcon="lucideInbox" />
+        }
       </div>
     }
   `,
@@ -129,6 +135,8 @@ export class ZardSelectComponent implements ControlValueAccessor {
   private readonly elementRef = inject(ElementRef);
 
   readonly items = contentChildren(ZardSelectItemComponent);
+
+  protected readonly hasItems = computed(() => this.items().length > 0);
 
   protected readonly selectedValues = computed<string[]>(() => {
     const v = this.zValue();

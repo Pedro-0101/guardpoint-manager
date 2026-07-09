@@ -34,6 +34,19 @@ export interface SubstituicaoDto {
   updated_at: string;
 }
 
+export interface SubstituicaoPrefill {
+  usuarioId?: string;
+  postoId?: string;
+  dataInicio?: string;
+  dataFim?: string;
+  horaInicio?: string;
+  horaFim?: string;
+  motivo?: string;
+  toleranciaMin?: number;
+  ativo?: boolean;
+  excludeUsuarioId?: string;
+}
+
 export interface CreateSubstituicaoPayload {
   data_inicio: string;
   data_fim: string;

@@ -13,7 +13,7 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardDatePickerComponent } from '@/shared/components/date-picker';
-import { ZardComboboxImports, type ZardComboboxOption } from '@/shared/components/combobox';
+import { ZardSelectImports } from '@/shared/components/select';
 import { ZardCheckboxComponent } from '@/shared/components/checkbox/checkbox.component';
 import {
   ZardFormFieldComponent,
@@ -47,7 +47,7 @@ function periodoValidator(group: AbstractControl): ValidationErrors | null {
     ReactiveFormsModule,
     ZardInputDirective,
     ZardDatePickerComponent,
-    ZardComboboxImports,
+    ZardSelectImports,
     ZardCheckboxComponent,
     ZardFormFieldComponent,
     ZardFormLabelComponent,
@@ -77,12 +77,13 @@ export class SubstituicoesFormComponent implements OnInit {
   readonly postos = signal<Posto[]>([]);
   readonly vigias = signal<Usuario[]>([]);
 
-  readonly vigiaOptions = computed<ZardComboboxOption[]>(() =>
-    this.vigias().map((v) => ({ value: v.id, label: v.nome }))
-  );
-  readonly postoOptions = computed<ZardComboboxOption[]>(() =>
-    this.postos().map((p) => ({ value: p.id, label: p.nome }))
-  );
+  readonly excludeUsuarioId = signal<string | null>(null);
+
+  readonly vigiasFiltrados = computed(() => {
+    const excludeId = this.excludeUsuarioId();
+    const source = this.vigias();
+    return excludeId ? source.filter((v) => v.id !== excludeId) : source;
+  });
 
   form = this.fb.nonNullable.group(
     {
@@ -103,6 +104,9 @@ export class SubstituicoesFormComponent implements OnInit {
     if (this.data) {
       if ('id' in this.data && this.data.id) {
         this.isEdit.set(true);
+      }
+      if ('excludeUsuarioId' in this.data && this.data.excludeUsuarioId) {
+        this.excludeUsuarioId.set(this.data.excludeUsuarioId);
       }
       if (this.data.dataInicio) {
         this.dataInicioValue.set(this.parseDateString(this.data.dataInicio));

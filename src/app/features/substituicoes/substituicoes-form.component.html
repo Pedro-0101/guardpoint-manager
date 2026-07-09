@@ -9,15 +9,15 @@
       <z-form-field>
         <z-form-label [zRequired]="true">Vigia</z-form-label>
         <z-form-control>
-          <z-combobox
+          <z-select
             class="w-full"
-            zWidth="full"
-            [zOptions]="vigiaOptions()"
             zPlaceholder="Selecione o vigia..."
-            zSearchPlaceholder="Buscar vigia..."
-            zEmptyText="Nenhum vigia encontrado."
             formControlName="usuarioId"
-          />
+          >
+            @for (vigia of vigiasFiltrados(); track vigia.id) {
+              <z-select-item [zValue]="vigia.id">{{ vigia.nome }}</z-select-item>
+            }
+          </z-select>
         </z-form-control>
         @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
           <z-form-message [zError]="true">Vigia é obrigatório.</z-form-message>
@@ -29,15 +29,15 @@
       <z-form-field>
         <z-form-label [zRequired]="true">Posto</z-form-label>
         <z-form-control>
-          <z-combobox
+          <z-select
             class="w-full"
-            zWidth="full"
-            [zOptions]="postoOptions()"
             zPlaceholder="Selecione o posto..."
-            zSearchPlaceholder="Buscar posto..."
-            zEmptyText="Nenhum posto encontrado."
             formControlName="postoId"
-          />
+          >
+            @for (posto of postos(); track posto.id) {
+              <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
+            }
+          </z-select>
         </z-form-control>
         @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
           <z-form-message [zError]="true">Posto é obrigatório.</z-form-message>
@@ -54,6 +54,7 @@
           <z-date-picker
             [value]="dataInicioValue()"
             placeholder="Selecionar data"
+            zFormat="dd/MM/yyyy"
             (dateChange)="onDataInicioChange($event)"
           />
         </z-form-control>
@@ -70,6 +71,7 @@
           <z-date-picker
             [value]="dataFimValue()"
             placeholder="Selecionar data"
+            zFormat="dd/MM/yyyy"
             (dateChange)="onDataFimChange($event)"
           />
         </z-form-control>

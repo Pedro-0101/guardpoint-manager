@@ -21,7 +21,7 @@ import { emptyVariants, emptyIconVariants, emptyTitleVariants, emptyDescriptionV
       </span>
     }
     @if (zTitle()) {
-      <h3 [class]="titleClasses()">{{ zTitle() }}</h3>
+      <span [class]="titleClasses()">{{ zTitle() }}</span>
     }
     @if (zDescription()) {
       <p [class]="descriptionClasses()">{{ zDescription() }}</p>
@@ -41,12 +41,13 @@ export class ZardEmptyComponent {
   readonly zIcon = input<string | TemplateRef<void>>('lucideInbox');
   readonly zTitle = input('Nenhum registro encontrado');
   readonly zDescription = input<string>();
+  readonly zSize = input<'default' | 'sm'>('default');
 
   protected readonly isTemplateIcon = computed(() => this.zIcon() instanceof TemplateRef);
   protected readonly iconName = computed(() => this.zIcon() as string);
 
-  protected readonly classes = computed(() => mergeClasses(emptyVariants(), this.class()));
-  protected readonly iconClasses = computed(() => emptyIconVariants());
-  protected readonly titleClasses = computed(() => emptyTitleVariants());
-  protected readonly descriptionClasses = computed(() => emptyDescriptionVariants());
+  protected readonly classes = computed(() => mergeClasses(emptyVariants({ zSize: this.zSize() }), this.class()));
+  protected readonly iconClasses = computed(() => emptyIconVariants({ zSize: this.zSize() }));
+  protected readonly titleClasses = computed(() => emptyTitleVariants({ zSize: this.zSize() }));
+  protected readonly descriptionClasses = computed(() => emptyDescriptionVariants({ zSize: this.zSize() }));
 }
