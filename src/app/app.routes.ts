@@ -42,7 +42,7 @@ export const routes: Routes = [
       {
         path: 'turnos',
         data: { breadcrumb: 'Turnos' },
-        canActivate: [roleGuard(['admin', 'supervisor'])],
+        canActivate: [roleGuard(['admin'])],
         loadComponent: () =>
           import('./features/turnos/turnos-list/turnos-list.component').then(
             (m) => m.TurnosListComponent
@@ -51,7 +51,7 @@ export const routes: Routes = [
       {
         path: 'turnos/:id',
         data: { breadcrumb: 'Detalhe' },
-        canActivate: [roleGuard(['admin', 'supervisor'])],
+        canActivate: [roleGuard(['admin'])],
         loadComponent: () =>
           import('./features/turnos/turno-detail/turno-detail').then(
             (m) => m.TurnoDetailComponent
@@ -98,6 +98,15 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/escalas/escalas-list.component').then(
             (m) => m.EscalasListComponent
+          ),
+      },
+      {
+        path: 'substituicoes',
+        data: { breadcrumb: 'Substituições' },
+        canActivate: [roleGuard(['admin'])],
+        loadComponent: () =>
+          import('./features/substituicoes/substituicoes-list.component').then(
+            (m) => m.SubstituicoesListComponent
           ),
       },
       {

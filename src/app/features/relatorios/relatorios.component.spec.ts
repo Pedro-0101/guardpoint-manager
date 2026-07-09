@@ -18,6 +18,19 @@ describe('RelatoriosComponent', () => {
 
   const baseUrl = environment.apiUrl;
 
+  // A API responde em snake_case; o PostosService mapeia para o modelo camelCase.
+  const mockPostoDto = {
+    id: 'p-1',
+    nome: 'Posto A',
+    latitude: -23.5,
+    longitude: -46.6,
+    raio_m: 100,
+    ativo: true,
+    empresa_id: 'e-1',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  };
+
   const mockPosto: Posto = {
     id: 'p-1',
     nome: 'Posto A',
@@ -104,7 +117,7 @@ describe('RelatoriosComponent', () => {
     fixture.detectChanges();
 
     const postosReq = httpMock.expectOne(`${baseUrl}/postos`);
-    postosReq.flush([mockPosto]);
+    postosReq.flush([mockPostoDto]);
 
     const usuariosReq = httpMock.expectOne(`${baseUrl}/usuarios`);
     usuariosReq.flush([mockUsuario]);
@@ -126,7 +139,7 @@ describe('RelatoriosComponent', () => {
     fixture.detectChanges();
 
     const postosReq = httpMock.expectOne(`${baseUrl}/postos`);
-    postosReq.flush([mockPosto]);
+    postosReq.flush([mockPostoDto]);
     const usuariosReq = httpMock.expectOne(`${baseUrl}/usuarios`);
     usuariosReq.flush([mockUsuario]);
     const historicoReq = httpMock.expectOne(`${baseUrl}/turnos/historico?limit=10&offset=0`);
@@ -149,7 +162,7 @@ describe('RelatoriosComponent', () => {
     fixture.detectChanges();
 
     const postosReq = httpMock.expectOne(`${baseUrl}/postos`);
-    postosReq.flush([mockPosto]);
+    postosReq.flush([mockPostoDto]);
     const usuariosReq = httpMock.expectOne(`${baseUrl}/usuarios`);
     usuariosReq.flush([mockUsuario]);
     const historicoReq = httpMock.expectOne(`${baseUrl}/turnos/historico?limit=10&offset=0`);

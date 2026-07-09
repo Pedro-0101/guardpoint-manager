@@ -111,7 +111,7 @@
           </div>
         </div>
 
-        @if (isAdmin && (turno.status === 'em_andamento' || turno.status === 'pausado')) {
+        @if (podeRevogar && (turno.status === 'em_andamento' || turno.status === 'pausado')) {
           <div class="detail-page__admin-actions">
             <button z-button zType="destructive" (click)="abrirRevogarDialog()">
               <ng-icon name="lucideBan" />

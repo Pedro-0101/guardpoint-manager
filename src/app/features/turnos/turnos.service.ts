@@ -8,12 +8,6 @@ import { Checkin } from '../../core/models/checkin.model';
 import { Posto } from '../../core/models/posto.model';
 import { Usuario } from '../../core/models/usuario.model';
 
-export interface IniciarTurnoPayload {
-  device_id: string;
-  posto_id: string;
-  intervalo_min?: number;
-}
-
 export interface RevogarSessaoResponse {
   pin_novo_dispositivo: string;
   validade_minutos: number;
@@ -112,12 +106,6 @@ export class TurnosService {
     return this.api
       .get<TurnoDto>(`/turnos/${id}`)
       .pipe(map((dto) => this.mapTurnoDetalheFromDto(dto)));
-  }
-
-  iniciar(data: IniciarTurnoPayload): Observable<Turno> {
-    return this.api
-      .post<TurnoDto>('/turnos/iniciar', data)
-      .pipe(map((dto) => this.mapTurnoFromDto(dto)));
   }
 
   revogarSessao(turnoId: string): Observable<RevogarSessaoResponse> {

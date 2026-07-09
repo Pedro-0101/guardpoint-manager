@@ -72,8 +72,9 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   private map: L.Map | null = null;
   private markersLayer: L.LayerGroup | null = null;
 
-  get isAdmin(): boolean {
-    return this.authService.userRole() === 'admin';
+  get podeRevogar(): boolean {
+    const role = this.authService.userRole();
+    return role === 'admin' || role === 'supervisor';
   }
 
   get checkins(): Checkin[] {

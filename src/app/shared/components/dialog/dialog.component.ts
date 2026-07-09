@@ -93,7 +93,7 @@ export class ZardDialogOptions<T, U> {
       <footer class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
         @if (config.zCancelText !== null) {
           <button type="button" data-testid="z-cancel-button" z-button zType="outline" (click)="onCloseClick()">
-            {{ config.zCancelText ?? 'Cancel' }}
+            {{ config.zCancelText ?? 'Cancelar' }}
           </button>
         }
 

@@ -1,0 +1,219 @@
+<gp-page-layout>
+  <div class="list-page">
+    <header class="list-page__header">
+      <div>
+        <h1 class="list-page__title">Substituições</h1>
+        <p class="list-page__subtitle">Coberturas pontuais da escala semanal</p>
+      </div>
+      <button z-button (click)="abrirFormulario()">
+        <ng-icon name="lucidePlus" />
+        Nova substituição
+      </button>
+    </header>
+
+    @if (error(); as errorMsg) {
+      <div class="list-page__error">
+        <ng-icon name="lucideAlertCircle" />
+        <p>{{ errorMsg }}</p>
+        <button class="list-page__retry-btn" (click)="carregarSubstituicoes()">
+          Tentar novamente
+        </button>
+      </div>
+    } @else {
+      <z-card class="p-4 mb-6">
+        <div class="flex flex-wrap gap-4 items-end">
+          <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
+            <label class="form-label" for="substituicao-search-input">
+              Buscar substituição
+            </label>
+            <div class="relative flex items-center">
+              <ng-icon
+                name="lucideSearch"
+                class="text-muted-foreground pointer-events-none absolute left-3 size-4"
+              />
+              <input
+                z-input
+                id="substituicao-search-input"
+                class="w-full pl-9"
+                [formControl]="searchControl"
+                placeholder="Vigia, posto ou motivo..."
+              />
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5 min-w-[180px] flex-1 max-w-[240px]">
+            <label class="form-label" for="filtro-postos-select">Postos</label>
+            <z-select
+              id="filtro-postos-select"
+              [zMultiple]="true"
+              [formControl]="postosControl"
+              [zPlaceholder]="'Todos os postos'"
+            >
+              @for (posto of postos(); track posto.id) {
+                <z-select-item [zValue]="posto.id">{{ posto.nome }}</z-select-item>
+              }
+            </z-select>
+          </div>
+
+          <div class="flex flex-col gap-1.5 min-w-[180px] flex-1 max-w-[240px]">
+            <label class="form-label" for="filtro-vigias-select">Vigias</label>
+            <z-select
+              id="filtro-vigias-select"
+              [zMultiple]="true"
+              [formControl]="vigiasControl"
+              [zPlaceholder]="'Todos os vigias'"
+            >
+              @for (vigia of vigias(); track vigia.id) {
+                <z-select-item [zValue]="vigia.id">{{ vigia.nome }}</z-select-item>
+              }
+            </z-select>
+          </div>
+
+          <div class="flex flex-col gap-1.5 min-w-[160px]">
+            <label class="form-label" for="filtro-data-input">Vigente em</label>
+            <input
+              z-input
+              id="filtro-data-input"
+              type="date"
+              [formControl]="dataControl"
+            />
+          </div>
+
+          <div class="flex items-center gap-3 min-w-fit">
+            <div class="flex items-center gap-2">
+              <z-checkbox [formControl]="ativasOnlyControl" />
+              <span class="text-sm text-muted-foreground whitespace-nowrap">Somente ativas</span>
+            </div>
+
+            <button
+              z-button
+              zType="ghost"
+              zSize="sm"
+              class="text-muted-foreground"
+              (click)="limparTodosFiltros()"
+            >
+              <ng-icon name="lucideX" class="size-3.5" />
+              Limpar filtros
+            </button>
+          </div>
+        </div>
+      </z-card>
+
+      <div class="w-full">
+        <div class="overflow-hidden rounded-md border">
+          <table z-table>
+            <thead z-table-header>
+              <tr z-table-row>
+                <th z-table-head>Vigia</th>
+                <th z-table-head>Posto</th>
+                <th z-table-head>Período</th>
+                <th z-table-head>Horário</th>
+                <th z-table-head>Motivo</th>
+                <th z-table-head class="text-center">Tolerância</th>
+                <th z-table-head>Status</th>
+                <th z-table-head>Ações</th>
+              </tr>
+            </thead>
+            <tbody z-table-body>
+              @if (loading()) {
+                @for (row of [1, 2, 3, 4, 5]; track row) {
+                  <tr z-table-row>
+                    <td z-table-cell>
+                      <z-skeleton class="h-[14px] w-[120px] rounded" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="h-[14px] w-[100px] rounded" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="h-[14px] w-[140px] rounded" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="h-[14px] w-[90px] rounded" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="h-[14px] w-[120px] rounded" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="h-[14px] w-[50px] rounded" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="h-6 w-[70px] rounded-full" />
+                    </td>
+                    <td z-table-cell>
+                      <z-skeleton class="size-8 rounded-md" />
+                    </td>
+                  </tr>
+                }
+              } @else {
+                @if (filteredSubstituicoes$ | async; as substituicoes) {
+                  @if (substituicoes.length === 0) {
+                    <tr>
+                      <td z-table-cell [attr.colspan]="8">
+                        <gp-empty-state
+                          icon="lucideCalendarOff"
+                          title="Nenhuma substituição encontrada"
+                          [description]="
+                            searchControl.value || postosControl.value.length || vigiasControl.value.length || dataControl.value || !ativasOnlyControl.value
+                              ? 'Nenhuma substituição corresponde aos filtros.'
+                              : 'Nenhuma substituição cadastrada.'
+                          "
+                        />
+                      </td>
+                    </tr>
+                  } @else {
+                    @for (substituicao of substituicoes; track substituicao.id) {
+                      <tr z-table-row>
+                        <td z-table-cell>
+                          <span class="list-page__vigia">{{ substituicao.usuarioNome }}</span>
+                        </td>
+                        <td z-table-cell>{{ substituicao.postoNome }}</td>
+                        <td z-table-cell>{{ formatarPeriodo(substituicao) }}</td>
+                        <td z-table-cell>{{ formatarHorario(substituicao) }}</td>
+                        <td z-table-cell>
+                          <span class="list-page__motivo">{{ substituicao.motivo || '—' }}</span>
+                        </td>
+                        <td z-table-cell class="text-center">
+                          {{ substituicao.toleranciaMin }} min
+                        </td>
+                        <td z-table-cell>
+                          <gp-status-badge
+                            [status]="substituicao.ativo ? 'ativo' : 'cancelado'"
+                          />
+                        </td>
+                        <td z-table-cell class="list-page__actions">
+                          <button
+                            z-button
+                            zType="ghost"
+                            zSize="icon"
+                            zTooltip="Editar substituição"
+                            (click)="abrirFormulario(substituicao)"
+                            aria-label="Editar substituição"
+                          >
+                            <ng-icon name="lucidePencil" />
+                          </button>
+                          @if (substituicao.ativo) {
+                            <button
+                              z-button
+                              zType="ghost"
+                              zSize="icon"
+                              class="text-destructive"
+                              zTooltip="Desativar"
+                              (click)="confirmarExclusao(substituicao)"
+                              aria-label="Desativar substituição"
+                            >
+                              <ng-icon name="lucideTrash2" />
+                            </button>
+                          }
+                        </td>
+                      </tr>
+                    }
+                  }
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+</gp-page-layout>

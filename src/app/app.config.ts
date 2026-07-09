@@ -6,6 +6,7 @@ import { provideIcons } from '@ng-icons/core';
 import {
   lucideAlertCircle,
   lucideArrowLeft,
+  lucideArrowRightLeft,
   lucideBan,
   lucideBarChart3,
   lucideBell,
@@ -68,6 +69,7 @@ export const appConfig: ApplicationConfig = {
     provideIcons({
       lucideAlertCircle,
       lucideArrowLeft,
+      lucideArrowRightLeft,
       lucideBan,
       lucideBarChart3,
       lucideBell,

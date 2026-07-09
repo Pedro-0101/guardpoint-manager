@@ -1,0 +1,145 @@
+@if (loadingDeps()) {
+  <div class="form__loading">
+    <gp-loading-spinner size="sm" />
+    <span>Carregando...</span>
+  </div>
+} @else {
+  <form [formGroup]="form" novalidate class="space-y-6">
+    <div class="grid grid-cols-2 gap-4">
+      <z-form-field>
+        <z-form-label [zRequired]="true">Vigia</z-form-label>
+        <z-form-control>
+          <z-combobox
+            class="w-full"
+            zWidth="full"
+            [zOptions]="vigiaOptions()"
+            zPlaceholder="Selecione o vigia..."
+            zSearchPlaceholder="Buscar vigia..."
+            zEmptyText="Nenhum vigia encontrado."
+            formControlName="usuarioId"
+          />
+        </z-form-control>
+        @if (form.controls.usuarioId.invalid && form.controls.usuarioId.touched) {
+          <z-form-message [zError]="true">Vigia é obrigatório.</z-form-message>
+        } @else {
+          <z-form-message>Vigia que fará a cobertura.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Posto</z-form-label>
+        <z-form-control>
+          <z-combobox
+            class="w-full"
+            zWidth="full"
+            [zOptions]="postoOptions()"
+            zPlaceholder="Selecione o posto..."
+            zSearchPlaceholder="Buscar posto..."
+            zEmptyText="Nenhum posto encontrado."
+            formControlName="postoId"
+          />
+        </z-form-control>
+        @if (form.controls.postoId.invalid && form.controls.postoId.touched) {
+          <z-form-message [zError]="true">Posto é obrigatório.</z-form-message>
+        } @else {
+          <z-form-message>Posto que será coberto.</z-form-message>
+        }
+      </z-form-field>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <z-form-field>
+        <z-form-label [zRequired]="true">Data início</z-form-label>
+        <z-form-control>
+          <input z-input type="date" formControlName="dataInicio" class="w-full" />
+        </z-form-control>
+        @if (form.controls.dataInicio.invalid && form.controls.dataInicio.touched) {
+          <z-form-message [zError]="true">Data início é obrigatória.</z-form-message>
+        } @else {
+          <z-form-message>Primeiro dia da cobertura.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Data fim</z-form-label>
+        <z-form-control>
+          <input z-input type="date" formControlName="dataFim" class="w-full" />
+        </z-form-control>
+        @if (form.controls.dataFim.invalid && form.controls.dataFim.touched) {
+          <z-form-message [zError]="true">Data fim é obrigatória.</z-form-message>
+        } @else if (form.errors?.['periodoInvalido'] && form.controls.dataFim.touched) {
+          <z-form-message [zError]="true">Data fim deve ser igual ou posterior à data início.</z-form-message>
+        } @else {
+          <z-form-message>Último dia da cobertura.</z-form-message>
+        }
+      </z-form-field>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <z-form-field>
+        <z-form-label [zRequired]="true">Hora início</z-form-label>
+        <z-form-control>
+          <input z-input type="time" formControlName="horaInicio" class="w-full" />
+        </z-form-control>
+        @if (form.controls.horaInicio.invalid && form.controls.horaInicio.touched) {
+          <z-form-message [zError]="true">Hora início é obrigatória.</z-form-message>
+        } @else {
+          <z-form-message>Início do turno em cada dia.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Hora fim</z-form-label>
+        <z-form-control>
+          <input z-input type="time" formControlName="horaFim" class="w-full" />
+        </z-form-control>
+        @if (form.controls.horaFim.invalid && form.controls.horaFim.touched) {
+          <z-form-message [zError]="true">Hora fim é obrigatória.</z-form-message>
+        } @else {
+          <z-form-message>Fim do turno; pode cruzar a meia-noite.</z-form-message>
+        }
+      </z-form-field>
+    </div>
+
+    <z-form-field>
+      <z-form-label>Motivo</z-form-label>
+      <z-form-control>
+        <input
+          z-input
+          formControlName="motivo"
+          placeholder="Ex: Cobertura de férias"
+          class="w-full"
+        />
+      </z-form-control>
+      <z-form-message>Motivo da substituição (opcional).</z-form-message>
+    </z-form-field>
+
+    <z-form-field>
+      <z-form-label>Tolerância (min)</z-form-label>
+      <z-form-control>
+        <input
+          z-input
+          type="number"
+          formControlName="toleranciaMin"
+          class="w-full"
+          [zNumeric]="true"
+          [zMin]="0"
+          [zMax]="120"
+          [zStep]="1"
+        />
+      </z-form-control>
+      @if (form.controls.toleranciaMin.invalid && form.controls.toleranciaMin.touched) {
+        <z-form-message [zError]="true">Valor entre 0 e 120 minutos.</z-form-message>
+      } @else {
+        <z-form-message>Margem de tolerância em minutos (0 a 120).</z-form-message>
+      }
+    </z-form-field>
+
+    @if (isEdit()) {
+      <div class="flex items-center gap-2">
+        <z-checkbox [formControl]="form.controls.ativo" />
+        <span class="text-sm text-muted-foreground">Substituição ativa</span>
+      </div>
+    }
+  </form>
+}

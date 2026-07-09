@@ -6,8 +6,6 @@ import { Router } from '@angular/router';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
 import { TurnosService } from '../turnos.service';
-import { TurnoFormComponent } from '../turno-form.component';
-import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardInputDirective } from '@/shared/components/input';
@@ -57,7 +55,6 @@ const STATUS_FILTERS: StatusFilter[] = [
 export class TurnosListComponent implements OnInit, OnDestroy {
   private readonly turnosService = inject(TurnosService);
   private readonly router = inject(Router);
-  private readonly dialog = inject(ZardDialogService);
   private readonly destroy$ = new Subject<void>();
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -128,28 +125,6 @@ export class TurnosListComponent implements OnInit, OnDestroy {
 
   verDetalhe(turno: Turno): void {
     this.router.navigate(['/turnos', turno.id]);
-  }
-
-  abrirFormulario(): void {
-    const dialogRef = this.dialog.create({
-      zTitle: 'Iniciar turno',
-      zContent: TurnoFormComponent,
-      zWidth: '520px',
-      zOkText: 'Iniciar',
-      zOnOk: (instance) => {
-        instance.submit();
-        return false;
-      },
-    });
-
-    dialogRef
-      .afterClosed
-      .pipe(takeUntil(this.destroy$))
-      .subscribe((result) => {
-        if (result) {
-          this.carregarTurnos();
-        }
-      });
   }
 
   formatarData(iso: string): string {

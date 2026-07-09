@@ -11,6 +11,19 @@ describe('PostosService', () => {
   let httpMock: HttpTestingController;
   const baseUrl = environment.apiUrl;
 
+  // A API responde em snake_case; o service mapeia para o modelo camelCase.
+  const mockPostoDto = {
+    id: '1',
+    nome: 'Posto A',
+    latitude: -23.5,
+    longitude: -46.6,
+    raio_m: 100,
+    ativo: true,
+    empresa_id: 'emp-1',
+    created_at: '2026-01-01T00:00:00Z',
+    updated_at: '2026-01-01T00:00:00Z',
+  };
+
   const mockPosto: Posto = {
     id: '1',
     nome: 'Posto A',
@@ -37,13 +50,13 @@ describe('PostosService', () => {
 
   it('deve listar postos', async () => {
     const promise = firstValueFrom(service.listar());
-    httpMock.expectOne(`${baseUrl}/postos`).flush([mockPosto]);
+    httpMock.expectOne(`${baseUrl}/postos`).flush([mockPostoDto]);
     expect(await promise).toEqual([mockPosto]);
   });
 
   it('deve obter posto por id', async () => {
     const promise = firstValueFrom(service.obter('1'));
-    httpMock.expectOne(`${baseUrl}/postos/1`).flush(mockPosto);
+    httpMock.expectOne(`${baseUrl}/postos/1`).flush(mockPostoDto);
     expect(await promise).toEqual(mockPosto);
   });
 
@@ -52,7 +65,7 @@ describe('PostosService', () => {
     const promise = firstValueFrom(service.criar(data));
     const req = httpMock.expectOne(`${baseUrl}/postos`);
     expect(req.request.method).toBe('POST');
-    req.flush({ ...mockPosto, id: '2', nome: 'Novo Posto' });
+    req.flush({ ...mockPostoDto, id: '2', nome: 'Novo Posto' });
     const result = await promise;
     expect(result.id).toBe('2');
   });

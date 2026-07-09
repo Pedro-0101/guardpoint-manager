@@ -7,7 +7,6 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardComboboxImports, type ZardComboboxOption } from '@/shared/components/combobox';
-import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
@@ -27,7 +26,6 @@ interface EditData {
     ReactiveFormsModule,
     ZardInputDirective,
     ZardComboboxImports,
-    ZardButtonComponent,
     LoadingSpinner,
     WeeklyGridComponent,
   ],

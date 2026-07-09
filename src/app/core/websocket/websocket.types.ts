@@ -1,5 +1,5 @@
 export interface WsEvent {
-  type: 'gps_update' | 'status_change' | 'new_alert' | 'sync_resolved';
+  type: 'gps_update' | 'status_change' | 'new_alert';
   payload: unknown;
 }
 
@@ -22,10 +22,4 @@ export interface NewAlertPayload {
   tipo: string;
   turnoId: string;
   nivel: number;
-}
-
-export interface SyncResolvedPayload {
-  turnoId: string;
-  resolvido: boolean;
-  motivo: string;
 }
