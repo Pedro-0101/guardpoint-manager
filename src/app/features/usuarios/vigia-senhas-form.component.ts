@@ -1,5 +1,5 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
-import { FormControl, FormBuilder, ReactiveFormsModule, Validators, ValidationErrors, type ValidatorFn } from '@angular/forms';
+import { FormControl, FormBuilder, ReactiveFormsModule, Validators, type ValidatorFn } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -143,6 +143,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
     this.customForms = newCustomForms;
 
     this.loading.set(false);
+    this.setupCrossValidation();
   }
 
   private carregarEscalonamentos(): void {
@@ -158,6 +159,48 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
           this.notification.error(err.message ?? 'Erro ao carregar escalonamentos.');
         },
       });
+  }
+
+  private setupCrossValidation(): void {
+    this.okCodigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
+    this.emergenciaCodigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
+    this.novoCustomForm.controls.codigo.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.revalidarSenhas());
+
+    for (const form of Object.values(this.customForms)) {
+      form.codigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
+    }
+  }
+
+  private revalidarSenhas(): void {
+    interface CodeEntry { control: FormControl<string> | FormControl<string | null>; value: string }
+    const entries: CodeEntry[] = [];
+
+    const okValue = this.okCodigo.value.trim();
+    if (okValue) entries.push({ control: this.okCodigo, value: okValue });
+
+    const emergValue = this.emergenciaCodigo.value.trim();
+    if (emergValue) entries.push({ control: this.emergenciaCodigo, value: emergValue });
+
+    const novoValue = this.novoCustomForm.controls.codigo.value.trim();
+    if (novoValue) entries.push({ control: this.novoCustomForm.controls.codigo, value: novoValue });
+
+    for (const form of Object.values(this.customForms)) {
+      const val = form.codigo.value.trim();
+      if (val) entries.push({ control: form.codigo, value: val });
+    }
+
+    for (const entry of entries) {
+      const duplicates = entries.filter((e) => e.control !== entry.control && e.value === entry.value);
+      const currentErrors = { ...entry.control.errors };
+      if (duplicates.length > 0) {
+        currentErrors['senhaDuplicada'] = true;
+      } else {
+        delete currentErrors['senhaDuplicada'];
+      }
+      entry.control.setErrors(Object.keys(currentErrors).length > 0 ? currentErrors : null);
+    }
   }
 
   escalonamentosDisponiveis(escalonamentoAtualId: string | null): ConfigEscalonamento[] {
@@ -296,6 +339,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
           delete this.customForms[senhaId];
           this.deletingSenhaId.set(null);
           this.notification.success('Senha customizada removida.');
+          this.revalidarSenhas();
         },
         error: (err) => {
           this.deletingSenhaId.set(null);
@@ -328,10 +372,14 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
         next: (nova) => {
           this.senhas.update((list) => [...list, nova]);
           this.customForms[nova.id] = this.buildCustomForm(nova);
+          this.customForms[nova.id].codigo.valueChanges
+            .pipe(takeUntil(this.destroy$))
+            .subscribe(() => this.revalidarSenhas());
           this.novoCustomForm.reset();
           this.showingNewCustom.set(false);
           this.savingNewCustom.set(false);
           this.notification.success('Senha customizada criada.');
+          this.revalidarSenhas();
         },
         error: (err) => {
           this.savingNewCustom.set(false);

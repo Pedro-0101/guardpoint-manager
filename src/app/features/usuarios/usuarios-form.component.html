@@ -171,16 +171,162 @@
     @if (currentStep() === 2) {
       <div class="space-y-4">
         @if (form.controls.cargo.value === 'vigia') {
-          <div class="flex flex-col items-center gap-3 py-8 text-center">
-            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
-              <ng-icon name="lucideLock" class="size-6 text-muted-foreground" />
+          <div class="rounded-lg border p-4">
+            <h4 class="font-medium text-sm">Senha OK <span class="text-destructive">*</span></h4>
+            <p class="text-xs text-muted-foreground mt-0.5 mb-3">
+              Senha vinculativa. Código de 2 a 6 caracteres com pelo menos 2 números.
+            </p>
+            <z-form-field class="max-w-[180px]">
+              <z-form-label>Código</z-form-label>
+              <z-form-control>
+                <input
+                  z-input
+                  [zPass]="true"
+                  [zMinlength]="2"
+                  [zMaxlength]="6"
+                  [formControl]="okCodigo"
+                  placeholder="2 a 6 caracteres"
+                  class="w-full"
+                  autocomplete="new-password"
+                />
+              </z-form-control>
+              @if (okCodigo.invalid && okCodigo.touched) {
+                @if (okCodigo.errors?.['required']) {
+                  <z-form-message [zError]="true">Código obrigatório.</z-form-message>
+                } @else if (okCodigo.errors?.['minlength'] || okCodigo.errors?.['maxlength']) {
+                  <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                } @else if (okCodigo.errors?.['atLeastTwoNumbers']) {
+                  <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                } @else if (okCodigo.errors?.['senhaDuplicada']) {
+                  <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
+                } @else {
+                  <z-form-message [zError]="true">Código inválido.</z-form-message>
+                }
+              }
+            </z-form-field>
+          </div>
+
+          <div class="rounded-lg border p-4">
+            <h4 class="font-medium text-sm">Senha de Emergência <span class="text-destructive">*</span></h4>
+            <p class="text-xs text-muted-foreground mt-0.5 mb-3">
+              Senha de emergência do sistema. Código de 2 a 6 caracteres com pelo menos 2 números.
+            </p>
+            <z-form-field class="max-w-[180px]">
+              <z-form-label>Código</z-form-label>
+              <z-form-control>
+                <input
+                  z-input
+                  [zPass]="true"
+                  [zMinlength]="2"
+                  [zMaxlength]="6"
+                  [formControl]="emergenciaCodigo"
+                  placeholder="2 a 6 caracteres"
+                  class="w-full"
+                  autocomplete="new-password"
+                />
+              </z-form-control>
+              @if (emergenciaCodigo.invalid && emergenciaCodigo.touched) {
+                @if (emergenciaCodigo.errors?.['required']) {
+                  <z-form-message [zError]="true">Código obrigatório.</z-form-message>
+                } @else if (emergenciaCodigo.errors?.['minlength'] || emergenciaCodigo.errors?.['maxlength']) {
+                  <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                } @else if (emergenciaCodigo.errors?.['atLeastTwoNumbers']) {
+                  <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                } @else if (emergenciaCodigo.errors?.['senhaDuplicada']) {
+                  <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
+                } @else {
+                  <z-form-message [zError]="true">Código inválido.</z-form-message>
+                }
+              }
+            </z-form-field>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h4 class="font-medium text-sm">Senhas Customizadas</h4>
+                <p class="text-xs text-muted-foreground mt-0.5">
+                  Senhas opcionais para níveis de escalonamento personalizados.
+                </p>
+              </div>
+              <button type="button" z-button zSize="sm" zType="outline" (click)="addCustomSenha()">
+                <ng-icon name="lucidePlus" class="size-3.5" />
+                Adicionar
+              </button>
             </div>
-            <div>
-              <h3 class="text-sm font-medium">Configuração de senhas</h3>
-              <p class="text-sm text-muted-foreground mt-1">
-                Em breve você poderá configurar as senhas de OK, emergência e personalizadas para este vigia durante a criação do usuário.
-              </p>
-            </div>
+
+            @if (customSenhas().length === 0) {
+              <p class="text-sm text-muted-foreground text-center py-3">Nenhuma senha customizada.</p>
+            } @else {
+              <div class="space-y-3">
+                @for (entry of customSenhas(); track entry.id) {
+                  <div class="rounded-lg border border-dashed p-4">
+                    <div class="flex items-center justify-between mb-3">
+                      <h5 class="text-sm font-medium">Senha customizada</h5>
+                      <button
+                        type="button"
+                        z-button
+                        zType="ghost"
+                        zSize="sm"
+                        class="text-destructive"
+                        (click)="removeCustomSenha(entry.id)"
+                      >
+                        <ng-icon name="lucideTrash2" class="size-3.5" />
+                      </button>
+                    </div>
+
+                    <z-form-field>
+                      <z-form-label [zRequired]="true">Código</z-form-label>
+                      <z-form-control>
+                        <input
+                          z-input
+                          [zPass]="true"
+                          [zMinlength]="2"
+                          [zMaxlength]="6"
+                          [formControl]="entry.codigo"
+                          placeholder="2 a 6 caracteres"
+                          class="w-full"
+                          autocomplete="new-password"
+                        />
+                      </z-form-control>
+                      @if (entry.codigo.invalid && entry.codigo.touched) {
+                        @if (entry.codigo.errors?.['required']) {
+                          <z-form-message [zError]="true">Código obrigatório.</z-form-message>
+                        } @else if (entry.codigo.errors?.['minlength'] || entry.codigo.errors?.['maxlength']) {
+                          <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
+                        } @else if (entry.codigo.errors?.['atLeastTwoNumbers']) {
+                          <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                        } @else if (entry.codigo.errors?.['senhaDuplicada']) {
+                          <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
+                        } @else {
+                          <z-form-message [zError]="true">Código inválido.</z-form-message>
+                        }
+                      }
+                    </z-form-field>
+
+                    <z-form-field class="mt-3">
+                      <z-form-label [zRequired]="true">Escalonamento</z-form-label>
+                      <z-form-control>
+                        <z-select
+                          [formControl]="entry.escalonamentoId"
+                          [zPlaceholder]="'Selecione o nível...'"
+                          class="w-full"
+                        >
+                          @for (esc of escalonamentosDisponiveis(entry.escalonamentoId.value); track esc.id) {
+                            <z-select-item [zValue]="esc.id">
+                              {{ esc.descricao || 'Nível ' + esc.atrasoMinutos + 'min' }}
+                            </z-select-item>
+                          }
+                        </z-select>
+                      </z-form-control>
+                      @if (entry.escalonamentoId.invalid && entry.escalonamentoId.touched) {
+                        <z-form-message [zError]="true">Selecione um nível de escalonamento.</z-form-message>
+                      }
+                    </z-form-field>
+                  </div>
+                }
+              </div>
+            }
           </div>
         } @else {
           <div class="flex flex-col items-center gap-3 py-8 text-center">

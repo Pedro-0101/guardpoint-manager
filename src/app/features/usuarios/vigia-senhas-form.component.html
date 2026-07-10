@@ -44,6 +44,8 @@
               <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
             } @else if (okCodigo.errors?.['atLeastTwoNumbers']) {
               <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+            } @else if (okCodigo.errors?.['senhaDuplicada']) {
+              <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
             } @else {
               <z-form-message [zError]="true">Código inválido.</z-form-message>
             }
@@ -94,6 +96,8 @@
               <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
             } @else if (emergenciaCodigo.errors?.['atLeastTwoNumbers']) {
               <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+            } @else if (emergenciaCodigo.errors?.['senhaDuplicada']) {
+              <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
             } @else {
               <z-form-message [zError]="true">Código inválido.</z-form-message>
             }
@@ -152,6 +156,8 @@
                   <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
                 } @else if (novoCustomForm.controls.codigo.errors?.['atLeastTwoNumbers']) {
                   <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                } @else if (novoCustomForm.controls.codigo.errors?.['senhaDuplicada']) {
+                  <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
                 } @else {
                   <z-form-message [zError]="true">Código inválido.</z-form-message>
                 }
@@ -229,6 +235,8 @@
                       <z-form-message [zError]="true">Código deve ter entre 2 e 6 caracteres.</z-form-message>
                     } @else if (form.codigo.errors?.['atLeastTwoNumbers']) {
                       <z-form-message [zError]="true">Código deve ter pelo menos 2 números.</z-form-message>
+                    } @else if (form.codigo.errors?.['senhaDuplicada']) {
+                      <z-form-message [zError]="true">Código já utilizado em outra senha.</z-form-message>
                     } @else {
                       <z-form-message [zError]="true">Código inválido.</z-form-message>
                     }
