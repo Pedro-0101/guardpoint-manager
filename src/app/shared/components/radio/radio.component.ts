@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  Directive,
+  ElementRef,
   forwardRef,
   inject,
   Injectable,
@@ -138,5 +140,24 @@ export class ZardRadioComponent implements ControlValueAccessor, OnInit, OnDestr
 
   setDisabledState(isDisabled: boolean): void {
     this.disabledState.set(isDisabled);
+  }
+}
+
+@Directive({
+  selector: '[zRadioCard]',
+  host: {
+    '(click)': 'onCardClick($event)',
+  },
+})
+export class ZardRadioCardDirective {
+  private readonly elementRef = inject(ElementRef<HTMLElement>);
+
+  onCardClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.closest('[z-radio]')) {
+      return;
+    }
+    const radio: HTMLElement | null = this.elementRef.nativeElement.querySelector('[z-radio]');
+    radio?.click();
   }
 }

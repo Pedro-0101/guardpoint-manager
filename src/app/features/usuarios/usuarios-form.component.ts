@@ -1,15 +1,18 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { NgIcon } from '@ng-icons/core';
 import { UsuariosService, CreateUsuarioPayload, UpdateUsuarioPayload } from './usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
-import { ZardRadioComponent } from '@/shared/components/radio';
+import { ZardRadioComponent, ZardRadioCardDirective } from '@/shared/components/radio';
 import {
   ZardFormFieldComponent,
   ZardFormLabelComponent,
   ZardFormControlComponent,
   ZardFormMessageComponent,
+  ZardFormStepperComponent,
 } from '@/shared/components/form';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Usuario } from '../../core/models/usuario.model';
@@ -18,12 +21,16 @@ import { Usuario } from '../../core/models/usuario.model';
   selector: 'gp-usuarios-form',
   imports: [
     ReactiveFormsModule,
+    NgIcon,
     ZardInputDirective,
     ZardRadioComponent,
+    ZardRadioCardDirective,
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
     ZardFormMessageComponent,
+    ZardFormStepperComponent,
+    ZardButtonComponent,
   ],
   templateUrl: './usuarios-form.component.html',
 })
@@ -36,11 +43,31 @@ export class UsuariosFormComponent implements OnInit {
 
   readonly loading = signal(false);
   readonly isEdit = signal(false);
+  readonly currentStep = signal(0);
+
+  readonly stepLabels = ['Informações básicas', 'Tipo de usuário', 'Configurações'];
+  readonly showStepper = computed(() => !this.isEdit());
+  readonly isLastStep = computed(() => this.currentStep() === this.stepLabels.length - 1);
 
   readonly cargos = [
-    { value: 'vigia', label: 'Vigia' },
-    { value: 'supervisor', label: 'Supervisor' },
-    { value: 'admin', label: 'Admin' },
+    {
+      value: 'admin',
+      label: 'Admin',
+      description:
+        'Acesso total ao sistema. Pode gerenciar usuários, postos, configurar escalonamento e acessar todos os relatórios.',
+    },
+    {
+      value: 'supervisor',
+      label: 'Supervisor',
+      description:
+        'Gerencia os turnos e vigias. Pode visualizar o mapa, alertas e relatórios, mas não pode alterar configurações do sistema.',
+    },
+    {
+      value: 'vigia',
+      label: 'Vigia',
+      description:
+        'Usuário operacional. Realiza rondas, registra checkpoints e reporta ocorrências durante o turno.',
+    },
   ];
 
   form = this.fb.nonNullable.group({
@@ -66,8 +93,38 @@ export class UsuariosFormComponent implements OnInit {
     }
   }
 
+  nextStep(): void {
+    if (this.currentStep() === 0) {
+      this.form.controls.nome.markAsTouched();
+      this.form.controls.email.markAsTouched();
+      this.form.controls.senha.markAsTouched();
+      if (
+        this.form.controls.nome.invalid ||
+        this.form.controls.email.invalid ||
+        this.form.controls.senha.invalid
+      ) {
+        return;
+      }
+    }
+    this.currentStep.update((s) => s + 1);
+  }
+
+  prevStep(): void {
+    this.currentStep.update((s) => Math.max(0, s - 1));
+  }
+
+  close(): void {
+    this.dialogRef.close();
+  }
+
   submit(): void {
     if (this.loading()) return;
+
+    if (!this.isEdit() && !this.isLastStep()) {
+      this.nextStep();
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -96,15 +153,13 @@ export class UsuariosFormComponent implements OnInit {
       next: () => {
         this.loading.set(false);
         this.notification.success(
-          this.isEdit() ? 'Usuário atualizado com sucesso.' : 'Usuário criado com sucesso.'
+          this.isEdit() ? 'Usuário atualizado com sucesso.' : 'Usuário criado com sucesso.',
         );
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.loading.set(false);
-        this.notification.error(
-          err.message ?? 'Erro ao salvar usuário.'
-        );
+        this.notification.error(err.message ?? 'Erro ao salvar usuário.');
       },
     });
   }

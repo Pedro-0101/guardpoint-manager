@@ -1,73 +1,226 @@
 <form [formGroup]="form" novalidate class="space-y-6">
-  <z-form-field>
-    <z-form-label [zRequired]="true">Nome</z-form-label>
-    <z-form-control>
-      <input z-input formControlName="nome" placeholder="Ex: João Silva" class="w-full" />
-    </z-form-control>
-    @if (form.controls.nome.invalid && form.controls.nome.touched) {
-      <z-form-message [zError]="true">
-        @if (form.controls.nome.errors?.['required']) {
-          Nome é obrigatório.
-        } @else if (form.controls.nome.errors?.['minlength']) {
-          Mínimo de 3 caracteres.
-        }
-      </z-form-message>
-    } @else {
-      <z-form-message>Como o usuário será identificado no sistema.</z-form-message>
-    }
-  </z-form-field>
+  @if (isEdit()) {
+    <z-form-field>
+      <z-form-label [zRequired]="true">Nome</z-form-label>
+      <z-form-control>
+        <input z-input formControlName="nome" placeholder="Ex: João Silva" class="w-full" />
+      </z-form-control>
+      @if (form.controls.nome.invalid && form.controls.nome.touched) {
+        <z-form-message [zError]="true">
+          @if (form.controls.nome.errors?.['required']) {
+            Nome é obrigatório.
+          } @else if (form.controls.nome.errors?.['minlength']) {
+            Mínimo de 3 caracteres.
+          }
+        </z-form-message>
+      } @else {
+        <z-form-message>Como o usuário será identificado no sistema.</z-form-message>
+      }
+    </z-form-field>
 
-  <z-form-field>
-    <z-form-label [zRequired]="true">Email</z-form-label>
-    <z-form-control>
-      <input z-input type="email" autocomplete="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
-    </z-form-control>
-    @if (form.controls.email.invalid && form.controls.email.touched) {
-      <z-form-message [zError]="true">
-        @if (form.controls.email.errors?.['required']) {
-          Email é obrigatório.
-        } @else if (form.controls.email.errors?.['email']) {
-          Email inválido.
-        }
-      </z-form-message>
-    } @else {
-      <z-form-message>Usado para login e notificações do sistema.</z-form-message>
-    }
-  </z-form-field>
+    <z-form-field>
+      <z-form-label [zRequired]="true">Email</z-form-label>
+      <z-form-control>
+        <input z-input type="email" autocomplete="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
+      </z-form-control>
+      @if (form.controls.email.invalid && form.controls.email.touched) {
+        <z-form-message [zError]="true">
+          @if (form.controls.email.errors?.['required']) {
+            Email é obrigatório.
+          } @else if (form.controls.email.errors?.['email']) {
+            Email inválido.
+          }
+        </z-form-message>
+      } @else {
+        <z-form-message>Usado para login e notificações do sistema.</z-form-message>
+      }
+    </z-form-field>
 
-  <z-form-field>
-    <z-form-label [zRequired]="!isEdit()">{{ isEdit() ? 'Nova senha (opcional)' : 'Senha' }}</z-form-label>
-    <z-form-control>
-      <input z-input [zPass]="true" [zMinlength]="isEdit() ? 5 : 6" autocomplete="new-password" formControlName="senha" class="w-full" />
-    </z-form-control>
-    @if (form.controls.senha.invalid && form.controls.senha.touched) {
-      <z-form-message [zError]="true">
-        @if (form.controls.senha.errors?.['required']) {
-          Senha é obrigatória.
-        } @else if (form.controls.senha.errors?.['minlength']) {
-          Mínimo de 6 caracteres.
-        }
-      </z-form-message>
-    } @else {
-      <z-form-message>
-        {{ isEdit() ? 'Deixe em branco para manter a senha atual.' : 'Use pelo menos 6 caracteres.' }}
-      </z-form-message>
-    }
-  </z-form-field>
+    <z-form-field>
+      <z-form-label [zRequired]="!isEdit()">Nova senha (opcional)</z-form-label>
+      <z-form-control>
+        <input z-input [zPass]="true" [zMinlength]="5" autocomplete="new-password" formControlName="senha" class="w-full" />
+      </z-form-control>
+      @if (form.controls.senha.invalid && form.controls.senha.touched) {
+        <z-form-message [zError]="true">
+          @if (form.controls.senha.errors?.['required']) {
+            Senha é obrigatória.
+          } @else if (form.controls.senha.errors?.['minlength']) {
+            Mínimo de 5 caracteres.
+          }
+        </z-form-message>
+      } @else {
+        <z-form-message>Deixe em branco para manter a senha atual.</z-form-message>
+      }
+    </z-form-field>
 
-  <z-form-field>
-    <z-form-label [zRequired]="true">Cargo</z-form-label>
-    <z-form-control>
-      <div class="flex flex-col gap-3">
-        @for (cargo of cargos; track cargo.value) {
-          <span z-radio name="cargo" formControlName="cargo" [value]="cargo.value">{{ cargo.label }}</span>
+    <z-form-field>
+      <z-form-label [zRequired]="true">Cargo</z-form-label>
+      <z-form-control>
+        <div class="flex flex-col gap-3">
+          @for (cargo of cargos; track cargo.value) {
+            <div
+              zRadioCard
+              class="flex items-start gap-3 p-3 rounded-md border cursor-pointer transition-all hover:bg-primary/5 hover:border-primary/40"
+              [class.bg-primary/5]="form.controls.cargo.value === cargo.value"
+              [class.border-primary]="form.controls.cargo.value === cargo.value"
+              [class.ring-1]="form.controls.cargo.value === cargo.value"
+              [class.ring-primary]="form.controls.cargo.value === cargo.value"
+            >
+              <span z-radio name="cargo" formControlName="cargo" [value]="cargo.value" class="mt-0.5">{{ cargo.label }}</span>
+            </div>
+          }
+        </div>
+      </z-form-control>
+      @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
+        <z-form-message [zError]="true">Cargo é obrigatório.</z-form-message>
+      } @else {
+        <z-form-message>Define o nível de acesso do usuário no sistema.</z-form-message>
+      }
+    </z-form-field>
+  } @else {
+    <z-form-stepper [steps]="stepLabels" [currentStep]="currentStep()" />
+
+    @if (currentStep() === 0) {
+      <z-form-field>
+        <z-form-label [zRequired]="true">Nome</z-form-label>
+        <z-form-control>
+          <input z-input formControlName="nome" placeholder="Ex: João Silva" class="w-full" />
+        </z-form-control>
+        @if (form.controls.nome.invalid && form.controls.nome.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.nome.errors?.['required']) {
+              Nome é obrigatório.
+            } @else if (form.controls.nome.errors?.['minlength']) {
+              Mínimo de 3 caracteres.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Como o usuário será identificado no sistema.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Email</z-form-label>
+        <z-form-control>
+          <input z-input type="email" autocomplete="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
+        </z-form-control>
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.email.errors?.['required']) {
+              Email é obrigatório.
+            } @else if (form.controls.email.errors?.['email']) {
+              Email inválido.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Usado para login e notificações do sistema.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Senha</z-form-label>
+        <z-form-control>
+          <input z-input [zPass]="true" [zMinlength]="6" autocomplete="new-password" formControlName="senha" class="w-full" />
+        </z-form-control>
+        @if (form.controls.senha.invalid && form.controls.senha.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.senha.errors?.['required']) {
+              Senha é obrigatória.
+            } @else if (form.controls.senha.errors?.['minlength']) {
+              Mínimo de 6 caracteres.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Use pelo menos 6 caracteres.</z-form-message>
+        }
+      </z-form-field>
+    }
+
+    @if (currentStep() === 1) {
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-medium leading-none">Cargo <span class="text-destructive ml-0.5">*</span></h3>
+          <p class="text-sm text-muted-foreground mt-1.5">Define o nível de acesso do usuário no sistema.</p>
+        </div>
+
+        <div class="flex flex-col gap-4">
+          @for (cargo of cargos; track cargo.value) {
+            <div
+              zRadioCard
+              class="flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all hover:bg-primary/5 hover:border-primary/40"
+              [class.bg-primary/5]="form.controls.cargo.value === cargo.value"
+              [class.border-primary]="form.controls.cargo.value === cargo.value"
+              [class.ring-1]="form.controls.cargo.value === cargo.value"
+              [class.ring-primary]="form.controls.cargo.value === cargo.value"
+            >
+              <span z-radio name="cargo" formControlName="cargo" [value]="cargo.value" class="mt-0.5"></span>
+              <div class="flex flex-col gap-1">
+                <span class="text-sm font-medium">{{ cargo.label }}</span>
+                <span class="text-xs text-muted-foreground">{{ cargo.description }}</span>
+              </div>
+            </div>
+          }
+        </div>
+        @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
+          <p class="text-sm text-destructive">Cargo é obrigatório.</p>
         }
       </div>
-    </z-form-control>
-    @if (form.controls.cargo.invalid && form.controls.cargo.touched) {
-      <z-form-message [zError]="true">Cargo é obrigatório.</z-form-message>
-    } @else {
-      <z-form-message>Define o nível de acesso do usuário no sistema.</z-form-message>
     }
-  </z-form-field>
+
+    @if (currentStep() === 2) {
+      <div class="space-y-4">
+        @if (form.controls.cargo.value === 'vigia') {
+          <div class="flex flex-col items-center gap-3 py-8 text-center">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+              <ng-icon name="lucideLock" class="size-6 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 class="text-sm font-medium">Configuração de senhas</h3>
+              <p class="text-sm text-muted-foreground mt-1">
+                Em breve você poderá configurar as senhas de OK, emergência e personalizadas para este vigia durante a criação do usuário.
+              </p>
+            </div>
+          </div>
+        } @else {
+          <div class="flex flex-col items-center gap-3 py-8 text-center">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+              <ng-icon name="lucideBell" class="size-6 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 class="text-sm font-medium">Preferências de notificação</h3>
+              <p class="text-sm text-muted-foreground mt-1">
+                Em breve será possível configurar quais tipos de notificações este {{ form.controls.cargo.value === 'admin' ? 'administrador' : 'supervisor' }} receberá do sistema.
+              </p>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <div class="flex justify-between pt-4 border-t">
+      <button type="button" z-button zType="outline" (click)="close()">Cancelar</button>
+      <div class="flex gap-2">
+        @if (currentStep() > 0) {
+          <button type="button" z-button zType="outline" (click)="prevStep()">
+            <ng-icon name="lucideChevronLeft" class="size-4" />
+            Voltar
+          </button>
+        }
+        @if (isLastStep()) {
+          <button type="button" z-button [zDisabled]="loading()" (click)="submit()">
+            @if (loading()) {
+              <ng-icon name="lucideRefreshCw" class="size-4 animate-spin" />
+            }
+            Criar usuário
+          </button>
+        } @else {
+          <button type="button" z-button (click)="nextStep()">
+            Próximo
+            <ng-icon name="lucideChevronRight" class="size-4" />
+          </button>
+        }
+      </div>
+    </div>
+  }
 </form>

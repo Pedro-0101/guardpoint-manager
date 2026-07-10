@@ -144,16 +144,21 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   }
 
   abrirFormulario(usuario?: Usuario): void {
+    const isEdit = !!usuario;
     const dialogRef = this.dialog.create({
-      zTitle: usuario ? 'Editar usuário' : 'Novo usuário',
+      zTitle: isEdit ? 'Editar usuário' : 'Novo usuário',
       zContent: UsuariosFormComponent,
       zWidth: '520px',
       zData: usuario ?? null,
-      zOkText: usuario ? 'Salvar' : 'Criar',
-      zOnOk: (instance) => {
-        instance.submit();
-        return false;
-      },
+      zOkText: isEdit ? 'Salvar' : null,
+      zCancelText: isEdit ? 'Cancelar' : null,
+      zHideFooter: !isEdit,
+      zOnOk: isEdit
+        ? (instance) => {
+            instance.submit();
+            return false;
+          }
+        : undefined,
     });
 
     dialogRef

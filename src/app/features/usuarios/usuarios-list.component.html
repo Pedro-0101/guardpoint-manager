@@ -5,10 +5,12 @@
       <h1 class="list-page__title">Usuários</h1>
       <p class="list-page__subtitle">Gerencie os usuários do sistema</p>
     </div>
-    <button z-button (click)="abrirFormulario()">
-      <ng-icon name="lucidePlus" />
-      Novo usuário
-    </button>
+    @if (isAdmin()) {
+      <button z-button (click)="abrirFormulario()">
+        <ng-icon name="lucidePlus" />
+        Novo usuário
+      </button>
+    }
   </header>
 
   @if (error(); as errorMsg) {
