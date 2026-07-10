@@ -198,6 +198,10 @@ export class TurnosListComponent implements OnInit, OnDestroy {
     });
   }
 
+  trackById(index: number, turno: Turno): string | number {
+    return turno.id && turno.id !== '00000000-0000-0000-0000-000000000000' ? turno.id : index;
+  }
+
   voltarPagina(): void {
     if (this.page() > 0) {
       this.page.update((p) => p - 1);

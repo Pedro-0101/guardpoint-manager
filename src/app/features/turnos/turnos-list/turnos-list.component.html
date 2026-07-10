@@ -111,7 +111,7 @@
                   </td>
                 </tr>
               } @else {
-                @for (turno of turnosList; track turno.id ?? $index) {
+                @for (turno of turnosList; track trackById($index, turno)) {
                   <tr
                     z-table-row
                     class="list-page__row"
