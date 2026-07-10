@@ -55,6 +55,8 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   readonly usuario = inject<Usuario>(Z_MODAL_DATA);
 
+  private readonly API_ERRO_CODIGO_JA_USADO = 'codigo ja usado por outra senha deste vigia';
+
   readonly loading = signal(true);
   readonly senhas = signal<SenhaVigia[]>([]);
   readonly escalonamentos = signal<ConfigEscalonamento[]>([]);
@@ -249,7 +251,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.savingOk.set(false);
           console.error('[VigiaSenhasForm] Erro ao salvar senha OK:', err);
-          this.notification.error(err.message ?? 'Erro ao salvar senha OK.');
+          this.tratarErroPadrao(err, 'Erro ao salvar senha OK.');
         },
       });
   }
@@ -285,7 +287,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.savingEmergencia.set(false);
           console.error('[VigiaSenhasForm] Erro ao salvar senha emergência:', err);
-          this.notification.error(err.message ?? 'Erro ao salvar senha de emergência.');
+          this.tratarErroPadrao(err, 'Erro ao salvar senha de emergência.');
         },
       });
   }
@@ -321,7 +323,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.savingCustomId.set(null);
           console.error('[VigiaSenhasForm] Erro ao salvar senha customizada:', err);
-          this.notification.error(err.message ?? 'Erro ao atualizar senha customizada.');
+          this.tratarErroPadrao(err, 'Erro ao atualizar senha customizada.');
         },
       });
   }
@@ -384,7 +386,7 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
         error: (err) => {
           this.savingNewCustom.set(false);
           console.error('[VigiaSenhasForm] Erro ao criar senha customizada:', err);
-          this.notification.error(err.message ?? 'Erro ao criar senha customizada.');
+          this.tratarErroPadrao(err, 'Erro ao criar senha customizada.');
         },
       });
   }
@@ -407,6 +409,14 @@ export class VigiaSenhasFormComponent implements OnInit, OnDestroy {
       zCancelText: 'Fechar',
       zOkText: null,
     });
+  }
+
+  private tratarErroPadrao(err: Error, fallback: string): void {
+    if (err.message?.toLowerCase().includes(this.API_ERRO_CODIGO_JA_USADO)) {
+      this.notification.error('Este código já está em uso em outro nível de escalonamento. Não é possível usar o mesmo código em níveis diferentes.');
+    } else {
+      this.notification.error(err.message ?? fallback);
+    }
   }
 
   private atualizarSenhaLocal(updated: SenhaVigia): void {

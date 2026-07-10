@@ -56,6 +56,8 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   readonly data = inject<Usuario | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
+  private readonly API_ERRO_CODIGO_JA_USADO = 'codigo ja usado por outra senha deste vigia';
+
   readonly loading = signal(false);
   readonly isEdit = signal(false);
   readonly currentStep = signal(0);
@@ -354,9 +356,15 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
           },
           error: (err) => {
             this.loading.set(false);
-            this.notification.error(
-              'Usuário criado, mas houve erro ao configurar as senhas vinculativas. Configure-as manualmente na tela de senhas do vigia.',
-            );
+            if (err.message?.toLowerCase().includes(this.API_ERRO_CODIGO_JA_USADO)) {
+              this.notification.error(
+                'Usuário criado, mas não foi possível configurar as senhas. O mesmo código não pode ser usado em diferentes níveis de escalonamento. Configure as senhas manualmente na tela de senhas do vigia.',
+              );
+            } else {
+              this.notification.error(
+                'Usuário criado, mas houve erro ao configurar as senhas vinculativas. Configure-as manualmente na tela de senhas do vigia.',
+              );
+            }
             this.dialogRef.close(true);
           },
         });
