@@ -1,9 +1,20 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import {
+  Component,
+  inject,
+  signal,
+  effect,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  viewChild,
+} from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NgIcon } from '@ng-icons/core';
 import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
-import { takeUntil, debounceTime, distinctUntilChanged, startWith, map } from 'rxjs/operators';
+import { takeUntil, debounceTime, distinctUntilChanged, startWith, map, take } from 'rxjs/operators';
+import * as L from 'leaflet';
+
 import { PostosService } from './postos.service';
 import { PostosFormComponent } from './postos-form.component';
 import { ZardDialogService } from '@/shared/components/dialog';
@@ -60,6 +71,29 @@ export class PostosListComponent implements OnInit, OnDestroy {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
 
+  readonly selectedPosto = signal<Posto | null>(null);
+
+  readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
+
+  private map: L.Map | null = null;
+  private markersLayer: L.LayerGroup | null = null;
+
+  constructor() {
+    effect(() => {
+      if (this.selectedTab() === 'mapa') {
+        requestAnimationFrame(() => this.atualizarMapa());
+      }
+    });
+  }
+
+  selecionarPosto(posto: Posto): void {
+    this.selectedPosto.set(posto);
+  }
+
+  limparSelecao(): void {
+    this.selectedPosto.set(null);
+  }
+
   readonly filteredPostos$ = combineLatest([
     this.postos$,
     this.searchControl.valueChanges.pipe(
@@ -85,6 +119,10 @@ export class PostosListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
   }
 
   carregarPostos(): void {
@@ -151,5 +189,143 @@ export class PostosListComponent implements OnInit, OnDestroy {
         });
       },
     });
+  }
+
+  private atualizarMapa(): void {
+    const containerRef = this.mapContainer();
+    if (!containerRef) return;
+
+    const containerEl = containerRef.nativeElement;
+
+    if (this.map) {
+      if (this.map.getContainer() !== containerEl) {
+        this.map.remove();
+        this.map = null;
+        this.iniciarMapa(containerRef);
+      } else {
+        this.map.invalidateSize();
+      }
+    } else {
+      this.iniciarMapa(containerRef);
+    }
+
+    this.filteredPostos$
+      .pipe(take(1))
+      .subscribe((postos) => this.renderizarPostos(postos));
+  }
+
+  private iniciarMapa(container: ElementRef<HTMLDivElement>): void {
+    this.map = L.map(container.nativeElement, {
+      center: [-14.235, -51.9253],
+      zoom: 4,
+      zoomControl: false,
+      attributionControl: true,
+      scrollWheelZoom: true,
+    });
+
+    L.control.zoom({ position: 'topright' }).addTo(this.map);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      maxZoom: 19,
+    }).addTo(this.map);
+
+    this.markersLayer = L.layerGroup().addTo(this.map);
+
+    this.map.on('click', () => this.limparSelecao());
+  }
+
+  private renderizarPostos(postos: Posto[]): void {
+    if (!this.map || !this.markersLayer) return;
+
+    this.markersLayer.clearLayers();
+
+    const coords: [number, number][] = [];
+
+    for (const posto of postos) {
+      const lat = posto.latitude;
+      const lng = posto.longitude;
+      if (lat === undefined || lng === undefined) continue;
+
+      coords.push([lat, lng]);
+
+      const color = posto.ativo ? '#2563eb' : '#94a3b8';
+      const icon = this.criarPinIcon(color, posto);
+
+      const marker = L.marker([lat, lng], { icon }).addTo(this.markersLayer);
+
+      marker.on('click', () => {
+        this.selecionarPosto(posto);
+        marker.openPopup();
+      });
+
+      L.circle([lat, lng], {
+        radius: posto.raioM || 100,
+        color,
+        fillColor: color,
+        fillOpacity: 0.08,
+        weight: 1.5,
+        opacity: 0.4,
+      }).addTo(this.markersLayer);
+
+      const popupHtml = this.criarPopupHtml(posto, color);
+      marker.bindPopup(popupHtml, { maxWidth: 280, className: 'postos-mapa-popup' });
+    }
+
+    if (coords.length > 0) {
+      const bounds = L.latLngBounds(coords);
+      if (coords.length === 1) {
+        this.map.setView(bounds.getCenter(), 15);
+      } else {
+        this.map.fitBounds(bounds, { padding: [40, 40] });
+      }
+    }
+  }
+
+  private criarPinIcon(color: string, posto: Posto): L.DivIcon {
+    return L.divIcon({
+      className: 'postos-mapa-pin-wrapper',
+      html: `
+        <div class="postos-mapa-pin" style="--pin-color: ${color}">
+          <div class="postos-mapa-pin__dot"></div>
+        </div>
+        <div class="postos-mapa-pin__label">${this.escaparHtml(posto.nome)}</div>
+      `,
+      iconSize: [150, 40],
+      iconAnchor: [12, 20],
+      popupAnchor: [0, -20],
+    });
+  }
+
+  private criarPopupHtml(posto: Posto, color: string): string {
+    return `
+      <div class="postos-mapa-popup-content">
+        <div class="postos-mapa-popup-content__header">
+          <span class="postos-mapa-popup-content__dot" style="--dot-color: ${color}"></span>
+          <strong>${this.escaparHtml(posto.nome)}</strong>
+        </div>
+        <div class="postos-mapa-popup-content__info">
+          <span class="postos-mapa-popup-content__label">Coordenadas:</span>
+          <span>${posto.latitude.toFixed(5)}, ${posto.longitude.toFixed(5)}</span>
+        </div>
+        <div class="postos-mapa-popup-content__info">
+          <span class="postos-mapa-popup-content__label">Raio:</span>
+          <span>${posto.raioM}m</span>
+        </div>
+        <div class="postos-mapa-popup-content__info">
+          <span class="postos-mapa-popup-content__label">Status:</span>
+          <span>${posto.ativo ? 'Ativo' : 'Inativo'}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  private escaparHtml(texto: string): string {
+    return texto
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 }

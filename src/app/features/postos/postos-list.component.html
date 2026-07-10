@@ -22,7 +22,7 @@
       <z-segmented [zOptions]="tabOptions" zDefaultValue="lista" (zChange)="selectedTab.set($event)" />
     </div>
 
-    @if (selectedTab() === 'lista') {
+    <div [class.hidden]="selectedTab() !== 'lista'">
     <z-card class="p-4 mb-6">
       <div class="flex flex-wrap gap-4 items-end">
         <div class="flex flex-col gap-1.5 min-w-[200px] max-w-sm flex-1">
@@ -98,11 +98,64 @@
       </table>
       </div>
     </div>
-    } @else {
-      <div class="flex items-center justify-center h-64 text-muted-foreground">
-        <p>Mapa em breve</p>
-      </div>
-    }
+    </div>
+
+    <div class="postos-mapa" [class.postos-mapa--hidden]="selectedTab() !== 'mapa'">
+      @if ((filteredPostos$ | async); as postos) {
+        @if (postos.length === 0) {
+          <gp-empty-state
+            icon="lucideMapPinOff"
+            title="Nenhum posto para exibir"
+            [description]="searchControl.value ? 'Nenhum posto corresponde à busca.' : 'Nenhum posto cadastrado.'"
+          />
+        } @else {
+          <div
+            #mapContainer
+            class="postos-mapa__container"
+            tabindex="0"
+            role="application"
+          ></div>
+
+          @if (selectedPosto(); as posto) {
+            <div class="postos-mapa__card">
+              <button class="postos-mapa__card-close" (click)="limparSelecao()" aria-label="Fechar">
+                <ng-icon name="lucideX" />
+              </button>
+              <div class="postos-mapa__card-header">
+                <span class="postos-mapa__card-dot" [style.--dot-color]="posto.ativo ? '#2563eb' : '#94a3b8'"></span>
+                <strong>{{ posto.nome }}</strong>
+              </div>
+              <div class="postos-mapa__card-body">
+                <div class="postos-mapa__card-row">
+                  <span class="postos-mapa__card-label">Coordenadas:</span>
+                  <span>{{ posto.latitude.toFixed(5) }}, {{ posto.longitude.toFixed(5) }}</span>
+                </div>
+                <div class="postos-mapa__card-row">
+                  <span class="postos-mapa__card-label">Raio:</span>
+                  <span>{{ posto.raioM }}m</span>
+                </div>
+                <div class="postos-mapa__card-row">
+                  <span class="postos-mapa__card-label">Status:</span>
+                  <gp-status-badge [status]="posto.ativo ? 'ativo' : 'cancelado'" />
+                </div>
+              </div>
+              @if (posto.ativo) {
+                <div class="postos-mapa__card-actions">
+                  <button z-button zType="outline" zSize="sm" (click)="abrirFormulario(posto); limparSelecao()">
+                    <ng-icon name="lucidePencil" />
+                    Editar
+                  </button>
+                  <button z-button zType="outline" zSize="sm" class="text-destructive" (click)="confirmarExclusao(posto); limparSelecao()">
+                    <ng-icon name="lucideBan" />
+                    Inativar
+                  </button>
+                </div>
+              }
+            </div>
+          }
+        }
+      }
+    </div>
   }
 </div>
 </gp-page-layout>
