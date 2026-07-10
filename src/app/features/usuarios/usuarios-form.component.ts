@@ -57,6 +57,7 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
   readonly data = inject<Usuario | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   private readonly API_ERRO_CODIGO_JA_USADO = 'codigo ja usado por outra senha deste vigia';
+  private readonly API_ERRO_EMAIL_JA_CADASTRADO = 'email ja cadastrado';
 
   readonly loading = signal(false);
   readonly isEdit = signal(false);
@@ -238,6 +239,13 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
+  private mensagemErroSalvar(err: { message?: string }, fallback: string): string {
+    if (err.message?.toLowerCase().includes(this.API_ERRO_EMAIL_JA_CADASTRADO)) {
+      return 'Este e-mail já está cadastrado. Utilize outro e-mail.';
+    }
+    return err.message ?? fallback;
+  }
+
   private validaSenhasVigia(): boolean {
     let valid = true;
 
@@ -306,7 +314,7 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
           },
           error: (err) => {
             this.loading.set(false);
-            this.notification.error(err.message ?? 'Erro ao atualizar usuário.');
+            this.notification.error(this.mensagemErroSalvar(err, 'Erro ao atualizar usuário.'));
           },
         });
       return;
@@ -356,16 +364,19 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
           },
           error: (err) => {
             this.loading.set(false);
-            if (err.message?.toLowerCase().includes(this.API_ERRO_CODIGO_JA_USADO)) {
+            if (err.message?.toLowerCase().includes(this.API_ERRO_EMAIL_JA_CADASTRADO)) {
+              this.notification.error('Este e-mail já está cadastrado. Utilize outro e-mail.');
+            } else if (err.message?.toLowerCase().includes(this.API_ERRO_CODIGO_JA_USADO)) {
               this.notification.error(
                 'Usuário criado, mas não foi possível configurar as senhas. O mesmo código não pode ser usado em diferentes níveis de escalonamento. Configure as senhas manualmente na tela de senhas do vigia.',
               );
+              this.dialogRef.close(true);
             } else {
               this.notification.error(
                 'Usuário criado, mas houve erro ao configurar as senhas vinculativas. Configure-as manualmente na tela de senhas do vigia.',
               );
+              this.dialogRef.close(true);
             }
-            this.dialogRef.close(true);
           },
         });
       return;
@@ -379,7 +390,7 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.loading.set(false);
-        this.notification.error(err.message ?? 'Erro ao salvar usuário.');
+        this.notification.error(this.mensagemErroSalvar(err, 'Erro ao salvar usuário.'));
       },
     });
   }

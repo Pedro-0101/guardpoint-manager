@@ -76,6 +76,8 @@ export class ApiService {
       message = 'Servidor indisponível. Verifique sua conexão.';
     } else if (error.error?.message) {
       message = error.error.message;
+    } else if (error.error?.error) {
+      message = error.error.error;
     } else if (error.message) {
       message = error.message;
     }
