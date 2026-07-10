@@ -176,19 +176,32 @@
             <p class="text-xs text-muted-foreground mt-0.5 mb-3">
               Senha vinculativa. Código de 2 a 6 caracteres com pelo menos 2 números.
             </p>
-            <z-form-field class="max-w-[180px]">
+            <z-form-field class="max-w-[230px]">
               <z-form-label>Código</z-form-label>
               <z-form-control>
-                <input
-                  z-input
-                  [zPass]="true"
-                  [zMinlength]="2"
-                  [zMaxlength]="6"
-                  [formControl]="okCodigo"
-                  placeholder="2 a 6 caracteres"
-                  class="w-full"
-                  autocomplete="new-password"
-                />
+                <div class="flex gap-2">
+                  <input
+                    z-input
+                    [zPass]="true"
+                    [zMinlength]="2"
+                    [zMaxlength]="6"
+                    [formControl]="okCodigo"
+                    placeholder="2 a 6 caracteres"
+                    class="flex-1"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    z-button
+                    zSize="sm"
+                    zType="outline"
+                    class="shrink-0"
+                    zTooltip="Gerar senha aleatória de 4 dígitos"
+                    (click)="gerarSenhaVigia(okCodigo)"
+                  >
+                    <ng-icon name="lucideShuffle" class="size-4" />
+                  </button>
+                </div>
               </z-form-control>
               @if (okCodigo.invalid && okCodigo.touched) {
                 @if (okCodigo.errors?.['required']) {
@@ -211,19 +224,32 @@
             <p class="text-xs text-muted-foreground mt-0.5 mb-3">
               Senha de emergência do sistema. Código de 2 a 6 caracteres com pelo menos 2 números.
             </p>
-            <z-form-field class="max-w-[180px]">
+            <z-form-field class="max-w-[230px]">
               <z-form-label>Código</z-form-label>
               <z-form-control>
-                <input
-                  z-input
-                  [zPass]="true"
-                  [zMinlength]="2"
-                  [zMaxlength]="6"
-                  [formControl]="emergenciaCodigo"
-                  placeholder="2 a 6 caracteres"
-                  class="w-full"
-                  autocomplete="new-password"
-                />
+                <div class="flex gap-2">
+                  <input
+                    z-input
+                    [zPass]="true"
+                    [zMinlength]="2"
+                    [zMaxlength]="6"
+                    [formControl]="emergenciaCodigo"
+                    placeholder="2 a 6 caracteres"
+                    class="flex-1"
+                    autocomplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    z-button
+                    zSize="sm"
+                    zType="outline"
+                    class="shrink-0"
+                    zTooltip="Gerar senha aleatória de 4 dígitos"
+                    (click)="gerarSenhaVigia(emergenciaCodigo)"
+                  >
+                    <ng-icon name="lucideShuffle" class="size-4" />
+                  </button>
+                </div>
               </z-form-control>
               @if (emergenciaCodigo.invalid && emergenciaCodigo.touched) {
                 @if (emergenciaCodigo.errors?.['required']) {

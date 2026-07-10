@@ -19,6 +19,7 @@ import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Usuario } from '../../core/models/usuario.model';
 import { ConfigEscalonamento } from '../../core/models/config.model';
+import { ZardTooltipImports } from '@/shared/components/tooltip';
 import { Subject, forkJoin, map, switchMap } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -43,6 +44,7 @@ interface CustomSenhaEntry {
     ZardFormStepperComponent,
     ZardButtonComponent,
     ZardSelectComponent,
+    ZardTooltipImports,
     ZardSelectItemComponent,
   ],
   templateUrl: './usuarios-form.component.html',
@@ -237,6 +239,11 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  gerarSenhaVigia(control: FormControl<string>): void {
+    const senha = Math.floor(1000 + Math.random() * 9000).toString();
+    control.setValue(senha);
   }
 
   private mensagemErroSalvar(err: { message?: string }, fallback: string): string {
