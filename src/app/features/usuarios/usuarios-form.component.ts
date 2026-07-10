@@ -192,7 +192,9 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
       codigo: new FormControl('', {
         nonNullable: true,
         validators: [Validators.required, Validators.minLength(2), Validators.maxLength(6), this.atLeastTwoNumbers],
-    });
+      }),
+      escalonamentoId: new FormControl<string | null>(null, { validators: [Validators.required] }),
+    };
     entry.codigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
     this.customSenhas.update((list) => [...list, entry]);
   }
