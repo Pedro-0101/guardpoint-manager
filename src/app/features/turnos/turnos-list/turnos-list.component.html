@@ -112,8 +112,25 @@
                 </tr>
               } @else {
                 @for (turno of turnosList; track turno.id ?? $index) {
-                  <tr z-table-row class="list-page__row" [class.list-page__row--clickable]="!!turno.id" (click)="verDetalhe(turno)" (keydown.enter)="verDetalhe(turno)" tabindex="0">
-                    <td z-table-cell>{{ turno.usuarioNome }}</td>
+                  <tr
+                    z-table-row
+                    class="list-page__row"
+                    [class.list-page__row--clickable]="!!turno.id"
+                    (click)="verDetalhe(turno)"
+                    (keydown.enter)="verDetalhe(turno)"
+                    tabindex="0"
+                  >
+                    <td z-table-cell>
+                      {{ turno.usuarioNome }}
+                      @if (turno.substituicaoId) {
+                        <span
+                          zTooltip="Este turno foi criado como substituição"
+                          class="ml-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium leading-none text-amber-700 whitespace-nowrap"
+                        >
+                          Substituição
+                        </span>
+                      }
+                    </td>
                     <td z-table-cell>{{ turno.postoNome }}</td>
                     <td z-table-cell>
                       <gp-status-badge [status]="turno.status" />
@@ -126,10 +143,10 @@
                           z-button
                           zType="ghost"
                           zSize="icon"
-                          zTooltip="Lançar substituição"
+                          [zTooltip]="turno.substituicaoId ? 'Editar substituição' : 'Lançar substituição'"
                           (click)="$event.stopPropagation(); abrirSubstituicao(turno)"
                           (keydown.enter)="$event.stopPropagation(); abrirSubstituicao(turno)"
-                          aria-label="Lançar substituição para este turno"
+                          [attr.aria-label]="turno.substituicaoId ? 'Editar substituição deste turno' : 'Lançar substituição para este turno'"
                         >
                           <ng-icon name="lucideUserRoundPlus" />
                         </button>

@@ -15,6 +15,7 @@ export interface Turno {
   inicioReal: string | null;
   fimReal: string | null;
   intervaloMin: number;
+  substituicaoId?: string;
   createdAt: string;
 }
 

@@ -24,6 +24,7 @@ interface TurnoDto {
   inicio_real: string | null;
   fim_real: string | null;
   intervalo_min: number;
+  substituicao_id?: string;
   created_at: string;
   posto?: PostoDto;
   usuario?: UsuarioDto;
@@ -119,6 +120,7 @@ export class TurnosService {
       inicioReal: dto.inicio_real,
       fimReal: dto.fim_real,
       intervaloMin: dto.intervalo_min,
+      substituicaoId: dto.substituicao_id,
       createdAt: dto.created_at,
     };
   }

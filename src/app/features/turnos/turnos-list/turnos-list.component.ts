@@ -21,8 +21,10 @@ import { StatusBadge } from '../../../shared/components/status-badge/status-badg
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../../shared/components/page-layout/page-layout';
 import { Turno, TurnoFilter } from '../../../core/models/turno.model';
-import { SubstituicaoPrefill } from '../../../core/models/substituicao.model';
+import { Substituicao, SubstituicaoPrefill } from '../../../core/models/substituicao.model';
 import { Posto } from '../../../core/models/posto.model';
+import { SubstituicoesService } from '../../substituicoes/substituicoes.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 interface StatusFilter {
   value: string;
@@ -69,7 +71,9 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   private readonly turnosService = inject(TurnosService);
   private readonly postosService = inject(PostosService);
   private readonly usuariosService = inject(UsuariosService);
+  private readonly substituicoesService = inject(SubstituicoesService);
   private readonly dialog = inject(ZardDialogService);
+  private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
   private readonly destroy$ = new Subject<void>();
 
@@ -214,6 +218,20 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   }
 
   abrirSubstituicao(turno: Turno): void {
+    if (turno.substituicaoId) {
+      this.substituicoesService.obter(turno.substituicaoId)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (substituicao) => this.abrirDialogEdicao(substituicao),
+          error: () => this.notification.error('Erro ao carregar substituição para edição.'),
+        });
+      return;
+    }
+
+    this.abrirDialogCriacao(turno);
+  }
+
+  private abrirDialogCriacao(turno: Turno): void {
     const prefill: SubstituicaoPrefill = {
       postoId: turno.postoId,
       dataInicio: turno.inicioPrevisto.slice(0, 10),
@@ -229,6 +247,28 @@ export class TurnosListComponent implements OnInit, OnDestroy {
       zWidth: '640px',
       zData: prefill,
       zOkText: 'Criar',
+      zOnOk: (instance: { submit: () => void }) => {
+        instance.submit();
+        return false;
+      },
+    });
+
+    dialogRef.afterClosed
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.carregarTurnos();
+        }
+      });
+  }
+
+  private abrirDialogEdicao(substituicao: Substituicao): void {
+    const dialogRef = this.dialog.create({
+      zTitle: 'Editar substituição',
+      zContent: SubstituicoesFormComponent,
+      zWidth: '640px',
+      zData: substituicao,
+      zOkText: 'Salvar',
       zOnOk: (instance: { submit: () => void }) => {
         instance.submit();
         return false;
