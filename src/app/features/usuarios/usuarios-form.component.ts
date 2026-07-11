@@ -1,8 +1,10 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators, type ValidatorFn } from '@angular/forms';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideShield } from '@ng-icons/lucide';
 import { UsuariosService, CreateUsuarioPayload, UpdateUsuarioPayload } from './usuarios.service';
 import { ConfiguracoesService } from '../configuracoes/configuracoes.service';
+import { PostosService } from '../postos/postos.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardRadioComponent, ZardRadioCardDirective } from '@/shared/components/radio';
@@ -15,18 +17,29 @@ import {
 } from '@/shared/components/form';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import { ZardSelectComponent, ZardSelectItemComponent } from '@/shared/components/select';
+import { ZardCardComponent } from '@/shared/components/card/card.component';
+import { GpAvatarComponent } from '@/shared/components/avatar';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Usuario } from '../../core/models/usuario.model';
 import { ConfigEscalonamento } from '../../core/models/config.model';
 import { ZardTooltipImports } from '@/shared/components/tooltip';
-import { Subject, forkJoin, map, switchMap } from 'rxjs';
+import { Subject, forkJoin, map, switchMap, of } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 interface CustomSenhaEntry {
   id: number;
   codigo: FormControl<string>;
   escalonamentoId: FormControl<string | null>;
+}
+
+interface PostoVinculo {
+  id: string;
+  nome: string;
+  latitude: number;
+  longitude: number;
+  raioM: number;
+  vinculado: boolean;
 }
 
 @Component({
@@ -46,13 +59,17 @@ interface CustomSenhaEntry {
     ZardSelectComponent,
     ZardTooltipImports,
     ZardSelectItemComponent,
+    ZardCardComponent,
+    GpAvatarComponent,
   ],
   templateUrl: './usuarios-form.component.html',
+  viewProviders: [provideIcons({ lucideShield })],
 })
 export class UsuariosFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly usuariosService = inject(UsuariosService);
   private readonly configuracoesService = inject(ConfiguracoesService);
+  private readonly postosService = inject(PostosService);
   private readonly dialogRef = inject(ZardDialogRef<UsuariosFormComponent>);
   private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
@@ -64,6 +81,10 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
   readonly loading = signal(false);
   readonly isEdit = signal(false);
   readonly currentStep = signal(0);
+
+  readonly carregandoPostos = signal(false);
+  readonly postos = signal<PostoVinculo[]>([]);
+  readonly vinculosModificados = signal(false);
 
   readonly stepLabels = ['Tipo de usuário', 'Informações básicas', 'Configurações'];
   readonly showStepper = computed(() => !this.isEdit());
@@ -159,6 +180,38 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
       });
   }
 
+  private carregarPostos(): void {
+    if (this.carregandoPostos()) return;
+    this.carregandoPostos.set(true);
+    this.postosService.listar({ ativos: 'true' }).subscribe({
+      next: (postos) => {
+        this.postos.set(
+          postos.map((p) => ({
+            id: p.id,
+            nome: p.nome,
+            latitude: p.latitude,
+            longitude: p.longitude,
+            raioM: p.raioM,
+            vinculado: false,
+          })),
+        );
+        this.vinculosModificados.set(false);
+        this.carregandoPostos.set(false);
+      },
+      error: () => {
+        this.notification.error('Erro ao carregar postos.');
+        this.carregandoPostos.set(false);
+      },
+    });
+  }
+
+  toggleVinculo(posto: PostoVinculo): void {
+    posto.vinculado = !posto.vinculado;
+    this.vinculosModificados.set(
+      this.postos().some((p) => p.vinculado),
+    );
+  }
+
   private setupCrossValidation(): void {
     this.okCodigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
     this.emergenciaCodigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
@@ -251,6 +304,9 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
       }
     }
     this.currentStep.update((s) => s + 1);
+    if (this.currentStep() === 2 && this.form.controls.cargo.value === 'supervisor') {
+      this.carregarPostos();
+    }
   }
 
   prevStep(): void {
@@ -405,6 +461,33 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
               );
               this.dialogRef.close(true);
             }
+          },
+        });
+      return;
+    }
+
+    if (cargo === 'supervisor') {
+      this.usuariosService
+        .criar(createPayload)
+        .pipe(
+          switchMap((usuario) => {
+            const vinculacoes = this.postos()
+              .filter((p) => p.vinculado)
+              .map((p) => this.postosService.adicionarSupervisor(p.id, usuario.id));
+
+            if (vinculacoes.length === 0) return of(undefined);
+            return forkJoin(vinculacoes).pipe(map(() => undefined));
+          }),
+        )
+        .subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.notification.success('Usuário criado com sucesso.');
+            this.dialogRef.close(true);
+          },
+          error: (err) => {
+            this.loading.set(false);
+            this.notification.error(this.mensagemErroSalvar(err, 'Erro ao salvar usuário.'));
           },
         });
       return;

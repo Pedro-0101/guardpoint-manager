@@ -26,9 +26,7 @@
   @if (supervisorSelecionado(); as supervisor) {
     <z-card class="p-5 space-y-4">
       <div class="flex items-start gap-3">
-        <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <ng-icon name="lucideUserCheck" class="size-5" />
-        </div>
+        <gp-avatar [name]="supervisorSelecionado()?.label ?? ''" size="md" />
         <div>
           <h3 class="text-base font-semibold">{{ supervisor.label }}</h3>
           <p class="mt-1 text-sm text-muted-foreground">

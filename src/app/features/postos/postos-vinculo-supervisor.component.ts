@@ -15,7 +15,8 @@ import {
 } from '@/shared/components/form';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideUserCheck, lucideShield } from '@ng-icons/lucide';
+import { lucideShield } from '@ng-icons/lucide';
+import { GpAvatarComponent } from '@/shared/components/avatar';
 import { Posto } from '../../core/models/posto.model';
 
 interface PostoVinculo {
@@ -39,9 +40,10 @@ interface PostoVinculo {
     ZardFormControlComponent,
     ZardFormMessageComponent,
     NgIcon,
+    GpAvatarComponent,
   ],
   templateUrl: './postos-vinculo-supervisor.component.html',
-  viewProviders: [provideIcons({ lucideUserCheck, lucideShield })],
+  viewProviders: [provideIcons({ lucideShield })],
 })
 export class PostosVinculoSupervisorComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
