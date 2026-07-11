@@ -24,6 +24,7 @@ interface EmpresaDto {
   id: string;
   nome: string;
   cnpj: string;
+  codigo: string;
   ativa: boolean;
   alerta_sonoro: boolean;
   created_at: string;
@@ -48,6 +49,7 @@ function mapEmpresaFromDto(dto: EmpresaDto): Empresa {
     id: dto.id,
     nome: dto.nome,
     cnpj: dto.cnpj,
+    codigo: dto.codigo,
     ativa: dto.ativa,
     alertaSonoro: dto.alerta_sonoro,
     createdAt: dto.created_at,

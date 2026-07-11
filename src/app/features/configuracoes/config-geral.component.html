@@ -17,7 +17,7 @@
       <z-card class="p-6">
         @if (loading()) {
           <div class="config-grid">
-            @for (row of [1,2,3,4,5]; track row) {
+            @for (row of [1,2,3,4,5,6]; track row) {
               <div class="config-field">
                 <z-skeleton class="h-3 w-24 rounded mb-2" />
                 <z-skeleton class="h-6 w-48 rounded" />
@@ -34,6 +34,10 @@
               <div class="config-field">
                 <span class="config-field__label">CNPJ</span>
                 <span class="config-field__value">{{ e.cnpj || '—' }}</span>
+              </div>
+              <div class="config-field">
+                <span class="config-field__label">Código da empresa</span>
+                <span class="config-field__value">{{ e.codigo }}</span>
               </div>
               <div class="config-field">
                 <span class="config-field__label">Status</span>
