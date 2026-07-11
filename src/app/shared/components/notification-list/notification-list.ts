@@ -1,88 +1,117 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideCheckCircle, lucideX } from '@ng-icons/lucide';
 import { ZardDividerComponent } from '../divider/divider.component';
+import { ZardButtonComponent } from '../button/button.component';
+import { ZardTooltipDirective } from '../tooltip/tooltip.directive';
+import { AlertasService } from '../../../features/alertas/alertas.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { Alerta } from '../../../core/models/alerta.model';
 
 export interface NotificationItem {
   id: string;
-  tipo: string;
-  gravidade: string;
-  status: string;
+  tipo: Alerta['tipo'];
+  gravidade: Alerta['gravidade'];
+  status: Alerta['status'];
   mensagem: string;
   tempo: string;
   createdAt: string;
 }
 
-const MOCK_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: '1',
-    tipo: 'coacao',
-    gravidade: 'critica',
-    status: 'aberto',
-    mensagem: 'Vigilante João Silva acionou botão de coação no Posto 3',
-    tempo: 'há 2 min',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    tipo: 'atraso',
-    gravidade: 'alta',
-    status: 'aberto',
-    mensagem: 'Carlos Santos não registrou início do turno no Posto 1',
-    tempo: 'há 15 min',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    tipo: 'ausencia',
-    gravidade: 'media',
-    status: 'aberto',
-    mensagem: 'Ausência não justificada no posto Noturno',
-    tempo: 'há 1h',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    tipo: 'sabotagem',
-    gravidade: 'critica',
-    status: 'aberto',
-    mensagem: 'Tentativa de acesso não autorizado detectada no Posto 2',
-    tempo: 'há 3h',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    tipo: 'atraso',
-    gravidade: 'baixa',
-    status: 'reconhecido',
-    mensagem: 'Atraso de 5 min no início do turno',
-    tempo: 'há 5h',
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: '6',
-    tipo: 'ausencia',
-    gravidade: 'media',
-    status: 'encerrado',
-    mensagem: 'Falta justificada com atestado',
-    tempo: 'ontem',
-    createdAt: new Date().toISOString(),
-  },
-];
+function tempoRelativo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const segundos = Math.floor(diff / 1000);
+  if (segundos < 60) return 'agora';
+  const minutos = Math.floor(segundos / 60);
+  if (minutos < 60) return `há ${minutos} min`;
+  const horas = Math.floor(minutos / 60);
+  if (horas < 24) return `há ${horas}h`;
+  const dias = Math.floor(horas / 24);
+  if (dias < 7) return `há ${dias}d`;
+  const semanas = Math.floor(dias / 7);
+  return `há ${semanas} sem`;
+}
+
+function mensagemPadrao(tipo: Alerta['tipo']): string {
+  const map: Record<Alerta['tipo'], string> = {
+    atraso: 'Atraso na ronda detectado.',
+    ausencia: 'Alerta de ausência — vigia não iniciou o turno.',
+    sabotagem: 'Sabotagem reportada pelo vigia.',
+    coacao: 'Senha de emergência utilizada pelo vigia.',
+  };
+  return map[tipo] ?? 'Sem mensagem registrada';
+}
+
+function toNotificationItem(a: Alerta): NotificationItem {
+  return {
+    id: a.id,
+    tipo: a.tipo,
+    gravidade: a.gravidade,
+    status: a.status,
+    mensagem: a.mensagem || mensagemPadrao(a.tipo),
+    tempo: tempoRelativo(a.createdAt),
+    createdAt: a.createdAt,
+  };
+}
 
 @Component({
   selector: 'gp-notification-list',
-  imports: [NgIcon, RouterLink, ZardDividerComponent],
+  imports: [NgIcon, RouterLink, ZardDividerComponent, ZardButtonComponent, ZardTooltipDirective],
   templateUrl: './notification-list.html',
   styleUrl: './notification-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  viewProviders: [provideIcons({ lucideCheckCircle, lucideX })],
 })
 export class NotificationListComponent {
-  readonly notifications = signal<NotificationItem[]>(MOCK_NOTIFICATIONS);
-  readonly openCount = computed(() => this.notifications().filter(n => n.status === 'aberto').length);
+  private readonly alertasService = inject(AlertasService);
+  private readonly notification = inject(NotificationService);
 
-  tipoIcon(tipo: string): string {
-    const map: Record<string, string> = {
+  private readonly alertasRaw = signal<Alerta[]>([]);
+
+  readonly notifications = computed<NotificationItem[]>(() =>
+    this.alertasRaw()
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10)
+      .map(toNotificationItem),
+  );
+
+  readonly openCount = computed(() =>
+    this.alertasRaw().filter((a) => a.status === 'aberto').length,
+  );
+
+  constructor() {
+    this.alertasService.alertas$.subscribe((alertas) =>
+      this.alertasRaw.set(alertas),
+    );
+  }
+
+  reconhecer(item: NotificationItem): void {
+    this.alertasService.reconhecer(item.id).subscribe({
+      next: () => {
+        this.alertasService.atualizarStatusLocal(item.id, 'reconhecido');
+        this.notification.success('Alerta reconhecido com sucesso.');
+      },
+      error: (err) => {
+        this.notification.error(err.message ?? 'Erro ao reconhecer alerta.');
+      },
+    });
+  }
+
+  encerrar(item: NotificationItem): void {
+    this.alertasService.encerrar(item.id).subscribe({
+      next: () => {
+        this.alertasService.atualizarStatusLocal(item.id, 'encerrado');
+        this.notification.success('Alerta encerrado com sucesso.');
+      },
+      error: (err) => {
+        this.notification.error(err.message ?? 'Erro ao encerrar alerta.');
+      },
+    });
+  }
+
+  tipoIcon(tipo: Alerta['tipo']): string {
+    const map: Record<Alerta['tipo'], string> = {
       atraso: 'lucideClock',
       ausencia: 'lucideUserX',
       coacao: 'lucideTriangleAlert',
@@ -91,8 +120,8 @@ export class NotificationListComponent {
     return map[tipo] ?? 'lucideAlertCircle';
   }
 
-  tipoLabel(tipo: string): string {
-    const map: Record<string, string> = {
+  tipoLabel(tipo: Alerta['tipo']): string {
+    const map: Record<Alerta['tipo'], string> = {
       atraso: 'Atraso',
       ausencia: 'Ausência',
       coacao: 'Coação',
@@ -101,8 +130,8 @@ export class NotificationListComponent {
     return map[tipo] ?? tipo;
   }
 
-  iconBg(gravidade: string): string {
-    const map: Record<string, string> = {
+  iconBg(gravidade: Alerta['gravidade']): string {
+    const map: Record<Alerta['gravidade'], string> = {
       critica: 'color-mix(in oklch, var(--color-destructive), transparent 85%)',
       alta: 'color-mix(in oklch, #f97316, transparent 85%)',
       media: 'color-mix(in oklch, #f59e0b, transparent 85%)',
@@ -111,8 +140,8 @@ export class NotificationListComponent {
     return map[gravidade] ?? 'color-mix(in oklch, var(--color-muted), transparent 85%)';
   }
 
-  statusLabel(status: string): string {
-    const map: Record<string, string> = {
+  statusLabel(status: Alerta['status']): string {
+    const map: Record<Alerta['status'], string> = {
       aberto: 'Aberto',
       reconhecido: 'Visto',
       encerrado: 'Encerrado',
@@ -120,8 +149,8 @@ export class NotificationListComponent {
     return map[status] ?? status;
   }
 
-  iconColor(gravidade: string): string {
-    const map: Record<string, string> = {
+  iconColor(gravidade: Alerta['gravidade']): string {
+    const map: Record<Alerta['gravidade'], string> = {
       critica: 'var(--color-destructive)',
       alta: '#f97316',
       media: '#f59e0b',

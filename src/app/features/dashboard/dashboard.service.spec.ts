@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { DashboardService } from './dashboard.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
-import { DashboardSummary } from './dashboard.types';
+import { DashboardSummaryDto } from './dashboard.types';
 
 describe('DashboardService', () => {
   let service: DashboardService;
@@ -14,15 +14,13 @@ describe('DashboardService', () => {
 
   const baseUrl = environment.apiUrl;
 
-  const mockSummary: DashboardSummary = {
-    kpis: {
-      turnosAtivos: 5,
-      alertasAbertos: 3,
-      checkinsUltimaHora: 12,
-      desviosRota: 1,
-    },
-    alertasRecentes: [],
-    turnosPorPosto: [{ postoNome: 'Posto A', quantidade: 3 }],
+  const mockSummaryDto: DashboardSummaryDto = {
+    turnos_ativos: 5,
+    alertas_abertos: 3,
+    checkins_ultima_hora: 12,
+    desvios_rota: 1,
+    alertas_recentes: [],
+    turnos_por_posto: [{ posto_id: '1', posto_nome: 'Posto A', quantidade: 3 }],
   };
 
   beforeEach(() => {
@@ -50,16 +48,14 @@ describe('DashboardService', () => {
     service.startPolling();
 
     const req = httpMock.expectOne(`${baseUrl}/dashboard/summary`);
-    req.flush(mockSummary);
+    req.flush(mockSummaryDto);
 
-    const received = (service as unknown as { summarySubject: { getValue: () => DashboardSummary | null } })
-      .summarySubject?.getValue();
-
-    expect(received).toBeTruthy();
-    expect(received!.kpis.turnosAtivos).toBe(5);
-
-    const kpi = mockSummary.turnosPorPosto;
-    expect(kpi).toHaveLength(1);
+    service.summary$.subscribe((received) => {
+      expect(received).toBeTruthy();
+      expect(received!.kpis.turnosAtivos).toBe(5);
+      expect(received!.turnosPorPosto).toHaveLength(1);
+      expect(received!.turnosPorPosto[0].postoNome).toBe('Posto A');
+    });
   });
 
   it('deve expor Observables corretamente', () => {

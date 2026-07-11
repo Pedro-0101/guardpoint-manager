@@ -92,9 +92,14 @@ export class AlertaDetailComponent implements OnInit, OnDestroy {
   confirmarReconhecer(alerta: Alerta): void {
     this.dialog.create({
       zTitle: 'Reconhecer alerta',
-      zDescription: 'Deseja reconhecer este alerta?',
+      zDescription: [
+        'Tomar ciência do alerta.',
+        'O status muda de <strong>aberto</strong> para <strong>reconhecido</strong>.',
+        'O alerta continua pendente e ainda pode ser resolvido automaticamente (ex: quando o vigia fizer o check-in).',
+      ].join('<br>'),
       zOkText: 'Reconhecer',
       zCancelText: 'Cancelar',
+      zWidth: '28rem',
       zOnOk: () => this.reconhecer(alerta),
     });
   }
@@ -102,9 +107,14 @@ export class AlertaDetailComponent implements OnInit, OnDestroy {
   confirmarEncerrar(alerta: Alerta): void {
     this.dialog.create({
       zTitle: 'Encerrar alerta',
-      zDescription: 'Deseja encerrar este alerta?',
+      zDescription: [
+        'Resolução manual definitiva.',
+        'O status muda para <strong>encerrado</strong> com a data de conclusão.',
+        'O alerta não poderá mais ser alterado.',
+      ].join('<br>'),
       zOkText: 'Encerrar',
       zCancelText: 'Cancelar',
+      zWidth: '28rem',
       zOnOk: () => this.encerrar(alerta),
     });
   }

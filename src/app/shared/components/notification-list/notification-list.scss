@@ -65,7 +65,6 @@
     border-radius: 0;
     background: transparent;
     text-align: left;
-    cursor: pointer;
     transition: background var(--transition-fast);
 
     &:hover {
@@ -74,6 +73,29 @@
 
     &:not(:last-child) {
       border-bottom: 1px solid var(--border-color);
+    }
+  }
+
+  &__item-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  &__action-btn {
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+
+  &__action-btn--close {
+    &:hover {
+      color: var(--color-destructive);
     }
   }
 

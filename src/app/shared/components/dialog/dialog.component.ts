@@ -75,7 +75,7 @@ export class ZardDialogOptions<T, U> {
           <h4 data-testid="z-title" class="text-lg leading-none font-semibold tracking-tight">{{ config.zTitle }}</h4>
 
           @if (config.zDescription) {
-            <p data-testid="z-description" class="text-muted-foreground text-sm">{{ config.zDescription }}</p>
+            <p data-testid="z-description" class="text-muted-foreground text-sm" [innerHTML]="config.zDescription"></p>
           }
         }
       </header>

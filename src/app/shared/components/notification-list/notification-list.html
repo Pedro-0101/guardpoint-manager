@@ -13,7 +13,7 @@
 
   <div class="notification-panel__list">
     @for (item of notifications(); track item.id) {
-      <button class="notification-panel__item" type="button">
+      <div class="notification-panel__item">
         <div
           class="notification-panel__item-icon"
           [style.background]="iconBg(item.gravidade)"
@@ -33,7 +33,35 @@
           <p class="notification-panel__item-desc">{{ item.mensagem }}</p>
           <span class="notification-panel__item-time">{{ item.tempo }}</span>
         </div>
-      </button>
+        @if (item.status !== 'encerrado') {
+          <div class="notification-panel__item-actions">
+            @if (item.status === 'aberto') {
+              <button
+                z-button
+                zType="ghost"
+                zSize="icon"
+                class="notification-panel__action-btn"
+                (click)="reconhecer(item)"
+                [zTooltip]="'Reconhecer'"
+                aria-label="Reconhecer alerta"
+              >
+                <ng-icon name="lucideCheckCircle" class="size-4" />
+              </button>
+            }
+            <button
+              z-button
+              zType="ghost"
+              zSize="icon"
+              class="notification-panel__action-btn notification-panel__action-btn--close"
+              (click)="encerrar(item)"
+              [zTooltip]="'Encerrar'"
+              aria-label="Encerrar alerta"
+            >
+              <ng-icon name="lucideX" class="size-4" />
+            </button>
+          </div>
+        }
+      </div>
     } @empty {
       <div class="notification-panel__empty">
         <ng-icon name="lucideBellOff" class="notification-panel__empty-icon" />

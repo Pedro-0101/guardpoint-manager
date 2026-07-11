@@ -59,8 +59,8 @@ interface AlertaEstatisticasDto {
 function normalizarTipo(raw: string): Alerta['tipo'] {
   if (raw.startsWith('atraso')) return 'atraso';
   if (raw === 'no_show') return 'ausencia';
-  if (raw === 'coacao') return 'coacao';
   if (raw === 'sabotagem') return 'sabotagem';
+  if (raw === 'senha_emergencia' || raw === 'senha_customizada' || raw === 'coacao') return 'coacao';
   return 'atraso';
 }
 
@@ -72,7 +72,7 @@ function nivelDeTipo(raw: string): number {
 
 /** Deriva a gravidade a partir do tipo/nível — o backend não envia `gravidade`. */
 function gravidadePorTipo(raw: string, nivel: number): Alerta['gravidade'] {
-  if (raw === 'coacao' || raw === 'sabotagem') return 'critica';
+  if (raw === 'coacao' || raw === 'sabotagem' || raw === 'senha_emergencia' || raw === 'senha_customizada') return 'critica';
   if (raw === 'no_show') return 'alta';
   const nivelMap: Record<number, Alerta['gravidade']> = {
     1: 'baixa',
