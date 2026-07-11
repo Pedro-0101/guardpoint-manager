@@ -82,62 +82,6 @@
     <z-form-stepper [steps]="stepLabels" [currentStep]="currentStep()" />
 
     @if (currentStep() === 0) {
-      <z-form-field>
-        <z-form-label [zRequired]="true">Nome</z-form-label>
-        <z-form-control>
-          <input z-input formControlName="nome" placeholder="Ex: João Silva" class="w-full" />
-        </z-form-control>
-        @if (form.controls.nome.invalid && form.controls.nome.touched) {
-          <z-form-message [zError]="true">
-            @if (form.controls.nome.errors?.['required']) {
-              Nome é obrigatório.
-            } @else if (form.controls.nome.errors?.['minlength']) {
-              Mínimo de 3 caracteres.
-            }
-          </z-form-message>
-        } @else {
-          <z-form-message>Como o usuário será identificado no sistema.</z-form-message>
-        }
-      </z-form-field>
-
-      <z-form-field>
-        <z-form-label [zRequired]="true">Email</z-form-label>
-        <z-form-control>
-          <input z-input type="email" autocomplete="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
-        </z-form-control>
-        @if (form.controls.email.invalid && form.controls.email.touched) {
-          <z-form-message [zError]="true">
-            @if (form.controls.email.errors?.['required']) {
-              Email é obrigatório.
-            } @else if (form.controls.email.errors?.['email']) {
-              Email inválido.
-            }
-          </z-form-message>
-        } @else {
-          <z-form-message>Usado para login e notificações do sistema.</z-form-message>
-        }
-      </z-form-field>
-
-      <z-form-field>
-        <z-form-label [zRequired]="true">Senha</z-form-label>
-        <z-form-control>
-          <input z-input [zPass]="true" [zMinlength]="6" autocomplete="new-password" formControlName="senha" class="w-full" />
-        </z-form-control>
-        @if (form.controls.senha.invalid && form.controls.senha.touched) {
-          <z-form-message [zError]="true">
-            @if (form.controls.senha.errors?.['required']) {
-              Senha é obrigatória.
-            } @else if (form.controls.senha.errors?.['minlength']) {
-              Mínimo de 6 caracteres.
-            }
-          </z-form-message>
-        } @else {
-          <z-form-message>Use pelo menos 6 caracteres.</z-form-message>
-        }
-      </z-form-field>
-    }
-
-    @if (currentStep() === 1) {
       <div class="space-y-4">
         <div>
           <h3 class="text-sm font-medium leading-none">Cargo <span class="text-destructive ml-0.5">*</span></h3>
@@ -166,6 +110,64 @@
           <p class="text-sm text-destructive">Cargo é obrigatório.</p>
         }
       </div>
+    }
+
+    @if (currentStep() === 1) {
+      <z-form-field>
+        <z-form-label [zRequired]="true">Nome</z-form-label>
+        <z-form-control>
+          <input z-input formControlName="nome" placeholder="Ex: João Silva" class="w-full" />
+        </z-form-control>
+        @if (form.controls.nome.invalid && form.controls.nome.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.nome.errors?.['required']) {
+              Nome é obrigatório.
+            } @else if (form.controls.nome.errors?.['minlength']) {
+              Mínimo de 3 caracteres.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Como o usuário será identificado no sistema.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="form.controls.cargo.value !== 'vigia'">Email</z-form-label>
+        <z-form-control>
+          <input z-input type="email" autocomplete="email" formControlName="email" placeholder="Ex: joao@email.com" class="w-full" />
+        </z-form-control>
+        @if (form.controls.email.invalid && form.controls.email.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.email.errors?.['required']) {
+              Email é obrigatório.
+            } @else if (form.controls.email.errors?.['email']) {
+              Email inválido.
+            }
+          </z-form-message>
+        } @else if (form.controls.cargo.value === 'vigia') {
+          <z-form-message>Opcional para vigia. Vigias autenticam com código da empresa + nome.</z-form-message>
+        } @else {
+          <z-form-message>Usado para login e notificações do sistema.</z-form-message>
+        }
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Senha</z-form-label>
+        <z-form-control>
+          <input z-input [zPass]="true" [zMinlength]="6" autocomplete="new-password" formControlName="senha" class="w-full" />
+        </z-form-control>
+        @if (form.controls.senha.invalid && form.controls.senha.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.senha.errors?.['required']) {
+              Senha é obrigatória.
+            } @else if (form.controls.senha.errors?.['minlength']) {
+              Mínimo de 6 caracteres.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Use pelo menos 6 caracteres.</z-form-message>
+        }
+      </z-form-field>
     }
 
     @if (currentStep() === 2) {

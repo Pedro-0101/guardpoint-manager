@@ -6,7 +6,7 @@ import { SenhaVigia } from '../../core/models/senha.model';
 
 export interface CreateUsuarioPayload {
   nome: string;
-  email: string;
+  email?: string;
   cargo: Usuario['cargo'];
   senha: string;
   ativo?: boolean;

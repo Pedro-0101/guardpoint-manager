@@ -65,7 +65,7 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
   readonly isEdit = signal(false);
   readonly currentStep = signal(0);
 
-  readonly stepLabels = ['Informações básicas', 'Tipo de usuário', 'Configurações'];
+  readonly stepLabels = ['Tipo de usuário', 'Informações básicas', 'Configurações'];
   readonly showStepper = computed(() => !this.isEdit());
   readonly isLastStep = computed(() => this.currentStep() === this.stepLabels.length - 1);
 
@@ -139,6 +139,7 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
     this.carregarEscalonamentos();
     if (!this.isEdit()) {
       this.setupCrossValidation();
+      this.setupEmailValidator();
     }
   }
 
@@ -161,6 +162,22 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
   private setupCrossValidation(): void {
     this.okCodigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
     this.emergenciaCodigo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => this.revalidarSenhas());
+  }
+
+  private setupEmailValidator(): void {
+    const updateEmailValidators = (cargo: string) => {
+      const emailControl = this.form.controls.email;
+      if (cargo === 'vigia') {
+        emailControl.clearValidators();
+        emailControl.setValidators([Validators.email]);
+      } else {
+        emailControl.setValidators([Validators.required, Validators.email]);
+      }
+      emailControl.updateValueAndValidity();
+    };
+
+    this.form.controls.cargo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(updateEmailValidators);
+    updateEmailValidators(this.form.controls.cargo.value);
   }
 
   private revalidarSenhas(): void {
@@ -219,6 +236,9 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
 
   nextStep(): void {
     if (this.currentStep() === 0) {
+      this.form.controls.cargo.markAsTouched();
+      if (this.form.controls.cargo.invalid) return;
+    } else if (this.currentStep() === 1) {
       this.form.controls.nome.markAsTouched();
       this.form.controls.email.markAsTouched();
       this.form.controls.senha.markAsTouched();
@@ -327,7 +347,8 @@ export class UsuariosFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const createPayload: CreateUsuarioPayload = { nome, email, cargo, senha, ativo };
+    const createPayload: CreateUsuarioPayload = { nome, cargo, senha, ativo };
+    if (email) createPayload.email = email;
 
     if (cargo === 'vigia') {
       this.usuariosService
