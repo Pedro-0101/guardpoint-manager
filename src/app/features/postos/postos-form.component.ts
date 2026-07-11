@@ -2,6 +2,7 @@ import {
   Component,
   inject,
   signal,
+  computed,
   OnInit,
   OnDestroy,
   AfterViewInit,
@@ -9,58 +10,47 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import * as L from 'leaflet';
 import { PostosService } from './postos.service';
+import { UsuariosService } from '../usuarios/usuarios.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { NgIcon } from '@ng-icons/core';
 import { ZardInputDirective } from '@/shared/components/input';
+import { ZardButtonComponent } from '@/shared/components/button/button.component';
 import {
   ZardFormFieldComponent,
   ZardFormLabelComponent,
   ZardFormControlComponent,
   ZardFormMessageComponent,
+  ZardFormStepperComponent,
 } from '@/shared/components/form';
 import { ZardDialogRef } from '@/shared/components/dialog/dialog-ref';
 import { Z_MODAL_DATA } from '@/shared/components/dialog/dialog.service';
 import { Posto } from '../../core/models/posto.model';
 import { parseCoordenadas } from '../../shared/utils/coordenadas.util';
 
-/**
- * Formulário de criação e edição de Postos.
- *
- * ## Padrão de formulário
- *
- * Este componente segue o padrão de formulário reativo do GuardPoint, alinhado ao
- * `UsuariosFormComponent`. O template utiliza os componentes de form do Zard UI:
- *
- * - `<z-form-field>` — agrupa label, controle e mensagem com espaçamento consistente.
- * - `<z-form-label [zRequired]="true">` — exibe o rótulo com indicador de obrigatoriedade.
- * - `<z-form-control>` — wrapper semântico ao redor do `<input z-input class="w-full" />`.
- * - `<z-form-message [zError]="true">` — mensagem de erro (exibida apenas quando o campo
- *   está inválido **e** foi tocado).
- * - `<z-form-message>` (sem `[zError]`) — texto descritivo exibido como ajuda enquanto o
- *   campo está válido ou intocado, explicando a finalidade do campo ao usuário.
- *
- * O `<form>` raiz usa `class="space-y-6"` para espaçamento vertical uniforme entre os
- * campos. Campos lado a lado (ex.: latitude/longitude) utilizam `grid grid-cols-2 gap-4`.
- * Todos os inputs possuem `class="w-full"` para ocupar a largura total do container.
- *
- * O mapa Leaflet (`#mapContainer`) é injetado via `viewChild` e gerenciado manualmente
- * no ciclo de vida (`AfterViewInit` / `OnDestroy`), ficando fora do fluxo dos componentes
- * Zard por ser um elemento de terceiros.
- */
+interface SupervisorItem {
+  id: string;
+  nome: string;
+  vinculado: boolean;
+}
+
 const CENTRO_BRASIL: L.LatLngExpression = [-14.235, -51.9253];
 
 @Component({
   selector: 'gp-postos-form',
   imports: [
     ReactiveFormsModule,
+    NgIcon,
     ZardInputDirective,
+    ZardButtonComponent,
     ZardFormFieldComponent,
     ZardFormLabelComponent,
     ZardFormControlComponent,
     ZardFormMessageComponent,
+    ZardFormStepperComponent,
   ],
   templateUrl: './postos-form.component.html',
   styleUrl: './postos-form.component.scss',
@@ -68,16 +58,24 @@ const CENTRO_BRASIL: L.LatLngExpression = [-14.235, -51.9253];
 export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly postosService = inject(PostosService);
+  private readonly usuariosService = inject(UsuariosService);
   private readonly dialogRef = inject(ZardDialogRef<PostosFormComponent>);
   private readonly notification = inject(NotificationService);
+  private readonly destroy$ = new Subject<void>();
   readonly data = inject<Posto | null>(Z_MODAL_DATA, { optional: true }) ?? null;
 
   readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
 
   readonly loading = signal(false);
   readonly isEdit = signal(false);
+  readonly currentStep = signal(0);
 
-  private readonly destroy$ = new Subject<void>();
+  readonly stepLabels = ['Dados do posto', 'Vincular supervisores'];
+  readonly isLastStep = computed(() => this.currentStep() === this.stepLabels.length - 1);
+
+  readonly supervisores = signal<SupervisorItem[]>([]);
+  readonly carregandoSupervisores = signal(false);
+
   private map: L.Map | null = null;
   private marker: L.Marker | null = null;
   private circulo: L.Circle | null = null;
@@ -110,8 +108,6 @@ export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.iniciarMapa();
-    // O container está dentro de um MatDialog em animação; o Leaflet precisa
-    // recalcular o tamanho depois que o dialog assume as dimensões finais.
     setTimeout(() => {
       this.map?.invalidateSize();
       this.atualizarCamadas();
@@ -127,8 +123,54 @@ export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  nextStep(): void {
+    if (this.currentStep() === 0) {
+      if (this.form.invalid) {
+        this.form.markAllAsTouched();
+        return;
+      }
+      this.carregarSupervisores();
+    }
+    this.currentStep.update((s) => s + 1);
+  }
+
+  prevStep(): void {
+    this.currentStep.update((s) => Math.max(0, s - 1));
+  }
+
+  private carregarSupervisores(): void {
+    this.carregandoSupervisores.set(true);
+    this.usuariosService.listar().subscribe({
+      next: (users) => {
+        const supervisors = users.filter((u) => u.ativo && u.cargo === 'supervisor');
+        this.supervisores.set(
+          supervisors.map((u) => ({
+            id: u.id,
+            nome: u.nome,
+            vinculado: false,
+          }))
+        );
+        this.carregandoSupervisores.set(false);
+      },
+      error: () => {
+        this.notification.error('Erro ao carregar supervisores.');
+        this.carregandoSupervisores.set(false);
+      },
+    });
+  }
+
+  toggleSupervisor(supervisor: SupervisorItem): void {
+    supervisor.vinculado = !supervisor.vinculado;
+  }
+
   submit(): void {
     if (this.loading()) return;
+
+    if (!this.isEdit() && !this.isLastStep()) {
+      this.nextStep();
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -137,25 +179,57 @@ export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loading.set(true);
     const data = this.form.getRawValue();
 
-    const request$ = this.isEdit()
-      ? this.postosService.atualizar(this.data!.id, data)
-      : this.postosService.criar(data);
+    if (this.isEdit()) {
+      this.postosService.atualizar(this.data!.id, data).subscribe({
+        next: () => {
+          this.loading.set(false);
+          this.notification.success('Posto atualizado com sucesso.');
+          this.dialogRef.close(true);
+        },
+        error: (err) => {
+          this.loading.set(false);
+          this.notification.error(err.message ?? 'Erro ao salvar posto.');
+        },
+      });
+      return;
+    }
 
-    request$.subscribe({
-      next: () => {
-        this.loading.set(false);
-        this.notification.success(
-          this.isEdit() ? 'Posto atualizado com sucesso.' : 'Posto criado com sucesso.'
+    this.postosService.criar(data).subscribe({
+      next: (posto) => {
+        const selecionados = this.supervisores().filter((s) => s.vinculado);
+        if (selecionados.length === 0) {
+          this.loading.set(false);
+          this.notification.success('Posto criado com sucesso.');
+          this.dialogRef.close(true);
+          return;
+        }
+
+        const vinculos$ = selecionados.map((s) =>
+          this.postosService.adicionarSupervisor(posto.id, s.id)
         );
-        this.dialogRef.close(true);
+
+        forkJoin(vinculos$).subscribe({
+          next: () => {
+            this.loading.set(false);
+            this.notification.success('Posto criado e supervisores vinculados com sucesso.');
+            this.dialogRef.close(true);
+          },
+          error: () => {
+            this.loading.set(false);
+            this.notification.success('Posto criado, mas houve erro ao vincular alguns supervisores.');
+            this.dialogRef.close(true);
+          },
+        });
       },
       error: (err) => {
         this.loading.set(false);
-        this.notification.error(
-          err.message ?? 'Erro ao salvar posto.'
-        );
+        this.notification.error(err.message ?? 'Erro ao salvar posto.');
       },
     });
+  }
+
+  close(): void {
+    this.dialogRef.close();
   }
 
   onColarCoordenadas(event: ClipboardEvent): void {
@@ -210,7 +284,6 @@ export class PostosFormComponent implements OnInit, AfterViewInit, OnDestroy {
     const { latitude, longitude, raioM } = this.form.getRawValue();
     const coordsValidas =
       this.form.controls.latitude.valid && this.form.controls.longitude.valid;
-    // 0,0 é o valor default do formulário, não uma posição escolhida.
     const temPosicao = coordsValidas && !(latitude === 0 && longitude === 0);
 
     if (!temPosicao) {

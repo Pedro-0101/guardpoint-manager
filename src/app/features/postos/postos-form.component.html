@@ -1,106 +1,311 @@
 <form [formGroup]="form" novalidate class="space-y-6">
-  <z-form-field>
-    <z-form-label [zRequired]="true">Nome</z-form-label>
-    <z-form-control>
-      <input z-input formControlName="nome" placeholder="Ex: Portaria Principal" class="w-full" />
-    </z-form-control>
-    @if (form.controls.nome.invalid && form.controls.nome.touched) {
-      <z-form-message [zError]="true">
-        @if (form.controls.nome.errors?.['required']) {
-          Nome é obrigatório.
-        } @else if (form.controls.nome.errors?.['minlength']) {
-          Mínimo de 3 caracteres.
-        }
-      </z-form-message>
-    } @else {
-      <z-form-message>Nome de identificação do posto de serviço.</z-form-message>
-    }
-  </z-form-field>
-
-  <div class="grid grid-cols-2 gap-4">
+  @if (isEdit()) {
     <z-form-field>
-      <z-form-label [zRequired]="true">Latitude</z-form-label>
+      <z-form-label [zRequired]="true">Nome</z-form-label>
       <z-form-control>
-        <input
-          z-input
-          type="number"
-          formControlName="latitude"
-          step="any"
-          class="w-full"
-          (paste)="onColarCoordenadas($event)"
-        />
+        <input z-input formControlName="nome" placeholder="Ex: Portaria Principal" class="w-full" />
       </z-form-control>
-      @if (form.controls.latitude.invalid && form.controls.latitude.touched) {
+      @if (form.controls.nome.invalid && form.controls.nome.touched) {
         <z-form-message [zError]="true">
-          @if (form.controls.latitude.errors?.['required']) {
-            Latitude é obrigatória.
-          } @else {
-            Valor deve estar entre -90 e 90.
+          @if (form.controls.nome.errors?.['required']) {
+            Nome é obrigatório.
+          } @else if (form.controls.nome.errors?.['minlength']) {
+            Mínimo de 3 caracteres.
           }
         </z-form-message>
       } @else {
-        <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
+        <z-form-message>Nome de identificação do posto de serviço.</z-form-message>
       }
     </z-form-field>
 
-    <z-form-field>
-      <z-form-label [zRequired]="true">Longitude</z-form-label>
-      <z-form-control>
-        <input
-          z-input
-          type="number"
-          formControlName="longitude"
-          step="any"
-          class="w-full"
-          (paste)="onColarCoordenadas($event)"
-        />
-      </z-form-control>
-      @if (form.controls.longitude.invalid && form.controls.longitude.touched) {
-        <z-form-message [zError]="true">
-          @if (form.controls.longitude.errors?.['required']) {
-            Longitude é obrigatória.
-          } @else {
-            Valor deve estar entre -180 e 180.
-          }
-        </z-form-message>
-      } @else {
-        <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
-      }
-    </z-form-field>
-  </div>
-
-  <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
-
-  <z-form-field>
-    <z-form-label>Colar coordenadas do Google Maps</z-form-label>
-    <z-form-control>
-      <input
-        z-input
-        placeholder="Ex: 23°12'05.6&quot;S 47°35'56.3&quot;W"
-        class="w-full"
-        (paste)="onColarCoordenadas($event)"
-        (keydown)="$event.preventDefault()"
-        readonly
-      />
-    </z-form-control>
-    <z-form-message>Clique no mapa, arraste o marcador ou cole coordenadas do Google Maps para posicionar o posto.</z-form-message>
-  </z-form-field>
-
-  <z-form-field>
-    <z-form-label [zRequired]="true">Raio de tolerância (metros)</z-form-label>
-    <z-form-control>
-      <input z-input type="number" formControlName="raioM" class="w-full" [zNumeric]="true" [zMin]="10" [zMax]="5000" [zStep]="1" />
-    </z-form-control>
-    @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
-      <z-form-message [zError]="true">
-        @if (form.controls.raioM.errors?.['required']) {
-          Raio é obrigatório.
+    <div class="grid grid-cols-2 gap-4">
+      <z-form-field>
+        <z-form-label [zRequired]="true">Latitude</z-form-label>
+        <z-form-control>
+          <input
+            z-input
+            type="number"
+            formControlName="latitude"
+            step="any"
+            class="w-full"
+            (paste)="onColarCoordenadas($event)"
+          />
+        </z-form-control>
+        @if (form.controls.latitude.invalid && form.controls.latitude.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.latitude.errors?.['required']) {
+              Latitude é obrigatória.
+            } @else {
+              Valor deve estar entre -90 e 90.
+            }
+          </z-form-message>
         } @else {
-          Valor deve estar entre 10 e 5000 metros.
+          <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
         }
-      </z-form-message>
-    } @else {
-      <z-form-message>Distância máxima permitida para registro de ponto pelo vigilante.</z-form-message>
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Longitude</z-form-label>
+        <z-form-control>
+          <input
+            z-input
+            type="number"
+            formControlName="longitude"
+            step="any"
+            class="w-full"
+            (paste)="onColarCoordenadas($event)"
+          />
+        </z-form-control>
+        @if (form.controls.longitude.invalid && form.controls.longitude.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.longitude.errors?.['required']) {
+              Longitude é obrigatória.
+            } @else {
+              Valor deve estar entre -180 e 180.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
+        }
+      </z-form-field>
+    </div>
+
+    <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
+
+    <z-form-field>
+      <z-form-label>Colar coordenadas do Google Maps</z-form-label>
+      <z-form-control>
+        <input
+          z-input
+          placeholder="Ex: 23°12'05.6&quot;S 47°35'56.3&quot;W"
+          class="w-full"
+          (paste)="onColarCoordenadas($event)"
+          (keydown)="$event.preventDefault()"
+          readonly
+        />
+      </z-form-control>
+      <z-form-message>Clique no mapa, arraste o marcador ou cole coordenadas do Google Maps para posicionar o posto.</z-form-message>
+    </z-form-field>
+
+    <z-form-field>
+      <z-form-label [zRequired]="true">Raio de tolerância (metros)</z-form-label>
+      <z-form-control>
+        <input z-input type="number" formControlName="raioM" class="w-full" [zNumeric]="true" [zMin]="10" [zMax]="5000" [zStep]="1" />
+      </z-form-control>
+      @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
+        <z-form-message [zError]="true">
+          @if (form.controls.raioM.errors?.['required']) {
+            Raio é obrigatório.
+          } @else {
+            Valor deve estar entre 10 e 5000 metros.
+          }
+        </z-form-message>
+      } @else {
+        <z-form-message>Distância máxima permitida para registro de ponto pelo vigilante.</z-form-message>
+      }
+    </z-form-field>
+  } @else {
+    <z-form-stepper [steps]="stepLabels" [currentStep]="currentStep()" />
+
+    @if (currentStep() === 0) {
+      <z-form-field>
+        <z-form-label [zRequired]="true">Nome</z-form-label>
+        <z-form-control>
+          <input z-input formControlName="nome" placeholder="Ex: Portaria Principal" class="w-full" />
+        </z-form-control>
+        @if (form.controls.nome.invalid && form.controls.nome.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.nome.errors?.['required']) {
+              Nome é obrigatório.
+            } @else if (form.controls.nome.errors?.['minlength']) {
+              Mínimo de 3 caracteres.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Nome de identificação do posto de serviço.</z-form-message>
+        }
+      </z-form-field>
+
+      <div class="grid grid-cols-2 gap-4">
+        <z-form-field>
+          <z-form-label [zRequired]="true">Latitude</z-form-label>
+          <z-form-control>
+            <input
+              z-input
+              type="number"
+              formControlName="latitude"
+              step="any"
+              class="w-full"
+              (paste)="onColarCoordenadas($event)"
+            />
+          </z-form-control>
+          @if (form.controls.latitude.invalid && form.controls.latitude.touched) {
+            <z-form-message [zError]="true">
+              @if (form.controls.latitude.errors?.['required']) {
+                Latitude é obrigatória.
+              } @else {
+                Valor deve estar entre -90 e 90.
+              }
+            </z-form-message>
+          } @else {
+            <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
+          }
+        </z-form-field>
+
+        <z-form-field>
+          <z-form-label [zRequired]="true">Longitude</z-form-label>
+          <z-form-control>
+            <input
+              z-input
+              type="number"
+              formControlName="longitude"
+              step="any"
+              class="w-full"
+              (paste)="onColarCoordenadas($event)"
+            />
+          </z-form-control>
+          @if (form.controls.longitude.invalid && form.controls.longitude.touched) {
+            <z-form-message [zError]="true">
+              @if (form.controls.longitude.errors?.['required']) {
+                Longitude é obrigatória.
+              } @else {
+                Valor deve estar entre -180 e 180.
+              }
+            </z-form-message>
+          } @else {
+            <z-form-message>Selecione no mapa ou cole do Google Maps.</z-form-message>
+          }
+        </z-form-field>
+      </div>
+
+      <div #mapContainer class="form__mapa" aria-label="Mapa para seleção de coordenadas"></div>
+
+      <z-form-field>
+        <z-form-label>Colar coordenadas do Google Maps</z-form-label>
+        <z-form-control>
+          <input
+            z-input
+            placeholder="Ex: 23°12'05.6&quot;S 47°35'56.3&quot;W"
+            class="w-full"
+            (paste)="onColarCoordenadas($event)"
+            (keydown)="$event.preventDefault()"
+            readonly
+          />
+        </z-form-control>
+        <z-form-message>Clique no mapa, arraste o marcador ou cole coordenadas do Google Maps para posicionar o posto.</z-form-message>
+      </z-form-field>
+
+      <z-form-field>
+        <z-form-label [zRequired]="true">Raio de tolerância (metros)</z-form-label>
+        <z-form-control>
+          <input z-input type="number" formControlName="raioM" class="w-full" [zNumeric]="true" [zMin]="10" [zMax]="5000" [zStep]="1" />
+        </z-form-control>
+        @if (form.controls.raioM.invalid && form.controls.raioM.touched) {
+          <z-form-message [zError]="true">
+            @if (form.controls.raioM.errors?.['required']) {
+              Raio é obrigatório.
+            } @else {
+              Valor deve estar entre 10 e 5000 metros.
+            }
+          </z-form-message>
+        } @else {
+          <z-form-message>Distância máxima permitida para registro de ponto pelo vigilante.</z-form-message>
+        }
+      </z-form-field>
     }
-  </z-form-field>
+
+    @if (currentStep() === 1) {
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-medium leading-none">Vincular supervisores</h3>
+          <p class="text-sm text-muted-foreground mt-1.5">
+            Selecione os supervisores que terão acesso a este posto e receberão seus alertas.
+          </p>
+        </div>
+
+        @if (carregandoSupervisores()) {
+          <div class="flex items-center justify-center py-8">
+            <div class="flex flex-col items-center gap-2 text-muted-foreground">
+              <svg class="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+                <path fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" class="opacity-75" />
+              </svg>
+              <span class="text-sm">Carregando supervisores...</span>
+            </div>
+          </div>
+        } @else if (supervisores().length === 0) {
+          <div class="flex flex-col items-center gap-3 py-8 text-center">
+            <div class="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+              <ng-icon name="lucideUserX" class="size-6 text-muted-foreground" />
+            </div>
+            <div>
+              <h3 class="text-sm font-medium">Nenhum supervisor disponível</h3>
+              <p class="text-sm text-muted-foreground mt-1">
+              Crie supervisores antes de vincular ao posto, ou prossiga sem vínculos.
+              </p>
+            </div>
+          </div>
+        } @else {
+          <div class="flex flex-col gap-2">
+            @for (sup of supervisores(); track sup.id) {
+              <button
+                type="button"
+                class="flex w-full cursor-pointer items-center gap-3 rounded-md border border-border px-4 py-3 text-left transition-all hover:bg-primary/5 hover:border-primary/40"
+                [class.bg-primary/5]="sup.vinculado"
+                [class.border-primary]="sup.vinculado"
+                [class.ring-1]="sup.vinculado"
+                [class.ring-primary]="sup.vinculado"
+                (click)="toggleSupervisor(sup)"
+              >
+                <div
+                  class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
+                  [class.border-primary]="sup.vinculado"
+                  [class.bg-primary]="sup.vinculado"
+                  [class.text-primary-foreground]="sup.vinculado"
+                  [class.border-input]="!sup.vinculado"
+                >
+                  @if (sup.vinculado) {
+                    <svg class="size-3" viewBox="0 0 16 16" fill="none">
+                      <path d="M13.5 4L6 12L2.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  }
+                </div>
+                <div class="flex flex-1 items-center justify-between">
+                  <span class="text-sm font-medium">{{ sup.nome }}</span>
+                  @if (sup.vinculado) {
+                    <span class="text-xs text-primary">Vinculado</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+
+    <div class="flex justify-between pt-4 border-t">
+      <button type="button" z-button zType="outline" (click)="close()">Cancelar</button>
+      <div class="flex gap-2">
+        @if (currentStep() > 0) {
+          <button type="button" z-button zType="outline" (click)="prevStep()">
+            <ng-icon name="lucideChevronLeft" class="size-4" />
+            Voltar
+          </button>
+        }
+        @if (isLastStep()) {
+          <button type="button" z-button [zDisabled]="loading()" (click)="submit()">
+            @if (loading()) {
+              <ng-icon name="lucideRefreshCw" class="size-4 animate-spin" />
+            }
+            Criar posto
+          </button>
+        } @else {
+          <button type="button" z-button (click)="nextStep()">
+            Próximo
+            <ng-icon name="lucideChevronRight" class="size-4" />
+          </button>
+        }
+      </div>
+    </div>
+  }
 </form>

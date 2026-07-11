@@ -53,6 +53,7 @@ import {
   lucideTrash2,
   lucideTriangleAlert,
   lucideUser,
+  lucideUserCheck,
   lucideUserRoundPlus,
   lucideUserX,
   lucideUsers,

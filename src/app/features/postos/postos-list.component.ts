@@ -10,13 +10,15 @@ import {
 } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideUserCheck } from '@ng-icons/lucide';
 import { Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged, startWith, map, take } from 'rxjs/operators';
 import * as L from 'leaflet';
 
 import { PostosService } from './postos.service';
 import { PostosFormComponent } from './postos-form.component';
+import { PostosVinculoSupervisorComponent } from './postos-vinculo-supervisor.component';
 import { ZardDialogService } from '@/shared/components/dialog';
 import { ZardTableImports } from '@/shared/components/table';
 import { ZardButtonComponent } from '@/shared/components/button/button.component';
@@ -50,6 +52,7 @@ import { Posto } from '../../core/models/posto.model';
   ],
   templateUrl: './postos-list.component.html',
   styleUrl: './postos-list.component.scss',
+  viewProviders: [provideIcons({ lucideUserCheck })],
 })
 export class PostosListComponent implements OnInit, OnDestroy {
   readonly tabOptions = [
@@ -72,6 +75,10 @@ export class PostosListComponent implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
 
   readonly selectedPosto = signal<Posto | null>(null);
+
+  readonly acoes = {
+    vincularSupervisores: () => this.abrirVinculoSupervisor(),
+  };
 
   readonly mapContainer = viewChild<ElementRef<HTMLDivElement>>('mapContainer');
 
@@ -145,12 +152,39 @@ export class PostosListComponent implements OnInit, OnDestroy {
   }
 
   abrirFormulario(posto?: Posto): void {
+    const isEdit = !!posto;
+
     const dialogRef = this.dialog.create({
-      zTitle: posto ? 'Editar posto' : 'Novo posto',
+      zTitle: isEdit ? 'Editar posto' : 'Novo posto',
       zContent: PostosFormComponent,
       zWidth: '640px',
       zData: posto ?? null,
-      zOkText: posto ? 'Salvar' : 'Criar',
+      zHideFooter: !isEdit,
+      zOkText: isEdit ? 'Salvar' : undefined,
+      zOnOk: isEdit
+        ? (instance) => {
+            instance.submit();
+            return false;
+          }
+        : undefined,
+    });
+
+    dialogRef
+      .afterClosed
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        if (result) {
+          this.carregarPostos();
+        }
+      });
+  }
+
+  abrirVinculoSupervisor(): void {
+    const dialogRef = this.dialog.create({
+      zTitle: 'Vincular supervisores aos postos',
+      zContent: PostosVinculoSupervisorComponent,
+      zWidth: '640px',
+      zOkText: 'Salvar vínculos',
       zOnOk: (instance) => {
         instance.submit();
         return false;
@@ -158,8 +192,7 @@ export class PostosListComponent implements OnInit, OnDestroy {
     });
 
     dialogRef
-      .afterClosed
-      .pipe(takeUntil(this.destroy$))
+      .afterClosed.pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         if (result) {
           this.carregarPostos();

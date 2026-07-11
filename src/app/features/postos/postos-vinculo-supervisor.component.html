@@ -1,0 +1,124 @@
+<div class="space-y-6">
+  <z-form-field>
+    <z-form-label [zRequired]="true">Selecione o supervisor</z-form-label>
+    <z-form-control>
+      <z-combobox
+        [zOptions]="supervisores()"
+        [zPlaceholder]="'Buscar supervisor...'"
+        [zSearchable]="true"
+        [zSearchPlaceholder]="'Digite o nome...'"
+        [zEmptyText]="'Nenhum usuário encontrado.'"
+        [formControl]="form.controls.supervisorId"
+        (zComboSelected)="onSupervisorChange($event)"
+        class="w-full"
+      />
+    </z-form-control>
+    @if (!supervisoresCarregados()) {
+      <z-form-message>Carregando usuários...</z-form-message>
+    } @else {
+      <z-form-message>
+        Selecione quem será vinculado aos postos. O usuário receberá notificações e terá acesso aos
+        postos selecionados.
+      </z-form-message>
+    }
+  </z-form-field>
+
+  @if (supervisorSelecionado(); as supervisor) {
+    <z-card class="p-5 space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <ng-icon name="lucideUserCheck" class="size-5" />
+        </div>
+        <div>
+          <h3 class="text-base font-semibold">{{ supervisor.label }}</h3>
+          <p class="mt-1 text-sm text-muted-foreground">
+            Marque os postos aos quais este usuário deve ser vinculado. Apenas postos ativos são
+            exibidos.
+          </p>
+          <ul class="mt-2 space-y-1 text-sm text-muted-foreground">
+            <li class="flex items-start gap-2">
+              <ng-icon name="lucideBell" class="mt-0.5 size-4 shrink-0 text-primary" />
+              <span>
+                <strong>Notificações:</strong> o usuário receberá alertas dos postos vinculados.
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <ng-icon name="lucideEye" class="mt-0.5 size-4 shrink-0 text-primary" />
+              <span>
+                <strong>Visibilidade:</strong> o usuário poderá visualizar e gerenciar os postos
+                vinculados.
+              </span>
+            </li>
+            <li class="flex items-start gap-2">
+              <ng-icon name="lucideShield" class="mt-0.5 size-4 shrink-0 text-primary" />
+              <span>
+                <strong>Escalonamento:</strong> para receber alertas, o usuário também precisa estar
+                na lista de destinatários de uma configuração de escalonamento.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </z-card>
+
+    @if (carregandoPostos()) {
+      <div class="flex items-center justify-center py-8">
+        <div class="flex flex-col items-center gap-2 text-muted-foreground">
+          <svg class="size-5 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25" />
+            <path fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" class="opacity-75" />
+          </svg>
+          <span class="text-sm">Carregando postos...</span>
+        </div>
+      </div>
+    } @else {
+      @if (postos().length === 0) {
+        <div class="flex items-center justify-center py-8 text-sm text-muted-foreground">
+          Nenhum posto ativo disponível.
+        </div>
+      } @else {
+        <div class="space-y-1">
+          <p class="mb-2 text-sm font-medium text-foreground">
+            Postos ({{ postos().length }})
+          </p>
+      @for (posto of postos(); track posto.id) {
+        <button
+          type="button"
+          class="flex w-full cursor-pointer items-center gap-3 rounded-md border border-border px-4 py-3 text-left transition-all hover:bg-primary/5 hover:border-primary/40"
+          [class.bg-primary/5]="posto.vinculado"
+          [class.border-primary]="posto.vinculado"
+          [class.ring-1]="posto.vinculado"
+          [class.ring-primary]="posto.vinculado"
+          (click)="toggleVinculo(posto)"
+        >
+          <div
+            class="flex size-4 shrink-0 items-center justify-center rounded-[4px] border transition-colors"
+            [class.border-primary]="posto.vinculado"
+            [class.bg-primary]="posto.vinculado"
+            [class.text-primary-foreground]="posto.vinculado"
+            [class.border-input]="!posto.vinculado"
+          >
+            @if (posto.vinculado) {
+              <svg class="size-3" viewBox="0 0 16 16" fill="none">
+                <path d="M13.5 4L6 12L2.5 8.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            }
+          </div>
+          <div class="flex flex-1 flex-col gap-0.5 min-w-0">
+            <div class="flex items-center justify-between">
+              <span class="text-sm font-medium truncate">{{ posto.nome }}</span>
+              @if (posto.vinculado) {
+                <span class="text-xs text-primary shrink-0 ml-2">Vinculado</span>
+              }
+            </div>
+            <span class="text-xs text-muted-foreground">
+              {{ posto.latitude }}, {{ posto.longitude }} &middot; {{ posto.raioM }}m
+            </span>
+          </div>
+        </button>
+      }
+        </div>
+      }
+    }
+  }
+</div>

@@ -5,10 +5,16 @@
       <h1 class="list-page__title">Postos</h1>
       <p class="list-page__subtitle">Gerencie os postos de trabalho</p>
     </div>
-    <button z-button (click)="abrirFormulario()">
-      <ng-icon name="lucidePlus" />
-      Novo posto
-    </button>
+    <div class="flex gap-2">
+      <button z-button zType="outline" (click)="abrirVinculoSupervisor()">
+        <ng-icon name="lucideUserCheck" />
+        Vincular supervisores
+      </button>
+      <button z-button (click)="abrirFormulario()">
+        <ng-icon name="lucidePlus" />
+        Novo posto
+      </button>
+    </div>
   </header>
 
   @if (error(); as errorMsg) {

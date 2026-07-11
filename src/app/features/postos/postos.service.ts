@@ -44,6 +44,16 @@ function mapPostoFromDto(dto: PostoDto): Posto {
   };
 }
 
+interface PostoSupervisorDto {
+  posto_id: string;
+  supervisor_id: string;
+}
+
+interface SupervisorPostoDto {
+  posto_id: string;
+  posto_nome: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PostosService {
   private readonly api = inject(ApiService);
@@ -82,5 +92,27 @@ export class PostosService {
 
   inativar(id: string): Observable<void> {
     return this.api.delete<void>(`/postos/${id}`);
+  }
+
+  listarSupervisores(postoId: string): Observable<string[]> {
+    return this.api
+      .get<PostoSupervisorDto[]>(`/postos/${postoId}/supervisores`)
+      .pipe(map((dtos) => dtos.map((d) => d.supervisor_id)));
+  }
+
+  adicionarSupervisor(postoId: string, supervisorId: string): Observable<void> {
+    return this.api.post<void>(`/postos/${postoId}/supervisores`, {
+      supervisor_id: supervisorId,
+    });
+  }
+
+  removerSupervisor(postoId: string, supervisorId: string): Observable<void> {
+    return this.api.delete<void>(`/postos/${postoId}/supervisores/${supervisorId}`);
+  }
+
+  listarPostosPorSupervisor(supervisorId: string): Observable<string[]> {
+    return this.api
+      .get<SupervisorPostoDto[]>(`/usuarios/${supervisorId}/postos`)
+      .pipe(map((dtos) => dtos.map((d) => d.posto_id)));
   }
 }
