@@ -72,6 +72,18 @@ interface UsuarioDto {
   updated_at: string;
 }
 
+interface TurnoMapaDto {
+  id: string;
+  usuario_nome: string;
+  posto_id: string;
+  posto_nome: string;
+  status: string;
+  posto_latitude: number;
+  posto_longitude: number;
+  posto_raio_m: number;
+  ultimo_checkin: CheckinDto | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TurnosService {
   private readonly api = inject(ApiService);
@@ -89,11 +101,8 @@ export class TurnosService {
 
   listarMapa(): Observable<TurnoComPosicao[]> {
     return this.api
-      .get<TurnoListResponseDto>('/turnos/', {
-        status: 'em_andamento,pausado,critico',
-        limit: 100,
-      } as Record<string, string | number | boolean>)
-      .pipe(map((response) => response.data.map((dto) => this.mapTurnoComPosicaoFromDto(dto))));
+      .get<TurnoMapaDto[]>('/turnos/mapa')
+      .pipe(map((dtos) => dtos.map((dto) => this.mapTurnoMapaFromDto(dto))));
   }
 
   obter(id: string): Observable<TurnoDetalhe> {
@@ -185,6 +194,37 @@ export class TurnosService {
       posto: dto.posto ? this.mapPostoFromDto(dto.posto) : null,
       usuario: dto.usuario ? this.mapUsuarioFromDto(dto.usuario) : null,
       ultimoCheckin,
+    };
+  }
+
+  private mapTurnoMapaFromDto(dto: TurnoMapaDto): TurnoComPosicao {
+    return {
+      id: dto.id,
+      empresaId: '',
+      usuarioId: '',
+      postoId: dto.posto_id,
+      postoNome: dto.posto_nome,
+      usuarioNome: dto.usuario_nome,
+      status: dto.status as Turno['status'],
+      inicioPrevisto: '',
+      fimPrevisto: '',
+      inicioReal: null,
+      fimReal: null,
+      intervaloMin: 0,
+      createdAt: '',
+      posto: {
+        id: dto.posto_id,
+        nome: dto.posto_nome,
+        latitude: dto.posto_latitude,
+        longitude: dto.posto_longitude,
+        raioM: dto.posto_raio_m,
+        ativo: true,
+        empresaId: '',
+        createdAt: '',
+        updatedAt: '',
+      },
+      usuario: null,
+      ultimoCheckin: dto.ultimo_checkin ? this.mapCheckinFromDto(dto.ultimo_checkin) : null,
     };
   }
 

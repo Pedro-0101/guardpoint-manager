@@ -8,7 +8,7 @@
         } @else if (error()) {
           Erro ao carregar
         } @else {
-          {{ turnosComPosicao.length }} vigia{{ turnosComPosicao.length !== 1 ? 's' : '' }} em campo
+          {{ turnosComPosicao.length }} vigia{{ turnosComPosicao.length !== 1 ? 's' : '' }} em {{ postosAtivos }} posto{{ postosAtivos !== 1 ? 's' : '' }}
         }
       </span>
     </div>
@@ -29,6 +29,15 @@
       <div class="mapa-page__legend-item">
         <span class="mapa-page__legend-dot mapa-page__legend-dot--cinza"></span>
         Offline
+      </div>
+      <div class="mapa-page__legend-item">
+        <span class="mapa-page__legend-dot mapa-page__legend-dot--posto"></span>
+        Sem check-in
+      </div>
+      <div class="mapa-page__legend-divider"></div>
+      <div class="mapa-page__legend-item">
+        <span class="mapa-page__legend-circle"></span>
+        Posto (área)
       </div>
     </div>
 

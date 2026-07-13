@@ -22,7 +22,7 @@ import { Checkin } from '../../core/models/checkin.model';
 import { LoadingSpinner } from '../../shared/components/loading-spinner/loading-spinner';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 
-type PinColor = 'verde' | 'amarelo' | 'vermelho' | 'cinza';
+type PinColor = 'verde' | 'amarelo' | 'vermelho' | 'cinza' | 'posto';
 
 const STALE_MINUTES = 30;
 
@@ -31,6 +31,7 @@ const PIN_COLORS: Record<PinColor, string> = {
   amarelo: '#f57f17',
   vermelho: '#c62828',
   cinza: '#78909c',
+  posto: '#3b82f6',
 };
 
 @Component({
@@ -58,10 +59,30 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private map: L.Map | null = null;
   private pinsLayer: L.LayerGroup | null = null;
+  private postosLayer: L.LayerGroup | null = null;
   private markerMap = new Map<string, L.Marker>();
+  private postosCircleMap = new Map<string, L.Circle>();
 
   get turnosComPosicao(): TurnoComPosicao[] {
-    return this.turnos().filter((t) => t.ultimoCheckin !== null);
+    return this.turnos().filter((t) => this.obterPosicao(t) !== null);
+  }
+
+  get postosAtivos(): number {
+    const postos = new Set(this.turnos().map((t) => t.postoId));
+    return postos.size;
+  }
+
+  private obterPosicao(turno: TurnoComPosicao): { lat: number; lng: number } | null {
+    if (turno.ultimoCheckin) {
+      const { latitude, longitude } = turno.ultimoCheckin;
+      if (latitude !== undefined && longitude !== undefined) {
+        return { lat: latitude, lng: longitude };
+      }
+    }
+    if (turno.posto?.latitude !== undefined && turno.posto?.longitude !== undefined) {
+      return { lat: turno.posto.latitude, lng: turno.posto.longitude };
+    }
+    return null;
   }
 
   ngOnInit(): void {
@@ -144,6 +165,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
       const updated = [...current];
       updated.splice(index, 1);
       this.turnos.set(updated);
+      this.redesenharPostos();
       return;
     }
 
@@ -152,32 +174,36 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     this.turnos.set(updated);
 
     this.atualizarMarkerIndividual(updated[index]);
+    this.redesenharPostos();
+  }
+
+  private redesenharPostos(): void {
+    if (!this.postosLayer) return;
+    this.postosLayer.clearLayers();
+    this.postosCircleMap.clear();
+    this.desenharPostos();
   }
 
   private atualizarMarkerIndividual(turno: TurnoComPosicao): void {
     if (!this.pinsLayer || !this.map) return;
     if (!turno.id) return;
-    const checkin = turno.ultimoCheckin;
-    if (!checkin) return;
-
-    const lat = checkin.latitude;
-    const lng = checkin.longitude;
-    if (lat === undefined || lng === undefined) return;
+    const pos = this.obterPosicao(turno);
+    if (!pos) return;
 
     const agora = Date.now();
-    const color = this.determinarCor(turno, checkin, agora);
+    const color = this.determinarCor(turno, turno.ultimoCheckin, agora);
     const icon = this.criarPinIcon(color, turno);
-    const popupHtml = this.criarPopupHtml(turno, checkin, agora, color);
+    const popupHtml = this.criarPopupHtml(turno, turno.ultimoCheckin, agora, color);
 
     let marker = this.markerMap.get(turno.id);
 
     if (marker) {
-      marker.setLatLng([lat, lng]);
+      marker.setLatLng([pos.lat, pos.lng]);
       marker.setIcon(icon);
       marker.unbindPopup();
       marker.bindPopup(popupHtml, { maxWidth: 280, className: 'mapa-popup' });
     } else {
-      marker = L.marker([lat, lng], { icon }).addTo(this.pinsLayer);
+      marker = L.marker([pos.lat, pos.lng], { icon }).addTo(this.pinsLayer);
       marker.bindPopup(popupHtml, { maxWidth: 280, className: 'mapa-popup' });
       this.markerMap.set(turno.id, marker);
     }
@@ -234,33 +260,36 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
       maxZoom: 19,
     }).addTo(this.map);
 
+    this.postosLayer = L.layerGroup().addTo(this.map);
     this.pinsLayer = L.layerGroup().addTo(this.map);
   }
 
   private atualizarMapa(): void {
-    if (!this.map || !this.pinsLayer) return;
+    if (!this.map || !this.pinsLayer || !this.postosLayer) return;
+    this.postosLayer.clearLayers();
     this.pinsLayer.clearLayers();
     this.markerMap.clear();
+    this.postosCircleMap.clear();
+
+    this.desenharPostos();
 
     const agora = Date.now();
     const coords: [number, number][] = [];
 
     for (const turno of this.turnosComPosicao) {
       if (!turno.id) continue;
-      const checkin = turno.ultimoCheckin!;
-      const lat = checkin.latitude;
-      const lng = checkin.longitude;
-      if (lat === undefined || lng === undefined) continue;
+      const pos = this.obterPosicao(turno);
+      if (!pos) continue;
 
-      coords.push([lat, lng]);
+      coords.push([pos.lat, pos.lng]);
 
-      const color = this.determinarCor(turno, checkin, agora);
+      const color = this.determinarCor(turno, turno.ultimoCheckin, agora);
       const icon = this.criarPinIcon(color, turno);
 
-      const marker = L.marker([lat, lng], { icon }).addTo(this.pinsLayer);
+      const marker = L.marker([pos.lat, pos.lng], { icon }).addTo(this.pinsLayer);
       this.markerMap.set(turno.id, marker);
 
-      const popupHtml = this.criarPopupHtml(turno, checkin, agora, color);
+      const popupHtml = this.criarPopupHtml(turno, turno.ultimoCheckin, agora, color);
       marker.bindPopup(popupHtml, { maxWidth: 280, className: 'mapa-popup' });
     }
 
@@ -274,15 +303,84 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  private desenharPostos(): void {
+    if (!this.postosLayer) return;
+
+    const postosMap = new Map<string, NonNullable<TurnoComPosicao['posto']> & { turnos: TurnoComPosicao[] }>();
+
+    for (const turno of this.turnos()) {
+      if (!turno.posto?.id) continue;
+      const postoId = turno.posto.id;
+      if (!postosMap.has(postoId)) {
+        postosMap.set(postoId, { ...turno.posto, turnos: [] });
+      }
+      postosMap.get(postoId)!.turnos.push(turno);
+    }
+
+    for (const [, posto] of postosMap) {
+      if (posto.latitude === undefined || posto.longitude === undefined) continue;
+
+      const radius = Math.max(posto.raioM || 100, 50);
+
+      const circle = L.circle([posto.latitude, posto.longitude], {
+        radius,
+        color: '#3b82f6',
+        fillColor: '#3b82f6',
+        fillOpacity: 0.06,
+        weight: 1.5,
+        opacity: 0.3,
+      });
+
+      const emAndamento = posto.turnos.filter((t) => t.status === 'em_andamento').length;
+      const critico = posto.turnos.filter((t) => t.status === 'critico').length;
+      const pausado = posto.turnos.filter((t) => t.status === 'pausado').length;
+
+      circle.bindTooltip(this.escaparHtml(posto.nome), {
+        permanent: true,
+        direction: 'center',
+        className: 'mapa-posto-tooltip',
+        offset: [0, 0],
+      });
+
+      circle.bindPopup(`
+        <div class="mapa-popup-content">
+          <div class="mapa-popup-content__header">
+            <strong>${this.escaparHtml(posto.nome)}</strong>
+          </div>
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Raio:</span>
+            <span>${radius}m</span>
+          </div>
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Vigias no posto:</span>
+            <span>${posto.turnos.length}</span>
+          </div>
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Em andamento:</span>
+            <span>${emAndamento}</span>
+          </div>
+          ${critico > 0 ? `<div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Crítico:</span>
+            <span style="color: #c62828; font-weight: 600;">${critico}</span>
+          </div>` : ''}
+          ${pausado > 0 ? `<div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Pausado:</span>
+            <span>${pausado}</span>
+          </div>` : ''}
+        </div>
+      `, { maxWidth: 240, className: 'mapa-popup' });
+
+      this.postosLayer.addLayer(circle);
+      this.postosCircleMap.set(posto.id, circle);
+    }
+  }
+
   private determinarCor(
     turno: TurnoComPosicao,
-    checkin: Checkin,
+    checkin: Checkin | null,
     agora: number,
   ): PinColor {
     if (turno.status === 'critico') return 'vermelho';
-
-    const minutosDesdeUltimoCheckin =
-      (agora - new Date(checkin.timestampCriacao).getTime()) / 60000;
 
     if (
       turno.fimPrevisto &&
@@ -290,6 +388,11 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     ) {
       return 'vermelho';
     }
+
+    if (!checkin) return 'posto';
+
+    const minutosDesdeUltimoCheckin =
+      (agora - new Date(checkin.timestampCriacao).getTime()) / 60000;
 
     if (minutosDesdeUltimoCheckin > STALE_MINUTES) {
       return 'cinza';
@@ -307,11 +410,13 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
     turno: TurnoComPosicao,
   ): L.DivIcon {
     const hex = PIN_COLORS[color];
+    const isPostoFallback = color === 'posto';
+    const dotClass = isPostoFallback ? 'mapa-pin__dot mapa-pin__dot--posto' : 'mapa-pin__dot';
     return L.divIcon({
       className: 'mapa-pin-wrapper',
       html: `
         <div class="mapa-pin" style="--pin-color: ${hex}">
-          <div class="mapa-pin__dot"></div>
+          <div class="${dotClass}"></div>
         </div>
         <div class="mapa-pin__label">${this.escaparHtml(turno.usuarioNome)}</div>
       `,
@@ -323,27 +428,40 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private criarPopupHtml(
     turno: TurnoComPosicao,
-    checkin: Checkin,
+    checkin: Checkin | null,
     agora: number,
     color: PinColor,
   ): string {
-    const minutosAtras =
-      Math.round(
-        (agora - new Date(checkin.timestampCriacao).getTime()) / 60000,
-      );
-    const tempoRelativo =
-      minutosAtras < 1
-        ? 'Agora mesmo'
-        : minutosAtras === 1
-          ? 'Há 1 minuto'
-          : `Há ${minutosAtras} minutos`;
-
     const corLabel: Record<PinColor, string> = {
       verde: 'Normal',
       amarelo: 'Desvio de rota',
       vermelho: 'Crítico / Atrasado',
       cinza: 'Offline',
+      posto: 'Sem check-in',
     };
+
+    const posto = turno.posto;
+
+    let tempoHtml: string;
+    let coordHtml: string;
+
+    if (checkin) {
+      const minutosAtras =
+        Math.round(
+          (agora - new Date(checkin.timestampCriacao).getTime()) / 60000,
+        );
+      const tempoRelativo =
+        minutosAtras < 1
+          ? 'Agora mesmo'
+          : minutosAtras === 1
+            ? 'Há 1 minuto'
+            : `Há ${minutosAtras} minutos`;
+      tempoHtml = `<span>${tempoRelativo}</span>`;
+      coordHtml = `<span>${checkin.latitude.toFixed(5)}, ${checkin.longitude.toFixed(5)}</span>`;
+    } else {
+      tempoHtml = `<span style="color: var(--text-tertiary);">Nenhum check-in registrado</span>`;
+      coordHtml = `<span>${posto?.latitude.toFixed(5) ?? '?'}, ${posto?.longitude.toFixed(5) ?? '?'} (posto)</span>`;
+    }
 
     return `
       <div class="mapa-popup-content">
@@ -361,11 +479,11 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
         </div>
         <div class="mapa-popup-content__info">
           <span class="mapa-popup-content__label">Último check-in:</span>
-          <span>${tempoRelativo}</span>
+          ${tempoHtml}
         </div>
         <div class="mapa-popup-content__info">
           <span class="mapa-popup-content__label">Coordenadas:</span>
-          <span>${checkin.latitude.toFixed(5)}, ${checkin.longitude.toFixed(5)}</span>
+          ${coordHtml}
         </div>
         <button class="mapa-popup-content__action" data-turno-id="${turno.id}">
           Ver detalhes do turno
