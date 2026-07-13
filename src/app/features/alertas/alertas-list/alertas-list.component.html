@@ -80,11 +80,42 @@
         </div>
       </z-card>
 
+      @if (hasSelection()) {
+        <div class="flex items-center gap-3 px-4 py-2 mb-4 rounded-md border bg-muted/50">
+          <span class="text-sm font-medium">{{ selectedCount() }} selecionado(s)</span>
+          <div class="flex items-center gap-2 ml-auto">
+            <button z-button zType="outline" zSize="sm" (click)="limparSelecao()">
+              Limpar seleção
+            </button>
+            <button z-button zType="outline" zSize="sm" (click)="reconhecerSelecionados()">
+              Reconhecer
+            </button>
+            <button
+              z-button
+              zType="outline"
+              zSize="sm"
+              class="text-destructive"
+              (click)="encerrarSelecionados()"
+            >
+              Encerrar
+            </button>
+          </div>
+        </div>
+      }
+
       <div class="w-full">
         <div class="overflow-hidden rounded-md border">
           <table z-table>
           <thead z-table-header>
             <tr z-table-row>
+              <th z-table-head class="w-10">
+                @if ((filteredAlertas$ | async); as alertas) {
+                  <z-checkbox
+                    [checked]="isAllSelected(alertas)"
+                    (checkedChange)="toggleAll(alertas)"
+                  />
+                }
+              </th>
               <th z-table-head>Tipo</th>
               <th z-table-head>Gravidade</th>
               <th z-table-head>Status</th>
@@ -97,6 +128,7 @@
             @if (loading()) {
               @for (row of [1,2,3,4,5]; track row) {
                 <tr z-table-row>
+                  <td z-table-cell><z-skeleton class="size-4 rounded-sm" /></td>
                   <td z-table-cell>
                     <span class="list-page__tipo">
                       <z-skeleton class="h-[14px] w-[100px] rounded" />
@@ -113,7 +145,7 @@
               @if ((filteredAlertas$ | async); as alertas) {
                 @if (alertas.length === 0) {
                   <tr>
-                    <td z-table-cell [attr.colspan]="6">
+                    <td z-table-cell [attr.colspan]="7">
                       <gp-empty-state
                         icon="lucideBellOff"
                         title="Nenhum alerta encontrado"
@@ -128,6 +160,12 @@
                 } @else {
                   @for (alerta of alertas; track alerta.id) {
                     <tr z-table-row [class.list-page__row--coacao]="isCoercaoAberto(alerta)">
+                      <td z-table-cell>
+                        <z-checkbox
+                          [checked]="isSelected(alerta.id)"
+                          (checkedChange)="toggleSelecionado(alerta.id)"
+                        />
+                      </td>
                       <td z-table-cell>
                         <span class="list-page__tipo">
                           <ng-icon [name]="tipoIcon(alerta.tipo)" />

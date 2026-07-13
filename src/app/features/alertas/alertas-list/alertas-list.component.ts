@@ -1,5 +1,6 @@
 import {
   Component,
+  computed,
   inject,
   signal,
   OnInit,
@@ -29,6 +30,7 @@ import { ZardButtonComponent } from '@/shared/components/button/button.component
 import { ZardInputDirective } from '@/shared/components/input';
 import { ZardCardComponent } from '@/shared/components/card/card.component';
 import { ZardSelectImports } from '@/shared/components/select';
+import { ZardCheckboxComponent } from '../../../shared/components/checkbox/checkbox.component';
 import { ZardSkeletonComponent } from '../../../shared/components/skeleton/skeleton.component';
 import { StatusBadge } from '../../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../../shared/components/empty-state/empty-state';
@@ -88,6 +90,7 @@ const STATUS_FILTERS: StatusFilter[] = [
     ZardCardComponent,
     ZardSelectImports,
     NgIcon,
+    ZardCheckboxComponent,
     ZardSkeletonComponent,
     StatusBadge,
     EmptyState,
@@ -178,6 +181,87 @@ export class AlertasListComponent implements OnInit, OnDestroy, AfterViewInit {
     ),
     { initialValue: 0 },
   );
+
+  /** IDs dos alertas selecionados para ações em lote. */
+  readonly selectedIds = signal<Set<string>>(new Set());
+
+  readonly hasSelection = computed(() => this.selectedIds().size > 0);
+  readonly selectedCount = computed(() => this.selectedIds().size);
+
+  isSelected(id: string): boolean {
+    return this.selectedIds().has(id);
+  }
+
+  isAllSelected(alertas: Alerta[]): boolean {
+    return alertas.length > 0 && alertas.every((a) => this.selectedIds().has(a.id));
+  }
+
+  toggleSelecionado(id: string): void {
+    this.selectedIds.update((ids) => {
+      const next = new Set(ids);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  toggleAll(alertas: Alerta[]): void {
+    if (this.isAllSelected(alertas)) {
+      this.selectedIds.set(new Set());
+    } else {
+      this.selectedIds.set(new Set(alertas.map((a) => a.id)));
+    }
+  }
+
+  limparSelecao(): void {
+    this.selectedIds.set(new Set());
+  }
+
+  reconhecerSelecionados(): void {
+    const ids = Array.from(this.selectedIds());
+    if (ids.length === 0) return;
+
+    this.dialog.create({
+      zTitle: 'Reconhecer alertas em lote',
+      zDescription: `Reconhecer <strong>${ids.length}</strong> alerta(s)?<br>O status muda de <strong>aberto</strong> para <strong>reconhecido</strong>.`,
+      zOkText: 'Reconhecer',
+      zCancelText: 'Cancelar',
+      zWidth: '28rem',
+      zOnOk: () => {
+        this.alertasService.reconhecerEmLote(ids).subscribe({
+          next: () => {
+            ids.forEach((id) => this.alertasService.atualizarStatusLocal(id, 'reconhecido'));
+            this.limparSelecao();
+            this.notification.success(`${ids.length} alerta(s) reconhecido(s).`);
+          },
+          error: (err) => this.notification.error(err.message ?? 'Erro ao reconhecer alertas.'),
+        });
+      },
+    });
+  }
+
+  encerrarSelecionados(): void {
+    const ids = Array.from(this.selectedIds());
+    if (ids.length === 0) return;
+
+    this.dialog.create({
+      zTitle: 'Encerrar alertas em lote',
+      zDescription: `Encerrar <strong>${ids.length}</strong> alerta(s)?<br>O status muda para <strong>encerrado</strong> definitivamente.`,
+      zOkText: 'Encerrar',
+      zCancelText: 'Cancelar',
+      zWidth: '28rem',
+      zOnOk: () => {
+        this.alertasService.encerrarEmLote(ids).subscribe({
+          next: () => {
+            ids.forEach((id) => this.alertasService.atualizarStatusLocal(id, 'encerrado'));
+            this.limparSelecao();
+            this.notification.success(`${ids.length} alerta(s) encerrado(s).`);
+          },
+          error: (err) => this.notification.error(err.message ?? 'Erro ao encerrar alertas.'),
+        });
+      },
+    });
+  }
 
   ngOnInit(): void {
     this.carregarAlertas();

@@ -153,6 +153,14 @@ export class AlertasService {
     return this.api.put<{ status: string }>(`/alertas/${id}/encerrar`, {});
   }
 
+  reconhecerEmLote(ids: string[]): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('/alertas/reconhecer', { ids });
+  }
+
+  encerrarEmLote(ids: string[]): Observable<{ message: string }> {
+    return this.api.post<{ message: string }>('/alertas/encerrar', { ids });
+  }
+
   listarEstatisticas(): Observable<AlertasEstatisticas> {
     return this.api
       .get<AlertaEstatisticasDto>('/alertas/estatisticas')
