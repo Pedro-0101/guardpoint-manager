@@ -201,10 +201,10 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
       marker.setLatLng([pos.lat, pos.lng]);
       marker.setIcon(icon);
       marker.unbindPopup();
-      marker.bindPopup(popupHtml, { maxWidth: 280, className: 'mapa-popup' });
+      marker.bindPopup(popupHtml, { maxWidth: 340, className: 'mapa-popup' });
     } else {
       marker = L.marker([pos.lat, pos.lng], { icon }).addTo(this.pinsLayer);
-      marker.bindPopup(popupHtml, { maxWidth: 280, className: 'mapa-popup' });
+      marker.bindPopup(popupHtml, { maxWidth: 340, className: 'mapa-popup' });
       this.markerMap.set(turno.id, marker);
     }
   }
@@ -290,7 +290,7 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
       this.markerMap.set(turno.id, marker);
 
       const popupHtml = this.criarPopupHtml(turno, turno.ultimoCheckin, agora, color);
-      marker.bindPopup(popupHtml, { maxWidth: 280, className: 'mapa-popup' });
+      marker.bindPopup(popupHtml, { maxWidth: 340, className: 'mapa-popup' });
     }
 
     if (coords.length > 0) {
@@ -469,21 +469,23 @@ export class MapaComponent implements OnInit, OnDestroy, AfterViewInit {
           <span class="mapa-popup-content__dot" style="--dot-color: ${PIN_COLORS[color]}"></span>
           <strong>${this.escaparHtml(turno.usuarioNome)}</strong>
         </div>
-        <div class="mapa-popup-content__info">
-          <span class="mapa-popup-content__label">Posto:</span>
-          <span>${this.escaparHtml(turno.postoNome)}</span>
-        </div>
-        <div class="mapa-popup-content__info">
-          <span class="mapa-popup-content__label">Status:</span>
-          <span>${corLabel[color]}</span>
-        </div>
-        <div class="mapa-popup-content__info">
-          <span class="mapa-popup-content__label">Último check-in:</span>
-          ${tempoHtml}
-        </div>
-        <div class="mapa-popup-content__info">
-          <span class="mapa-popup-content__label">Coordenadas:</span>
-          ${coordHtml}
+        <div class="mapa-popup-content__body">
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Posto:</span>
+            <span>${this.escaparHtml(turno.postoNome)}</span>
+          </div>
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Status:</span>
+            <span>${corLabel[color]}</span>
+          </div>
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Último check-in:</span>
+            ${tempoHtml}
+          </div>
+          <div class="mapa-popup-content__info">
+            <span class="mapa-popup-content__label">Coordenadas:</span>
+            ${coordHtml}
+          </div>
         </div>
         <button class="mapa-popup-content__action" data-turno-id="${turno.id}">
           Ver detalhes do turno
