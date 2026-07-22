@@ -33,6 +33,7 @@ import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
+import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
 import { NotificationService } from '../../core/services/notification.service';
 import { Escala } from '../../core/models/escala.model';
 import { Posto } from '../../core/models/posto.model';
@@ -78,6 +79,7 @@ interface VigiaPostoGroup {
     StatusBadge,
     EmptyState,
     PageLayoutComponent,
+    ZardPaginationComponent,
     ...ZardTooltipImports,
   ],
   templateUrl: './escalas-list.component.html',
@@ -105,6 +107,11 @@ export class EscalasListComponent implements OnInit, OnDestroy {
 
   readonly postos = signal<Posto[]>([]);
   readonly vigias = signal<Usuario[]>([]);
+
+  readonly pageIndex = signal(0);
+  readonly pageSize = 20;
+  readonly totalUsers = signal(0);
+  readonly totalPages = signal(0);
 
   readonly filteredGroups$ = combineLatest([
     this.escalas$,
@@ -165,12 +172,19 @@ export class EscalasListComponent implements OnInit, OnDestroy {
     this.loading.set(true);
     this.error.set(null);
 
+    const params: { limit: number; offset: number } = {
+      limit: this.pageSize,
+      offset: this.pageIndex() * this.pageSize,
+    };
+
     this.escalasService
-      .listar()
+      .listar(params)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (escalas) => {
-          this.escalasSubject.next(escalas);
+        next: ({ data, total }) => {
+          this.escalasSubject.next(data);
+          this.totalUsers.set(total);
+          this.totalPages.set(Math.ceil(total / this.pageSize) || 1);
           this.loading.set(false);
         },
         error: (err) => {
@@ -180,6 +194,17 @@ export class EscalasListComponent implements OnInit, OnDestroy {
           this.loading.set(false);
         },
       });
+  }
+
+  irParaPagina(index: number): void {
+    if (index < 0 || index >= this.totalPages()) return;
+    this.pageIndex.set(index);
+    this.expandedKey.set(null);
+    this.carregarEscalas();
+  }
+
+  onPageChange(page: number): void {
+    this.irParaPagina(page - 1);
   }
 
   carregarFiltros(): void {

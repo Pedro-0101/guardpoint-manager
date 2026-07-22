@@ -20,25 +20,17 @@ export class EscalasService {
     ativos?: string;
     limit?: number;
     offset?: number;
-  }): Observable<Escala[]> {
+  }): Observable<{ data: Escala[]; total: number }> {
     return this.api
-      .get<EscalaDto[] | { data: EscalaDto[]; total: number } | { escalas: EscalaDto[] }>(
+      .get<{ data: EscalaDto[]; total: number }>(
         '/escalas',
         params as Record<string, string | number | boolean>
       )
       .pipe(
-        map((res) => {
-          if (Array.isArray(res)) {
-            return res.map(mapEscalaFromDto);
-          }
-          if ('data' in res && Array.isArray(res.data)) {
-            return res.data.map(mapEscalaFromDto);
-          }
-          if ('escalas' in res && Array.isArray(res.escalas)) {
-            return res.escalas.map(mapEscalaFromDto);
-          }
-          throw new Error('Formato de resposta inesperado da API.');
-        })
+        map((res) => ({
+          data: (res.data ?? []).map(mapEscalaFromDto),
+          total: res.total ?? 0,
+        }))
       );
   }
 

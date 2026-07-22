@@ -126,10 +126,10 @@ export class EscalasFormComponent implements OnInit {
         ativos: 'true',
       })
       .subscribe({
-        next: (escalas) => {
-          this.existingEscalas = escalas;
+        next: ({ data }) => {
+          this.existingEscalas = data;
           this.entries.set(
-            escalas
+            data
               .filter((e) => e.ativo)
               .map((e) => ({
                 dia_semana_inicio: e.diaSemanaInicio,
@@ -138,9 +138,9 @@ export class EscalasFormComponent implements OnInit {
                 hora_fim: e.horaFim,
               }))
           );
-          if (escalas.length > 0) {
+          if (data.length > 0) {
             this.form.controls.toleranciaMin.setValue(
-              escalas[0].toleranciaMin
+              data[0].toleranciaMin
             );
           }
           this.loadingEscalas.set(false);

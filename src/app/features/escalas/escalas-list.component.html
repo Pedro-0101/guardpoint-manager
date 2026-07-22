@@ -262,6 +262,16 @@
           </tbody>
         </table>
         </div>
+        @if (totalPages() > 1) {
+          <div class="mt-4">
+            <z-pagination
+              [totalItems]="totalUsers()"
+              [pageSize]="pageSize"
+              [currentPage]="pageIndex() + 1"
+              (pageChange)="onPageChange($event)"
+            />
+          </div>
+        }
       </div>
     }
   </div>
