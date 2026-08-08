@@ -217,7 +217,7 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   }
 
   verDetalhe(turno: Turno): void {
-    if (turno.status === 'agendado') return;
+    if (!turno.id || turno.status === 'agendado') return;
     this.router.navigate(['/turnos', turno.id]);
   }
 

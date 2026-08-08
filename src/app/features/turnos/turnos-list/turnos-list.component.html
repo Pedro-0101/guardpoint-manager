@@ -115,9 +115,9 @@
                   <tr
                     z-table-row
                     class="list-page__row"
-                    [class.list-page__row--clickable]="!!turno.id"
-                    (click)="verDetalhe(turno)"
-                    (keydown.enter)="verDetalhe(turno)"
+                    [class.list-page__row--clickable]="!!turno.id && turno.status !== 'agendado'"
+                    (click)="(turno.id && turno.status !== 'agendado') ? verDetalhe(turno) : null"
+                    (keydown.enter)="(turno.id && turno.status !== 'agendado') ? verDetalhe(turno) : null"
                     tabindex="0"
                   >
                     <td z-table-cell>
@@ -151,16 +151,16 @@
                           <ng-icon name="lucideUserRoundPlus" />
                         </button>
                       }
-                      <button
-                        z-button
-                        zType="ghost"
-                        zSize="icon"
-                        [zTooltip]="turno.id ? 'Ver detalhes do turno' : 'Turno agendado sem detalhes disponíveis'"
-                        [zDisabled]="!turno.id"
-                        (click)="$event.stopPropagation(); verDetalhe(turno)"
-                        (keydown.enter)="$event.stopPropagation(); verDetalhe(turno)"
-                        aria-label="Ver detalhes do turno"
-                      >
+                    <button
+                      z-button
+                      zType="ghost"
+                      zSize="icon"
+                      [zTooltip]="!turno.id ? 'Turno agendado sem detalhes disponíveis' : turno.status === 'agendado' ? 'Detalhes indisponíveis para turnos agendados' : 'Ver detalhes do turno'"
+                      [zDisabled]="!turno.id || turno.status === 'agendado'"
+                      (click)="$event.stopPropagation(); verDetalhe(turno)"
+                      (keydown.enter)="$event.stopPropagation(); verDetalhe(turno)"
+                      aria-label="Ver detalhes do turno"
+                    >
                         <ng-icon name="lucideEye" />
                       </button>
                     </td>
