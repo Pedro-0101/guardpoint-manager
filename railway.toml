@@ -1,0 +1,8 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+numReplicas = 1
+
+[variables]
+BACKEND_URL = "http://guardpoint-server.railway.internal:8080"
