@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'z-step-indicator',

@@ -4,7 +4,6 @@ import {
   signal,
   OnInit,
   OnDestroy,
-  AfterViewInit,
   ElementRef,
   viewChild,
 } from '@angular/core';
@@ -53,7 +52,7 @@ const TIPO_CHECKIN_MAP: Record<string, { icon: string; label: string; color: str
   templateUrl: './turno-detail.html',
   styleUrl: './turno-detail.scss',
 })
-export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
+export class TurnoDetailComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly turnosService = inject(TurnosService);
@@ -90,13 +89,6 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
-    this.initMapa();
-    setTimeout(() => {
-      this.atualizarMapa();
-    }, 100);
-  }
-
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -124,7 +116,7 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         if (detalhe) {
           this.turno.set(detalhe);
           this.buildTimeline(detalhe.checkins);
-          setTimeout(() => this.atualizarMapa(), 100);
+          setTimeout(() => this.inicializarOuAtualizarMapa(), 100);
         }
       });
   }
@@ -145,6 +137,19 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     });
 
     this.timeline.set(entries);
+  }
+
+  private inicializarOuAtualizarMapa(): void {
+    if (this.checkins.length === 0) return;
+
+    if (!this.map) {
+      this.initMapa();
+    }
+
+    if (!this.map || !this.markersLayer) return;
+
+    this.map.invalidateSize();
+    this.atualizarMapa();
   }
 
   private initMapa(): void {
@@ -171,72 +176,58 @@ export class TurnoDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.markersLayer.clearLayers();
 
+    const posto = this.turno()?.posto;
     const checkins = this.checkins;
-    if (checkins.length === 0) return;
+
+    const allCoords: [number, number][] = [];
+
+    if (posto?.latitude && posto?.longitude && posto.raioM) {
+      L.circle([posto.latitude, posto.longitude], {
+        radius: posto.raioM,
+        color: '#1a73e8',
+        fillColor: '#1a73e8',
+        fillOpacity: 0.08,
+        weight: 2,
+        dashArray: '4 3',
+      })
+        .bindTooltip(`Cerca: ${posto.nome}`, { permanent: false, direction: 'top' })
+        .addTo(this.markersLayer);
+      allCoords.push([posto.latitude, posto.longitude]);
+    }
+
+    if (checkins.length === 0) {
+      if (allCoords.length > 0) {
+        this.map.fitBounds(L.latLngBounds(allCoords), { padding: [30, 30] });
+      }
+      return;
+    }
 
     const coords: [number, number][] = checkins
       .filter((c) => c.latitude && c.longitude)
       .map((c) => [c.latitude, c.longitude] as [number, number]);
 
-    if (coords.length === 0) return;
+    allCoords.push(...coords);
 
-    const firstCheckin = checkins[0];
+    if (coords.length === 0 && allCoords.length === 0) return;
+
     const lastCheckin = checkins[checkins.length - 1];
 
-    const startIcon = L.divIcon({
-      className: 'turno-detail__marker-start',
-      html: '<div class="marker-pin marker-pin--start"></div>',
-      iconSize: [24, 24],
-      iconAnchor: [12, 24],
+    const lastIcon = L.divIcon({
+      className: 'turno-detail__marker-last',
+      html: '<div class="marker-pin marker-pin--last"></div>',
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
     });
 
-    const endIcon = L.divIcon({
-      className: 'turno-detail__marker-end',
-      html: '<div class="marker-pin marker-pin--end"></div>',
-      iconSize: [24, 24],
-      iconAnchor: [12, 24],
-    });
-
-    const middleIcon = L.divIcon({
-      className: 'turno-detail__marker-middle',
-      html: '<div class="marker-pin marker-pin--middle"></div>',
-      iconSize: [12, 12],
-      iconAnchor: [6, 6],
-    });
-
-    if (firstCheckin.latitude && firstCheckin.longitude) {
-      L.marker([firstCheckin.latitude, firstCheckin.longitude], { icon: startIcon })
+    if (lastCheckin.latitude && lastCheckin.longitude) {
+      L.marker([lastCheckin.latitude, lastCheckin.longitude], { icon: lastIcon })
         .bindPopup(
-          `<strong>Início</strong><br>${this.formatarDataHora(firstCheckin.timestampCriacao)}`,
+          `<strong>Última posição</strong><br>${this.formatarDataHora(lastCheckin.timestampCriacao)}`,
         )
         .addTo(this.markersLayer);
     }
 
-    if (checkins.length > 1 && lastCheckin.latitude && lastCheckin.longitude) {
-      L.marker([lastCheckin.latitude, lastCheckin.longitude], { icon: endIcon })
-        .bindPopup(
-          `<strong>Último</strong><br>${this.formatarDataHora(lastCheckin.timestampCriacao)}`,
-        )
-        .addTo(this.markersLayer);
-    }
-
-    for (let i = 1; i < checkins.length - 1; i++) {
-      const c = checkins[i];
-      if (c.latitude && c.longitude) {
-        L.marker([c.latitude, c.longitude], { icon: middleIcon }).addTo(this.markersLayer);
-      }
-    }
-
-    if (coords.length >= 2) {
-      L.polyline(coords, {
-        color: '#1565c0',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '6 4',
-      }).addTo(this.markersLayer);
-    }
-
-    const bounds = L.latLngBounds(coords);
+    const bounds = L.latLngBounds(allCoords);
     this.map.fitBounds(bounds, { padding: [30, 30] });
   }
 

@@ -188,17 +188,18 @@
     display: inline-block;
     margin-right: 8px;
 
-    &--start {
-      background: var(--color-accent-dark);
-    }
-
-    &--middle {
-      background: var(--color-info);
-    }
-
-    &--end {
+    &--last {
       background: var(--color-destructive);
     }
+  }
+
+  &__map-legend-cerca {
+    width: 18px;
+    height: 0;
+    border-top: 2px dashed #1a73e8;
+    display: inline-block;
+    margin-right: 4px;
+    vertical-align: middle;
   }
 
   &__timeline-section {
@@ -328,28 +329,14 @@
     border: 2px solid white;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
 
-    &--start {
-      width: 24px;
-      height: 24px;
-      background: var(--color-accent-dark);
-    }
-
-    &--middle {
-      width: 12px;
-      height: 12px;
-      background: var(--color-info);
-    }
-
-    &--end {
-      width: 24px;
-      height: 24px;
+    &--last {
+      width: 28px;
+      height: 28px;
       background: var(--color-destructive);
     }
   }
 
-  .turno-detail__marker-start,
-  .turno-detail__marker-middle,
-  .turno-detail__marker-end {
+  .turno-detail__marker-last {
     background: transparent;
     border: none;
   }
