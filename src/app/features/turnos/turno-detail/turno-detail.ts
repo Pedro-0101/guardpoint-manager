@@ -216,7 +216,7 @@ export class TurnoDetailComponent implements OnInit, OnDestroy {
       className: 'turno-detail__marker-last',
       html: '<div class="marker-pin marker-pin--last"></div>',
       iconSize: [28, 28],
-      iconAnchor: [14, 28],
+      iconAnchor: [14, 14],
     });
 
     if (lastCheckin.latitude && lastCheckin.longitude) {
