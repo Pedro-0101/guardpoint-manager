@@ -1,13 +1,9 @@
 import { Injectable, inject } from '@angular/core';
-import { BehaviorSubject, Subject, merge } from 'rxjs';
-import { debounceTime, takeUntil, finalize, map } from 'rxjs/operators';
+import { Observable, Subject, merge } from 'rxjs';
+import { debounceTime, map, switchMap } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
-import {
-  DashboardTableResponse,
-  DashboardTableResponseDto,
-  DashboardLinha,
-} from './dashboard.types';
+import { DashboardTableResponse, DashboardTableResponseDto, DashboardLinha } from './dashboard.types';
 import { Alerta } from '../../core/models/alerta.model';
 
 function normalizarTipo(raw: string): Alerta['tipo'] {
@@ -21,12 +17,7 @@ function normalizarTipo(raw: string): Alerta['tipo'] {
 function gravidadePorTipo(raw: string, nivel: number): Alerta['gravidade'] {
   if (raw === 'coacao' || raw === 'sabotagem' || raw === 'senha_emergencia' || raw === 'senha_customizada') return 'critica';
   if (raw === 'no_show') return 'alta';
-  const nivelMap: Record<number, Alerta['gravidade']> = {
-    1: 'baixa',
-    2: 'media',
-    3: 'alta',
-    4: 'critica',
-  };
+  const nivelMap: Record<number, Alerta['gravidade']> = { 1: 'baixa', 2: 'media', 3: 'alta', 4: 'critica' };
   return nivelMap[nivel] ?? 'baixa';
 }
 
@@ -100,69 +91,30 @@ export class DashboardService {
   private readonly api = inject(ApiService);
   private readonly ws = inject(WebSocketService);
 
-  private readonly destroy$ = new Subject<void>();
-  private readonly tableSubject = new BehaviorSubject<DashboardTableResponse | null>(null);
-  private readonly loadingSubject = new BehaviorSubject(true);
-  private readonly errorSubject = new BehaviorSubject<string | null>(null);
+  private readonly stopWsRefresh$ = new Subject<void>();
 
-  readonly table$ = this.tableSubject.asObservable();
-  readonly loading$ = this.loadingSubject.asObservable();
-  readonly error$ = this.errorSubject.asObservable();
+  fetchTable(limit: number, offset: number): Observable<DashboardTableResponse> {
+    return this.api
+      .get<DashboardTableResponseDto>('/dashboard/table', {
+        limit: limit.toString(),
+        offset: offset.toString(),
+      } as Record<string, string>)
+      .pipe(map((dto) => mapDashboardTableDto(dto)));
+  }
 
-  private limit = 20;
-  private offset = 0;
+  startWsRefresh(limit: number, offset: number): Observable<DashboardTableResponse> {
+    this.stopWsRefresh$.next();
 
-  startPolling(limit = 20, offset = 0): void {
-    this.limit = limit;
-    this.offset = offset;
-    this.loadingSubject.next(true);
-    this.fetchTable();
-
-    merge(
+    return merge(
       this.ws.onEvent('new_alert'),
       this.ws.onEvent('status_change'),
-    )
-      .pipe(debounceTime(3000), takeUntil(this.destroy$))
-      .subscribe(() => this.fetchTable());
+    ).pipe(
+      debounceTime(3000),
+      switchMap(() => this.fetchTable(limit, offset)),
+    );
   }
 
-  stopPolling(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  refresh(): void {
-    this.loadingSubject.next(true);
-    this.errorSubject.next(null);
-    this.fetchTable();
-  }
-
-  changePage(page: number): void {
-    this.offset = (page - 1) * this.limit;
-    this.loadingSubject.next(true);
-    this.fetchTable();
-  }
-
-  private fetchTable(): void {
-    this.api
-      .get<DashboardTableResponseDto>('/dashboard/table', {
-        limit: this.limit.toString(),
-        offset: this.offset.toString(),
-      } as Record<string, string>)
-      .pipe(
-        map((dto) => mapDashboardTableDto(dto)),
-        finalize(() => this.loadingSubject.next(false)),
-      )
-      .subscribe({
-        next: (data) => {
-          this.tableSubject.next(data);
-          this.errorSubject.next(null);
-        },
-        error: (err: Error) => {
-          if (!this.tableSubject.value) {
-            this.errorSubject.next(err.message);
-          }
-        },
-      });
+  stopWsRefresh(): void {
+    this.stopWsRefresh$.next();
   }
 }
