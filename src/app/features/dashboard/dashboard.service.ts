@@ -3,7 +3,12 @@ import { BehaviorSubject, Subject, merge } from 'rxjs';
 import { debounceTime, takeUntil, finalize, map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
-import { DashboardSummary, DashboardSummaryDto } from './dashboard.types';
+import {
+  DashboardSummary,
+  DashboardSummaryDto,
+  FeedEvento,
+  PostoSemCobertura,
+} from './dashboard.types';
 import { Alerta } from '../../core/models/alerta.model';
 
 function normalizarTipo(raw: string): Alerta['tipo'] {
@@ -48,19 +53,47 @@ function mapAlertaRecente(dto: DashboardSummaryDto['alertas_recentes'][number]):
   };
 }
 
+function mapPostosSemCobertura(
+  dtos: DashboardSummaryDto['postos_sem_cobertura'],
+): PostoSemCobertura[] {
+  return (dtos ?? []).map((dto) => ({
+    postoId: dto.posto_id,
+    postoNome: dto.posto_nome,
+  }));
+}
+
+function mapFeedEventos(
+  dtos: DashboardSummaryDto['feed_eventos'],
+): FeedEvento[] {
+  return (dtos ?? []).map((dto) => ({
+    tipo: dto.tipo as FeedEvento['tipo'],
+    usuarioNome: dto.usuario_nome,
+    postoNome: dto.posto_nome,
+    turnoId: dto.turno_id,
+    timestamp: dto.timestamp,
+  }));
+}
+
 function mapDashboardDto(dto: DashboardSummaryDto): DashboardSummary {
   return {
     kpis: {
       turnosAtivos: dto.turnos_ativos,
+      turnosCriticos: dto.turnos_criticos,
+      turnosAtrasados: dto.turnos_atrasados,
       alertasAbertos: dto.alertas_abertos,
       checkinsUltimaHora: dto.checkins_ultima_hora,
       desviosRota: dto.desvios_rota,
+      noShowsHoje: dto.no_shows_hoje,
+      postosCobertos: dto.postos_cobertos,
+      postosTotal: dto.postos_total,
     },
     alertasRecentes: (dto.alertas_recentes ?? []).map(mapAlertaRecente),
     turnosPorPosto: (dto.turnos_por_posto ?? []).map((t) => ({
       postoNome: t.posto_nome,
       quantidade: t.quantidade,
     })),
+    postosSemCobertura: mapPostosSemCobertura(dto.postos_sem_cobertura),
+    feedEventos: mapFeedEventos(dto.feed_eventos),
   };
 }
 

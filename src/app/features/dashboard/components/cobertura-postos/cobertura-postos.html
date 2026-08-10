@@ -1,0 +1,44 @@
+<div class="cobertura">
+  <h3 class="cobertura__title">Cobertura de Postos</h3>
+
+  @if (postosTotal() === 0) {
+    <div class="cobertura__empty">
+      <p class="text-sm text-muted-foreground">Nenhum posto cadastrado</p>
+    </div>
+  } @else {
+    <div class="cobertura__chart-area">
+      <div class="cobertura__donut">
+        <canvas #donutCanvas></canvas>
+        <div class="cobertura__center">
+          <span class="cobertura__center-value">{{ label }}</span>
+          <span class="cobertura__center-pct">{{ percentual }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cobertura__list-section">
+      <div class="cobertura__list-header">
+        <span class="cobertura__list-title">Postos sem cobertura</span>
+        @if (postosSemCobertura().length > 0) {
+          <span class="cobertura__badge">{{ postosSemCobertura().length }}</span>
+        }
+      </div>
+
+      @if (postosSemCobertura().length === 0) {
+        <div class="cobertura__list-empty">
+          <ng-icon name="lucideCheckCircle" class="text-success size-5" />
+          <span>Todos os postos estão cobertos</span>
+        </div>
+      } @else {
+        <div class="cobertura__list">
+          @for (posto of postosSemCobertura(); track posto.postoId) {
+            <div class="cobertura__item">
+              <ng-icon name="lucideAlertCircle" class="cobertura__item-icon" />
+              <span class="cobertura__item-name">{{ posto.postoNome }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

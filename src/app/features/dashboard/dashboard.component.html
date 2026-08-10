@@ -1,6 +1,6 @@
 <div class="dashboard">
   <header class="dashboard__header">
-    <h1 class="dashboard__title">Dashboard</h1>
+    <h1 class="dashboard__title">Visão Geral Operacional</h1>
   </header>
 
   @if (error$ | async; as errorMsg) {
@@ -10,10 +10,10 @@
       <button class="dashboard__retry-btn" (click)="retry()">Tentar novamente</button>
     </div>
   } @else {
-    <!-- KPIs -->
+    <!-- KPIs — 8 cards, 2 rows of 4 -->
     <section class="dashboard__kpis">
       @if (loading$ | async) {
-        @for (kpi of [1,2,3,4]; track kpi) {
+        @for (kpi of [1,2,3,4,5,6,7,8]; track kpi) {
           <div class="kpi-card-skeleton">
             <z-skeleton class="size-10 rounded-lg" />
             <div class="flex flex-col gap-2 flex-1">
@@ -23,46 +23,87 @@
           </div>
         }
       } @else if (kpis$ | async; as kpis) {
+        <!-- Row 1 -->
         <gp-kpi-card
           icon="lucideUsers"
-          [value]="kpis.turnosAtivos"
-          label="Turnos ativos"
+          [value]="kpis.turnosAtivos || 0"
+          label="Turnos Ativos"
           color="primary"
         />
         <gp-kpi-card
+          icon="lucideShieldAlert"
+          [value]="kpis.turnosCriticos || 0"
+          label="Turnos Críticos"
+          color="destructive"
+        />
+        <gp-kpi-card
+          icon="lucideClock"
+          [value]="kpis.turnosAtrasados || 0"
+          label="Turnos em Atraso"
+          color="warning"
+        />
+        <gp-kpi-card
+          icon="lucideBuilding2"
+          [value]="(kpis.postosCobertos || 0) + '/' + (kpis.postosTotal || 0)"
+          label="Postos Cobertos"
+          color="info"
+        />
+
+        <!-- Row 2 -->
+        <gp-kpi-card
+          icon="lucideCheckCircle"
+          [value]="kpis.checkinsUltimaHora || 0"
+          label="Check-ins (1h)"
+          color="success"
+        />
+        <gp-kpi-card
           icon="lucideTriangleAlert"
-          [value]="kpis.alertasAbertos"
-          label="Alertas abertos"
+          [value]="kpis.alertasAbertos || 0"
+          label="Alertas Abertos"
           color="warn"
         />
         <gp-kpi-card
-          icon="lucideCheckCircle"
-          [value]="kpis.checkinsUltimaHora"
-          label="Check-ins (última hora)"
-          color="accent"
+          icon="lucideUserX"
+          [value]="kpis.noShowsHoje || 0"
+          label="No-Shows Hoje"
+          color="destructive"
         />
         <gp-kpi-card
           icon="lucideGitBranchPlus"
-          [value]="kpis.desviosRota"
-          label="Desvios de rota"
-          color="info"
+          [value]="kpis.desviosRota || 0"
+          label="Desvios 24h"
+          color="warning"
         />
       }
     </section>
 
-    <!-- Chart + Alertas -->
-    <section class="dashboard__grid">
-      @if (loading$ | async) {
-        <z-skeleton class="h-[300px] w-full rounded-xl" />
-        <z-skeleton class="h-[300px] w-full rounded-xl" />
-      } @else {
-        @if (turnosPorPosto$ | async; as turnosPorPosto) {
-          <gp-turnos-resumo [data]="turnosPorPosto" />
+    <!-- Main area: Mapa + Painel direito -->
+    <section class="dashboard__main">
+      <!-- Coluna esquerda: Mapa -->
+      <div class="dashboard__map-col">
+        @if (loading$ | async) {
+          <z-skeleton class="h-[420px] w-full rounded-lg" />
+        } @else {
+          <gp-dashboard-mapa />
         }
-        @if (alertas$ | async; as alertas) {
-          <gp-alertas-recentes [alertas]="alertas" />
+      </div>
+
+      <!-- Coluna direita: Cobertura + Feed -->
+      <div class="dashboard__side-col">
+        @if (loading$ | async) {
+          <z-skeleton class="h-[200px] w-full rounded-xl" />
+          <z-skeleton class="h-[200px] w-full rounded-xl" />
+        } @else {
+          @if (kpis$ | async; as kpis) {
+            <gp-cobertura-postos
+              [postosCobertos]="kpis.postosCobertos || 0"
+              [postosTotal]="kpis.postosTotal || 0"
+              [postosSemCobertura]="(postosSemCobertura$ | async) || []"
+            />
+          }
+          <gp-feed-eventos [eventos]="(feedEventos$ | async) || []" />
         }
-      }
+      </div>
     </section>
   }
 </div>

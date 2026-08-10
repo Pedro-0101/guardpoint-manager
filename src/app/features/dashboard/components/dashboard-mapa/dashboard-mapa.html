@@ -1,0 +1,59 @@
+<div class="dashboard-mapa">
+  <div class="dashboard-mapa__wrapper">
+    <div
+      #mapContainer
+      class="dashboard-mapa__map"
+    ></div>
+
+    @if (loading()) {
+      <div class="dashboard-mapa__loading">
+        <z-skeleton class="h-full w-full rounded-lg" />
+      </div>
+    }
+
+    @if (!loading() && !temDados && !error()) {
+      <div class="dashboard-mapa__empty">
+        <gp-empty-state
+          icon="lucideMap"
+          title="Nenhum posto ou vigia"
+          description="Não há postos cadastrados nem vigias em campo neste momento." />
+      </div>
+    }
+
+    @if (error()) {
+      <div class="dashboard-mapa__empty">
+        <gp-empty-state
+          icon="lucideAlertTriangle"
+          title="Erro ao carregar mapa"
+          [description]="error() ?? 'Tente novamente.'" />
+      </div>
+    }
+
+    @if (!loading() && temDados && !error()) {
+      <div class="dashboard-mapa__legend">
+        @if (turnosComPosicao.length > 0) {
+          <div class="dashboard-mapa__legend-item">
+            <span class="dashboard-mapa__legend-dot" style="background: #2e7d32"></span>
+            Normal
+          </div>
+          <div class="dashboard-mapa__legend-item">
+            <span class="dashboard-mapa__legend-dot" style="background: #f57f17"></span>
+            Desvio
+          </div>
+          <div class="dashboard-mapa__legend-item">
+            <span class="dashboard-mapa__legend-dot" style="background: #c62828"></span>
+            Crítico
+          </div>
+          <div class="dashboard-mapa__legend-item">
+            <span class="dashboard-mapa__legend-dot" style="background: #78909c"></span>
+            Offline
+          </div>
+        }
+        <div class="dashboard-mapa__legend-item">
+          <span class="dashboard-mapa__legend-circle"></span>
+          Posto
+        </div>
+      </div>
+    }
+  </div>
+</div>

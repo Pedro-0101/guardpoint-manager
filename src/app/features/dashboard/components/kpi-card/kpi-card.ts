@@ -9,7 +9,7 @@ import { NgIcon } from '@ng-icons/core';
 })
 export class KpiCard {
   icon = input.required<string>();
-  value = input.required<number>();
+  value = input.required<number | string>();
   label = input.required<string>();
-  color = input<'primary' | 'accent' | 'warn' | 'info'>('primary');
+  color = input<'primary' | 'accent' | 'warn' | 'info' | 'destructive' | 'success' | 'warning'>('primary');
 }

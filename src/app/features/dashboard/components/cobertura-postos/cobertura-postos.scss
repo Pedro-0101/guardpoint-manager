@@ -1,0 +1,129 @@
+.cobertura {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 16px;
+  }
+
+  &__empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 0;
+  }
+
+  &__chart-area {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  &__donut {
+    position: relative;
+    width: 140px;
+    height: 140px;
+  }
+
+  &__center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  &__center-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__center-pct {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  &__list-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
+  }
+
+  &__list-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  &__list-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    background: color-mix(in oklch, var(--color-destructive), transparent 85%);
+    color: var(--color-destructive);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  &__list-empty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklch, var(--bg-content), transparent 50%);
+    border: 1px solid var(--border-color);
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  &__item-icon {
+    font-size: 16px;
+    color: var(--muted-foreground);
+    flex-shrink: 0;
+  }
+
+  &__item-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

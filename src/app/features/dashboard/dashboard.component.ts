@@ -5,13 +5,22 @@ import { NgIcon } from '@ng-icons/core';
 import { DashboardService } from './dashboard.service';
 
 import { KpiCard } from './components/kpi-card/kpi-card';
-import { AlertasRecentes } from './components/alertas-recentes/alertas-recentes';
-import { TurnosResumo } from './components/turnos-resumo/turnos-resumo';
+import { DashboardMapaComponent } from './components/dashboard-mapa/dashboard-mapa';
+import { CoberturaPostos } from './components/cobertura-postos/cobertura-postos';
+import { FeedEventos } from './components/feed-eventos/feed-eventos';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
 
 @Component({
   selector: 'gp-dashboard',
-  imports: [AsyncPipe, NgIcon, KpiCard, AlertasRecentes, TurnosResumo, ZardSkeletonComponent],
+  imports: [
+    AsyncPipe,
+    NgIcon,
+    KpiCard,
+    DashboardMapaComponent,
+    CoberturaPostos,
+    FeedEventos,
+    ZardSkeletonComponent,
+  ],
   providers: [DashboardService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
@@ -24,8 +33,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   readonly summary$ = this.dashboardService.summary$;
 
   readonly kpis$ = this.summary$.pipe(map((s) => s?.kpis ?? null));
-  readonly alertas$ = this.summary$.pipe(map((s) => s?.alertasRecentes ?? []));
-  readonly turnosPorPosto$ = this.summary$.pipe(map((s) => s?.turnosPorPosto ?? []));
+  readonly postosSemCobertura$ = this.summary$.pipe(map((s) => s?.postosSemCobertura ?? []));
+  readonly feedEventos$ = this.summary$.pipe(map((s) => s?.feedEventos ?? []));
 
   ngOnInit(): void {
     this.dashboardService.startPolling();

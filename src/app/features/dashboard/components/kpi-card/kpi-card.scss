@@ -51,9 +51,13 @@
     text-overflow: ellipsis;
   }
 
+  @mixin variant-color($color-var) {
+    background: color-mix(in oklch, var($color-var), transparent 88%);
+    color: var($color-var);
+  }
+
   &--primary .kpi-card__icon {
-    background: color-mix(in oklch, var(--color-primary), transparent 88%);
-    color: var(--color-primary);
+    @include variant-color(--color-primary);
   }
 
   &--primary .kpi-card__value {
@@ -61,8 +65,7 @@
   }
 
   &--accent .kpi-card__icon {
-    background: color-mix(in oklch, var(--color-accent-dark), transparent 88%);
-    color: var(--color-accent-dark);
+    @include variant-color(--color-accent-dark);
   }
 
   &--accent .kpi-card__value {
@@ -70,8 +73,7 @@
   }
 
   &--warn .kpi-card__icon {
-    background: color-mix(in oklch, var(--color-warn), transparent 88%);
-    color: var(--color-warn);
+    @include variant-color(--color-warn);
   }
 
   &--warn .kpi-card__value {
@@ -79,11 +81,36 @@
   }
 
   &--info .kpi-card__icon {
-    background: color-mix(in oklch, var(--color-info), transparent 88%);
-    color: var(--color-info);
+    @include variant-color(--color-info);
   }
 
   &--info .kpi-card__value {
     color: var(--color-info);
+  }
+
+  &--destructive .kpi-card__icon {
+    @include variant-color(--color-destructive);
+  }
+
+  &--destructive .kpi-card__value {
+    color: var(--color-destructive);
+  }
+
+  &--success .kpi-card__icon {
+    background: color-mix(in oklch, var(--success), transparent 88%);
+    color: var(--success);
+  }
+
+  &--success .kpi-card__value {
+    color: var(--success);
+  }
+
+  &--warning .kpi-card__icon {
+    background: color-mix(in oklch, var(--warning), transparent 88%);
+    color: var(--warning);
+  }
+
+  &--warning .kpi-card__value {
+    color: var(--warning);
   }
 }

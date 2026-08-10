@@ -1,0 +1,30 @@
+<div class="feed">
+  <div class="feed__header">
+    <h3 class="feed__title">Últimos Eventos</h3>
+    <span class="feed__live-badge">
+      <span class="feed__live-dot"></span>
+      AO VIVO
+    </span>
+  </div>
+
+  @if (eventos().length === 0) {
+    <p class="feed__empty">Nenhum evento recente.</p>
+  } @else {
+    <div class="feed__list">
+      @for (evento of eventos(); track $index) {
+        <div class="feed__item">
+          <div
+            class="feed__icon"
+            [style.color]="cor(evento.tipo)"
+          >
+            <ng-icon [name]="icone(evento.tipo)" />
+          </div>
+          <div class="feed__content">
+            <span class="feed__descricao">{{ descricao(evento) }}</span>
+            <span class="feed__time">{{ tempoRelativo(evento.timestamp) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
