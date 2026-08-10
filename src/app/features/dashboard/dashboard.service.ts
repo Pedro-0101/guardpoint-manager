@@ -3,7 +3,7 @@ import { Observable, Subject, merge } from 'rxjs';
 import { debounceTime, map, switchMap } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
-import { DashboardTableResponse, DashboardTableResponseDto, DashboardLinha } from './dashboard.types';
+import { DashboardTableResponse, DashboardTableResponseDto, DashboardSummaryDto, DashboardLinha } from './dashboard.types';
 import { Alerta } from '../../core/models/alerta.model';
 
 function normalizarTipo(raw: string): Alerta['tipo'] {
@@ -26,7 +26,7 @@ function nivelDeTipo(raw: string): number {
   return match ? Number(match[1]) : 1;
 }
 
-function mapAlertaRecente(dto: DashboardTableResponseDto['summary']['alertas_recentes'][number]): Alerta {
+function mapAlertaRecente(dto: DashboardSummaryDto['alertas_recentes'][number]): Alerta {
   const tipo = normalizarTipo(dto.tipo);
   const nivel = nivelDeTipo(dto.tipo);
   return {
@@ -65,17 +65,26 @@ function mapDashboardLinha(dto: DashboardTableResponseDto['linhas'][number]): Da
 }
 
 function mapDashboardTableDto(dto: DashboardTableResponseDto): DashboardTableResponse {
+  const s = dto.summary ?? {
+    turnos_ativos: 0,
+    alertas_abertos: 0,
+    checkins_ultima_hora: 0,
+    desvios_rota: 0,
+    alertas_recentes: [],
+    turnos_por_posto: [],
+  };
+
   return {
     linhas: (dto.linhas ?? []).map(mapDashboardLinha),
     summary: {
       kpis: {
-        turnosAtivos: dto.summary.turnos_ativos,
-        alertasAbertos: dto.summary.alertas_abertos,
-        checkinsUltimaHora: dto.summary.checkins_ultima_hora,
-        desviosRota: dto.summary.desvios_rota,
+        turnosAtivos: s.turnos_ativos,
+        alertasAbertos: s.alertas_abertos,
+        checkinsUltimaHora: s.checkins_ultima_hora,
+        desviosRota: s.desvios_rota,
       },
-      alertasRecentes: (dto.summary.alertas_recentes ?? []).map(mapAlertaRecente),
-      turnosPorPosto: (dto.summary.turnos_por_posto ?? []).map((t) => ({
+      alertasRecentes: (s.alertas_recentes ?? []).map(mapAlertaRecente),
+      turnosPorPosto: (s.turnos_por_posto ?? []).map((t) => ({
         postoNome: t.posto_nome,
         quantidade: t.quantidade,
       })),

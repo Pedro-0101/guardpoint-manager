@@ -70,7 +70,7 @@ export interface DashboardSummaryDto {
 
 export interface DashboardTableResponseDto {
   linhas: DashboardLinhaDto[];
-  summary: DashboardSummaryDto;
+  summary?: DashboardSummaryDto;
   total: number;
   limit: number;
   offset: number;
