@@ -1,14 +1,14 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { map } from 'rxjs/operators';
 import { NgIcon } from '@ng-icons/core';
 import { DashboardService } from './dashboard.service';
 
 import { KpiCard } from './components/kpi-card/kpi-card';
-import { DashboardMapaComponent } from './components/dashboard-mapa/dashboard-mapa';
-import { CoberturaPostos } from './components/cobertura-postos/cobertura-postos';
-import { FeedEventos } from './components/feed-eventos/feed-eventos';
+import { DashboardTabela } from './components/dashboard-tabela/dashboard-tabela';
 import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton.component';
+
+const PAGE_SIZE = 20;
 
 @Component({
   selector: 'gp-dashboard',
@@ -16,9 +16,7 @@ import { ZardSkeletonComponent } from '../../shared/components/skeleton/skeleton
     AsyncPipe,
     NgIcon,
     KpiCard,
-    DashboardMapaComponent,
-    CoberturaPostos,
-    FeedEventos,
+    DashboardTabela,
     ZardSkeletonComponent,
   ],
   providers: [DashboardService],
@@ -30,14 +28,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   readonly loading$ = this.dashboardService.loading$;
   readonly error$ = this.dashboardService.error$;
-  readonly summary$ = this.dashboardService.summary$;
+  readonly table$ = this.dashboardService.table$;
 
-  readonly kpis$ = this.summary$.pipe(map((s) => s?.kpis ?? null));
-  readonly postosSemCobertura$ = this.summary$.pipe(map((s) => s?.postosSemCobertura ?? []));
-  readonly feedEventos$ = this.summary$.pipe(map((s) => s?.feedEventos ?? []));
+  readonly kpis$ = this.table$.pipe(map((t) => t?.summary.kpis ?? null));
+  readonly linhas$ = this.table$.pipe(map((t) => t?.linhas ?? []));
+  readonly total$ = this.table$.pipe(map((t) => t?.total ?? 0));
+
+  readonly pagina = signal(1);
 
   ngOnInit(): void {
-    this.dashboardService.startPolling();
+    this.dashboardService.startPolling(PAGE_SIZE, 0);
   }
 
   ngOnDestroy(): void {
@@ -46,5 +46,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   retry(): void {
     this.dashboardService.refresh();
+  }
+
+  onPageChange(page: number): void {
+    this.pagina.set(page);
+    this.dashboardService.changePage(page);
   }
 }

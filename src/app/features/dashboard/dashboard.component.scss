@@ -71,37 +71,14 @@
     border: 1px solid var(--border-color);
   }
 
-  &__main {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 24px;
-    align-items: start;
-  }
-
-  &__map-col {
-    min-height: 420px;
-  }
-
-  &__side-col {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+  &__table {
+    width: 100%;
   }
 }
 
 @media (max-width: 1200px) {
-  .dashboard {
-    &__kpis {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    &__main {
-      grid-template-columns: 1fr;
-    }
-
-    &__map-col {
-      min-height: 350px;
-    }
+  .dashboard__kpis {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -110,9 +87,7 @@
     padding: 16px;
   }
 
-  .dashboard {
-    &__kpis {
-      grid-template-columns: 1fr;
-    }
+  .dashboard__kpis {
+    grid-template-columns: 1fr;
   }
 }

@@ -2,14 +2,9 @@ import { Alerta } from '../../core/models/alerta.model';
 
 export interface DashboardKpis {
   turnosAtivos: number;
-  turnosCriticos: number;
-  turnosAtrasados: number;
   alertasAbertos: number;
   checkinsUltimaHora: number;
   desviosRota: number;
-  noShowsHoje: number;
-  postosCobertos: number;
-  postosTotal: number;
 }
 
 export interface TurnoPorPosto {
@@ -31,34 +26,73 @@ export interface FeedEvento {
   timestamp: string;
 }
 
+export interface DashboardLinha {
+  turnoId: string;
+  vigiaId: string;
+  vigiaNome: string;
+  postoId: string;
+  postoNome: string;
+  postoLatitude: number;
+  postoLongitude: number;
+  postoRaioM: number;
+  turnoStatus: string;
+  inicioPrevisto: string;
+  fimPrevisto: string;
+  inicioReal: string | null;
+  intervaloMin: number;
+  ultimoCheckin: string | null;
+  proximoCheckin: string | null;
+  atrasado: boolean;
+}
+
 export interface DashboardSummary {
   kpis: DashboardKpis;
   alertasRecentes: Alerta[];
   turnosPorPosto: TurnoPorPosto[];
-  postosSemCobertura: PostoSemCobertura[];
-  feedEventos: FeedEvento[];
+}
+
+export interface DashboardTableResponse {
+  linhas: DashboardLinha[];
+  summary: DashboardSummary;
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface DashboardSummaryDto {
   turnos_ativos: number;
-  turnos_criticos: number;
-  turnos_atrasados: number;
   alertas_abertos: number;
   checkins_ultima_hora: number;
   desvios_rota: number;
-  no_shows_hoje: number;
-  postos_cobertos: number;
-  postos_total: number;
-  postos_sem_cobertura: { posto_id: string; posto_nome: string }[];
   alertas_recentes: AlertaRecenteDto[];
   turnos_por_posto: TurnoPorPostoDto[];
-  feed_eventos: {
-    tipo: string;
-    usuario_nome: string;
-    posto_nome: string;
-    turno_id: string;
-    timestamp: string;
-  }[];
+}
+
+export interface DashboardTableResponseDto {
+  linhas: DashboardLinhaDto[];
+  summary: DashboardSummaryDto;
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface DashboardLinhaDto {
+  turno_id: string;
+  vigia_id: string;
+  vigia_nome: string;
+  posto_id: string;
+  posto_nome: string;
+  posto_latitude: number;
+  posto_longitude: number;
+  posto_raio_m: number;
+  turno_status: string;
+  inicio_previsto: string;
+  fim_previsto: string;
+  inicio_real: string | null;
+  intervalo_min: number;
+  ultimo_checkin: string | null;
+  proximo_checkin: string | null;
+  atrasado: boolean;
 }
 
 export interface AlertaRecenteDto {

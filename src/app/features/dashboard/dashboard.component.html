@@ -10,10 +10,10 @@
       <button class="dashboard__retry-btn" (click)="retry()">Tentar novamente</button>
     </div>
   } @else {
-    <!-- KPIs — 8 cards, 2 rows of 4 -->
+    <!-- KPIs -->
     <section class="dashboard__kpis">
       @if (loading$ | async) {
-        @for (kpi of [1,2,3,4,5,6,7,8]; track kpi) {
+        @for (kpi of [1,2,3,4]; track kpi) {
           <div class="kpi-card-skeleton">
             <z-skeleton class="size-10 rounded-lg" />
             <div class="flex flex-col gap-2 flex-1">
@@ -23,38 +23,11 @@
           </div>
         }
       } @else if (kpis$ | async; as kpis) {
-        <!-- Row 1 -->
         <gp-kpi-card
           icon="lucideUsers"
           [value]="kpis.turnosAtivos || 0"
           label="Turnos Ativos"
           color="primary"
-        />
-        <gp-kpi-card
-          icon="lucideShieldAlert"
-          [value]="kpis.turnosCriticos || 0"
-          label="Turnos Críticos"
-          color="destructive"
-        />
-        <gp-kpi-card
-          icon="lucideClock"
-          [value]="kpis.turnosAtrasados || 0"
-          label="Turnos em Atraso"
-          color="warning"
-        />
-        <gp-kpi-card
-          icon="lucideBuilding2"
-          [value]="(kpis.postosCobertos || 0) + '/' + (kpis.postosTotal || 0)"
-          label="Postos Cobertos"
-          color="info"
-        />
-
-        <!-- Row 2 -->
-        <gp-kpi-card
-          icon="lucideCheckCircle"
-          [value]="kpis.checkinsUltimaHora || 0"
-          label="Check-ins (1h)"
-          color="success"
         />
         <gp-kpi-card
           icon="lucideTriangleAlert"
@@ -63,10 +36,10 @@
           color="warn"
         />
         <gp-kpi-card
-          icon="lucideUserX"
-          [value]="kpis.noShowsHoje || 0"
-          label="No-Shows Hoje"
-          color="destructive"
+          icon="lucideCheckCircle"
+          [value]="kpis.checkinsUltimaHora || 0"
+          label="Check-ins (1h)"
+          color="success"
         />
         <gp-kpi-card
           icon="lucideGitBranchPlus"
@@ -77,33 +50,19 @@
       }
     </section>
 
-    <!-- Main area: Mapa + Painel direito -->
-    <section class="dashboard__main">
-      <!-- Coluna esquerda: Mapa -->
-      <div class="dashboard__map-col">
-        @if (loading$ | async) {
-          <z-skeleton class="h-[420px] w-full rounded-lg" />
-        } @else {
-          <gp-dashboard-mapa />
-        }
-      </div>
-
-      <!-- Coluna direita: Cobertura + Feed -->
-      <div class="dashboard__side-col">
-        @if (loading$ | async) {
-          <z-skeleton class="h-[200px] w-full rounded-xl" />
-          <z-skeleton class="h-[200px] w-full rounded-xl" />
-        } @else {
-          @if (kpis$ | async; as kpis) {
-            <gp-cobertura-postos
-              [postosCobertos]="kpis.postosCobertos || 0"
-              [postosTotal]="kpis.postosTotal || 0"
-              [postosSemCobertura]="(postosSemCobertura$ | async) || []"
-            />
-          }
-          <gp-feed-eventos [eventos]="(feedEventos$ | async) || []" />
-        }
-      </div>
+    <!-- Tabela -->
+    <section class="dashboard__table">
+      @if (loading$ | async) {
+        <z-skeleton class="h-[400px] w-full rounded-lg" />
+      } @else {
+        <gp-dashboard-tabela
+          [linhas]="(linhas$ | async) || []"
+          [total]="(total$ | async) || 0"
+          [pagina]="pagina()"
+          [limite]="20"
+          (paginaChange)="onPageChange($event)"
+        />
+      }
     </section>
   }
 </div>

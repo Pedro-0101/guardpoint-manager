@@ -1,0 +1,114 @@
+<div class="dashboard-tabela">
+  <div class="dashboard-tabela__header">
+    <h2 class="dashboard-tabela__title">
+      Postos × Turnos
+      @if (total() > 0) {
+        <span class="dashboard-tabela__count">{{ total() }} registros</span>
+      }
+    </h2>
+    <div class="dashboard-tabela__pagination">
+      <span class="text-sm text-muted-foreground">
+        Página {{ pagina() }} de {{ totalPages }}
+      </span>
+      <div class="flex gap-1">
+        <button
+          class="dashboard-tabela__page-btn"
+          [disabled]="pagina() <= 1"
+          (click)="mudarPagina(1)"
+        >Início</button>
+        <button
+          class="dashboard-tabela__page-btn"
+          [disabled]="pagina() <= 1"
+          (click)="mudarPagina(pagina() - 1)"
+        >Anterior</button>
+        <button
+          class="dashboard-tabela__page-btn"
+          [disabled]="pagina() >= totalPages"
+          (click)="mudarPagina(pagina() + 1)"
+        >Próximo</button>
+        <button
+          class="dashboard-tabela__page-btn"
+          [disabled]="pagina() >= totalPages"
+          (click)="mudarPagina(totalPages)"
+        >Fim</button>
+      </div>
+    </div>
+  </div>
+
+  @if (linhas().length === 0) {
+    <div class="dashboard-tabela__empty">
+      <ng-icon name="lucideTable" class="text-4xl text-muted-foreground/40" />
+      <p>Nenhum turno ativo encontrado.</p>
+    </div>
+  } @else {
+    <div class="dashboard-tabela__wrapper">
+      <table class="dashboard-tabela__table">
+        <thead>
+          <tr>
+            <th>Posto</th>
+            <th>Vigia</th>
+            <th>Status</th>
+            <th>Início Previsto</th>
+            <th class="hidden md:table-cell">Próx. Check-in</th>
+            <th class="hidden md:table-cell">Últ. Check-in</th>
+            <th class="hidden lg:table-cell">Intervalo</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (linha of linhas(); track linha.turnoId) {
+            <tr>
+              <td>
+                <div class="dashboard-tabela__cell-main">{{ linha.postoNome }}</div>
+              </td>
+              <td>
+                <div class="dashboard-tabela__cell-main">{{ linha.vigiaNome }}</div>
+              </td>
+              <td>
+                <div class="flex items-center gap-2">
+                  <gp-status-badge [status]="statusMap(linha.turnoStatus)" />
+                  @if (linha.atrasado) {
+                    <span class="dashboard-tabela__atraso-badge">Atrasado</span>
+                  }
+                </div>
+              </td>
+              <td class="text-sm text-muted-foreground whitespace-nowrap">
+                {{ linha.inicioPrevisto | date:'dd/MM HH:mm' }}
+              </td>
+              <td class="hidden md:table-cell text-sm whitespace-nowrap">
+                @if (linha.proximoCheckin) {
+                  <span [class.text-destructive]="linha.atrasado">
+                    {{ linha.proximoCheckin | date:'dd/MM HH:mm' }}
+                  </span>
+                } @else {
+                  <span class="text-muted-foreground">—</span>
+                }
+              </td>
+              <td class="hidden md:table-cell text-sm whitespace-nowrap">
+                @if (linha.ultimoCheckin) {
+                  <span class="text-muted-foreground">
+                    {{ linha.ultimoCheckin | date:'dd/MM HH:mm' }}
+                  </span>
+                } @else {
+                  <span class="text-muted-foreground">—</span>
+                }
+              </td>
+              <td class="hidden lg:table-cell text-sm text-muted-foreground">
+                {{ linha.intervaloMin }} min
+              </td>
+              <td class="text-right">
+                <a
+                  [routerLink]="['/turnos', linha.turnoId]"
+                  class="dashboard-tabela__action"
+                >
+                  <ng-icon name="lucideEye" class="size-4" />
+                  <span class="hidden sm:inline">Ver</span>
+                </a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

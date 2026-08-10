@@ -4,10 +4,9 @@ import { debounceTime, takeUntil, finalize, map } from 'rxjs/operators';
 import { ApiService } from '../../core/services/api.service';
 import { WebSocketService } from '../../core/websocket/websocket.service';
 import {
-  DashboardSummary,
-  DashboardSummaryDto,
-  FeedEvento,
-  PostoSemCobertura,
+  DashboardTableResponse,
+  DashboardTableResponseDto,
+  DashboardLinha,
 } from './dashboard.types';
 import { Alerta } from '../../core/models/alerta.model';
 
@@ -36,7 +35,7 @@ function nivelDeTipo(raw: string): number {
   return match ? Number(match[1]) : 1;
 }
 
-function mapAlertaRecente(dto: DashboardSummaryDto['alertas_recentes'][number]): Alerta {
+function mapAlertaRecente(dto: DashboardTableResponseDto['summary']['alertas_recentes'][number]): Alerta {
   const tipo = normalizarTipo(dto.tipo);
   const nivel = nivelDeTipo(dto.tipo);
   return {
@@ -53,47 +52,46 @@ function mapAlertaRecente(dto: DashboardSummaryDto['alertas_recentes'][number]):
   };
 }
 
-function mapPostosSemCobertura(
-  dtos: DashboardSummaryDto['postos_sem_cobertura'],
-): PostoSemCobertura[] {
-  return (dtos ?? []).map((dto) => ({
+function mapDashboardLinha(dto: DashboardTableResponseDto['linhas'][number]): DashboardLinha {
+  return {
+    turnoId: dto.turno_id,
+    vigiaId: dto.vigia_id,
+    vigiaNome: dto.vigia_nome,
     postoId: dto.posto_id,
     postoNome: dto.posto_nome,
-  }));
+    postoLatitude: dto.posto_latitude,
+    postoLongitude: dto.posto_longitude,
+    postoRaioM: dto.posto_raio_m,
+    turnoStatus: dto.turno_status,
+    inicioPrevisto: dto.inicio_previsto,
+    fimPrevisto: dto.fim_previsto,
+    inicioReal: dto.inicio_real,
+    intervaloMin: dto.intervalo_min,
+    ultimoCheckin: dto.ultimo_checkin,
+    proximoCheckin: dto.proximo_checkin,
+    atrasado: dto.atrasado,
+  };
 }
 
-function mapFeedEventos(
-  dtos: DashboardSummaryDto['feed_eventos'],
-): FeedEvento[] {
-  return (dtos ?? []).map((dto) => ({
-    tipo: dto.tipo as FeedEvento['tipo'],
-    usuarioNome: dto.usuario_nome,
-    postoNome: dto.posto_nome,
-    turnoId: dto.turno_id,
-    timestamp: dto.timestamp,
-  }));
-}
-
-function mapDashboardDto(dto: DashboardSummaryDto): DashboardSummary {
+function mapDashboardTableDto(dto: DashboardTableResponseDto): DashboardTableResponse {
   return {
-    kpis: {
-      turnosAtivos: dto.turnos_ativos,
-      turnosCriticos: dto.turnos_criticos,
-      turnosAtrasados: dto.turnos_atrasados,
-      alertasAbertos: dto.alertas_abertos,
-      checkinsUltimaHora: dto.checkins_ultima_hora,
-      desviosRota: dto.desvios_rota,
-      noShowsHoje: dto.no_shows_hoje,
-      postosCobertos: dto.postos_cobertos,
-      postosTotal: dto.postos_total,
+    linhas: (dto.linhas ?? []).map(mapDashboardLinha),
+    summary: {
+      kpis: {
+        turnosAtivos: dto.summary.turnos_ativos,
+        alertasAbertos: dto.summary.alertas_abertos,
+        checkinsUltimaHora: dto.summary.checkins_ultima_hora,
+        desviosRota: dto.summary.desvios_rota,
+      },
+      alertasRecentes: (dto.summary.alertas_recentes ?? []).map(mapAlertaRecente),
+      turnosPorPosto: (dto.summary.turnos_por_posto ?? []).map((t) => ({
+        postoNome: t.posto_nome,
+        quantidade: t.quantidade,
+      })),
     },
-    alertasRecentes: (dto.alertas_recentes ?? []).map(mapAlertaRecente),
-    turnosPorPosto: (dto.turnos_por_posto ?? []).map((t) => ({
-      postoNome: t.posto_nome,
-      quantidade: t.quantidade,
-    })),
-    postosSemCobertura: mapPostosSemCobertura(dto.postos_sem_cobertura),
-    feedEventos: mapFeedEventos(dto.feed_eventos),
+    total: dto.total,
+    limit: dto.limit,
+    offset: dto.offset,
   };
 }
 
@@ -103,43 +101,29 @@ export class DashboardService {
   private readonly ws = inject(WebSocketService);
 
   private readonly destroy$ = new Subject<void>();
-  private readonly summarySubject = new BehaviorSubject<DashboardSummary | null>(null);
+  private readonly tableSubject = new BehaviorSubject<DashboardTableResponse | null>(null);
   private readonly loadingSubject = new BehaviorSubject(true);
   private readonly errorSubject = new BehaviorSubject<string | null>(null);
 
-  readonly summary$ = this.summarySubject.asObservable();
+  readonly table$ = this.tableSubject.asObservable();
   readonly loading$ = this.loadingSubject.asObservable();
   readonly error$ = this.errorSubject.asObservable();
 
-  startPolling(): void {
-    this.loadingSubject.next(true);
+  private limit = 20;
+  private offset = 0;
 
-    this.api
-      .get<DashboardSummaryDto>('/dashboard/summary')
-      .pipe(
-        map((dto) => mapDashboardDto(dto)),
-        finalize(() => this.loadingSubject.next(false)),
-      )
-      .subscribe({
-        next: (data) => {
-          this.summarySubject.next(data);
-          this.loadingSubject.next(false);
-          this.errorSubject.next(null);
-        },
-        error: (err: Error) => {
-          this.loadingSubject.next(false);
-          if (!this.summarySubject.value) {
-            this.errorSubject.next(err.message);
-          }
-        },
-      });
+  startPolling(limit = 20, offset = 0): void {
+    this.limit = limit;
+    this.offset = offset;
+    this.loadingSubject.next(true);
+    this.fetchTable();
 
     merge(
       this.ws.onEvent('new_alert'),
       this.ws.onEvent('status_change'),
     )
       .pipe(debounceTime(3000), takeUntil(this.destroy$))
-      .subscribe(() => this.fetchSummary());
+      .subscribe(() => this.fetchTable());
   }
 
   stopPolling(): void {
@@ -150,23 +134,32 @@ export class DashboardService {
   refresh(): void {
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
-    this.fetchSummary();
+    this.fetchTable();
   }
 
-  private fetchSummary(): void {
+  changePage(page: number): void {
+    this.offset = (page - 1) * this.limit;
+    this.loadingSubject.next(true);
+    this.fetchTable();
+  }
+
+  private fetchTable(): void {
     this.api
-      .get<DashboardSummaryDto>('/dashboard/summary')
+      .get<DashboardTableResponseDto>('/dashboard/table', {
+        limit: this.limit.toString(),
+        offset: this.offset.toString(),
+      } as Record<string, string>)
       .pipe(
-        map((dto) => mapDashboardDto(dto)),
+        map((dto) => mapDashboardTableDto(dto)),
         finalize(() => this.loadingSubject.next(false)),
       )
       .subscribe({
         next: (data) => {
-          this.summarySubject.next(data);
+          this.tableSubject.next(data);
           this.errorSubject.next(null);
         },
         error: (err: Error) => {
-          if (!this.summarySubject.value) {
+          if (!this.tableSubject.value) {
             this.errorSubject.next(err.message);
           }
         },
