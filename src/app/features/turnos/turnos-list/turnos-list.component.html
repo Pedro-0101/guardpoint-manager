@@ -20,6 +20,8 @@
           <span class="form-label">Período</span>
           <z-date-picker
             [zRange]="true"
+            [zRangeStart]="dateRange().start"
+            [zRangeEnd]="dateRange().end"
             placeholder="Selecionar período"
             (dateRangeChange)="onDateRangeChange($event)"
           />

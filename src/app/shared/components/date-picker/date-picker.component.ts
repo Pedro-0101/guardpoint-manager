@@ -179,6 +179,8 @@ export class ZardDatePickerComponent {
 
   readonly value = input<Date | null>(null);
   readonly zRange = input(false);
+  readonly zRangeStart = input<Date | null>(null);
+  readonly zRangeEnd = input<Date | null>(null);
   readonly placeholder = input('Selecionar data');
   readonly zType = input<ZardDatePickerTypeVariants>('outline');
   readonly zSize = input<ZardDatePickerSizeVariants>('default');
@@ -276,6 +278,12 @@ export class ZardDatePickerComponent {
   constructor() {
     effect(() => {
       this.currentValue.set(this.value());
+    });
+    effect(() => {
+      this.rangeStart.set(this.zRangeStart());
+    });
+    effect(() => {
+      this.rangeEnd.set(this.zRangeEnd());
     });
   }
 

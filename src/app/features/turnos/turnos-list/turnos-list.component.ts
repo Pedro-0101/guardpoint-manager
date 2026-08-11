@@ -80,12 +80,13 @@ export class TurnosListComponent implements OnInit, OnDestroy {
   readonly isAdmin = computed(() => this.authService.userRole() === 'admin');
 
   private readonly hoje = new Date();
+  private readonly amanha = new Date(this.hoje.getFullYear(), this.hoje.getMonth(), this.hoje.getDate() + 1);
 
   readonly statusControl = new FormControl<string[]>([], { nonNullable: true });
   readonly postoControl = new FormControl<string[]>([], { nonNullable: true });
   readonly usuarioControl = new FormControl<string[]>([], { nonNullable: true });
 
-  readonly dateRange = signal<{ start: Date | null; end: Date | null }>({ start: this.hoje, end: this.hoje });
+  readonly dateRange = signal<{ start: Date | null; end: Date | null }>({ start: this.hoje, end: this.amanha });
 
   readonly statusFilters = STATUS_FILTERS;
 
