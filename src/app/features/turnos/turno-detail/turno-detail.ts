@@ -33,6 +33,7 @@ interface TimelineEntry {
 }
 
 const TIPO_CHECKIN_MAP: Record<string, { icon: string; label: string; color: string }> = {
+  inicio: { icon: 'lucidePlayCircle', label: 'Início de turno', color: 'var(--color-success)' },
   padrao: { icon: 'lucideClock', label: 'Check-in padrão', color: 'var(--color-info)' },
   coacao: { icon: 'lucideTriangleAlert', label: 'Check-in de coação', color: 'var(--color-destructive)' },
   finalizacao: { icon: 'lucideCircleStop', label: 'Finalização', color: 'var(--text-secondary)' },

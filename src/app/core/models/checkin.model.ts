@@ -5,7 +5,7 @@ export interface Checkin {
   longitude: number;
   timestampCriacao: string;
   timestampRecebimento: string;
-  tipoSenha: 'padrao' | 'coacao' | 'finalizacao' | 'sabotagem';
+  tipoSenha: 'padrao' | 'coacao' | 'finalizacao' | 'sabotagem' | 'inicio';
   flagGeofence: 'ok' | 'desvio_rota';
   origemRede: 'online' | 'offline_sincronizado';
 }
