@@ -34,20 +34,9 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 import { EmptyState } from '../../shared/components/empty-state/empty-state';
 import { PageLayoutComponent } from '../../shared/components/page-layout/page-layout';
 import { ZardPaginationComponent } from '@/shared/components/pagination/pagination.component';
-import { NotificationService } from '../../core/services/notification.service';
 import { Escala } from '../../core/models/escala.model';
 import { Posto } from '../../core/models/posto.model';
 import { Usuario } from '../../core/models/usuario.model';
-
-const DIA_LABELS: Record<number, string> = {
-  0: 'Dom',
-  1: 'Seg',
-  2: 'Ter',
-  3: 'Qua',
-  4: 'Qui',
-  5: 'Sex',
-  6: 'Sab',
-};
 
 interface VigiaPostoGroup {
   key: string;
@@ -55,7 +44,6 @@ interface VigiaPostoGroup {
   usuarioNome: string;
   postoId: string;
   postoNome: string;
-  escalas: Escala[];
   qtdEscalasAtivas: number;
   totalHoras: number;
   toleranciaMin: number;
@@ -90,7 +78,6 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   private readonly postosService = inject(PostosService);
   private readonly usuariosService = inject(UsuariosService);
   private readonly dialog = inject(ZardDialogService);
-  private readonly notification = inject(NotificationService);
   private readonly destroy$ = new Subject<void>();
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -103,7 +90,6 @@ export class EscalasListComponent implements OnInit, OnDestroy {
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
-  readonly expandedKey = signal<string | null>(null);
 
   readonly postos = signal<Posto[]>([]);
   readonly vigias = signal<Usuario[]>([]);
@@ -199,7 +185,6 @@ export class EscalasListComponent implements OnInit, OnDestroy {
   irParaPagina(index: number): void {
     if (index < 0 || index >= this.totalPages()) return;
     this.pageIndex.set(index);
-    this.expandedKey.set(null);
     this.carregarEscalas();
   }
 
@@ -241,16 +226,6 @@ export class EscalasListComponent implements OnInit, OnDestroy {
     this.postosControl.setValue([]);
     this.vigiasControl.setValue([]);
     this.ativosOnlyControl.setValue(true);
-  }
-
-  toggleExpand(key: string): void {
-    this.expandedKey.update((current) =>
-      current === key ? null : key
-    );
-  }
-
-  isExpanded(key: string): boolean {
-    return this.expandedKey() === key;
   }
 
   abrirFormulario(grupo: VigiaPostoGroup): void {
@@ -296,44 +271,6 @@ export class EscalasListComponent implements OnInit, OnDestroy {
         }
       });
   }
-
-  confirmarExclusaoIndividual(escala: Escala): void {
-    const label = `${escala.usuarioNome} - ${escala.postoNome}`;
-    this.dialog.create({
-      zTitle: 'Desativar escala',
-      zDescription: `Tem certeza que deseja desativar a escala de "${label}" (${this.formatarDias(escala.diaSemanaInicio, escala.diaSemanaFim)})?`,
-      zWidth: '28rem',
-      zOkText: 'Desativar',
-      zCancelText: 'Cancelar',
-      zOkDestructive: true,
-      zOnOk: () => {
-        this.escalasService.excluir(escala.id).subscribe({
-          next: () => {
-            this.notification.success(
-              `Escala desativada com sucesso.`
-            );
-            this.carregarEscalas();
-          },
-          error: (err) => {
-            this.notification.error(
-              err.message ?? 'Erro ao desativar escala.'
-            );
-          },
-        });
-      },
-    });
-  }
-
-  formatarDias(inicio: number, fim: number): string {
-    if (inicio === fim) {
-      return DIA_LABELS[inicio] ?? '';
-    }
-    return `${DIA_LABELS[inicio] ?? ''} - ${DIA_LABELS[fim] ?? ''}`;
-  }
-
-  formatarHorario(inicio: string, fim: string): string {
-    return `${inicio} - ${fim}`;
-  }
 }
 
 function timeToMinutes(time: string): number {
@@ -369,9 +306,6 @@ function buildGroups(escalas: Escala[]): VigiaPostoGroup[] {
       usuarioNome: first.usuarioNome,
       postoId: first.postoId,
       postoNome: first.postoNome,
-      escalas: items.sort(
-        (a, b) => a.diaSemanaInicio - b.diaSemanaInicio || a.horaInicio.localeCompare(b.horaInicio)
-      ),
       qtdEscalasAtivas: items.filter((e) => e.ativo).length,
       totalHoras: items.reduce((sum, e) => sum + escalaHoras(e), 0),
       toleranciaMin: first.toleranciaMin,

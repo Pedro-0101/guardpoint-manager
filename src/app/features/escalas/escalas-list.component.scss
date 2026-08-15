@@ -91,16 +91,6 @@
 }
 
 .group-row {
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-
-  &:hover {
-    background: var(--bg-hover);
-  }
-
-  &--expanded {
-    background: var(--bg-hover);
-  }
 
   &__vigia {
     font-weight: 600;
@@ -124,14 +114,6 @@
     font-weight: 600;
     color: var(--text-primary);
   }
-}
-
-.detail-row {
-  background: var(--bg-muted);
-}
-
-.detail-panel {
-  padding: 8px 0;
 }
 
 .text-center {
